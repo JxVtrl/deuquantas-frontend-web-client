@@ -22,9 +22,8 @@ FROM nginx:alpine AS production
 # Copiar arquivos de build para o NGINX
 COPY --from=builder /app/.next /usr/share/nginx/html
 
-# Copiar o arquivo estático para configurações de NGINX (se necessário)
-# COPY nginx.conf /etc/nginx/nginx.conf
+# Expor a porta do NGINX
+EXPOSE 80
 
-EXPOSE 3000
-
-CMD ["npm", "run", "dev"]
+# Iniciar o NGINX
+CMD ["nginx", "-g", "daemon off;"]
