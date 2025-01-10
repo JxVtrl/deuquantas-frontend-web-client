@@ -1,6 +1,11 @@
 import { createContext, ReactNode, useContext, useMemo, useState } from "react";
 import { PermissionLevel, User } from "../../services/api/types";
-
+import { setDefaultHeaderToken } from "../../services/api";
+import storage from "../../services/storage/storage";
+import { jwtDecode } from "jwt-decode";
+import { useRouter } from "next/router";
+import { saveUserPreferences, viewUserPreferences } from "../../services/user";
+import { login, logout } from "../../services/sessions";
 export type AvailableLanguages = "pt" | "en";
 export type AvailableThemes = "dark" | "light" | "system";
 
@@ -8,23 +13,102 @@ interface AuthContextData {
   signed: boolean;
   user?: User;
   logout: () => void;
-  login: (email: string, password: string) => void;
+  handleLogout: () => void;
+  login: (code: string, state: string, session_state: string) => Promise<void>;
   isAdmin: boolean;
+  processLogin: (token: string) => void;
+  storeUserPreferences: (
+    theme: AvailableThemes,
+    language: AvailableLanguages
+  ) => void;
+  clearSession: (msg: string) => void;
+  getUserPreferences: () => void;
 }
 
-const AuthContext = createContext<AuthContextData>({} as AuthContextData);
+export const AuthContext = createContext<AuthContextData>(
+  {} as AuthContextData
+);
 AuthContext.displayName = "AuthContext";
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user] = useState<User | undefined>(undefined);
+  const [user, setUser] = useState<User | undefined>(undefined);
+  const [_, setError] = useState<string>("");
+  const [theme, setTheme] = useState<AvailableThemes>("dark");
+  const [language, setLanguage] = useState<AvailableLanguages>("pt");
+  const router = useRouter();
 
   const isAdmin = useMemo(
     () => user?.permission_level === PermissionLevel.Admin,
     [user?.permission_level]
   );
 
-  const logout = () => {};
-  const login = () => {};
+  const handleLogin = async (code: string, _: string, sessionState: string) => {
+    try {
+      const redirect_url_path = "/auth/callback";
+      const res = await login(code, sessionState, redirect_url_path);
+
+      processLogin(res.data);
+    } catch (e) {
+      setError("There was an error logging in. Please try again.");
+      setUser(undefined);
+      router.replace("/login");
+    }
+  };
+
+  const processLogin = async (token: string) => {
+    const user = jwtDecode(token) as User;
+    setDefaultHeaderToken(token);
+    setUser(user);
+    storage.setItem("deuquantas_token", token);
+
+    await getUserPreferences();
+
+    const pageBeforeLogin = router.query.state;
+    if (pageBeforeLogin) {
+      router.back();
+    } else {
+      router.replace("/");
+    }
+  };
+
+  const storeUserPreferences = (
+    theme: AvailableThemes,
+    language: AvailableLanguages
+  ) => {
+    setTheme(theme);
+    setLanguage(language);
+  };
+
+  const getUserPreferences = async () => {
+    try {
+      const userPreferences = await viewUserPreferences();
+      storeUserPreferences(userPreferences.theme, userPreferences.language);
+    } catch (err: any) {
+      console.warn("Error getting user preferences.");
+      if (err.response?.status === 404) {
+        try {
+          const userPreferences = await saveUserPreferences(theme, language);
+          storeUserPreferences(userPreferences.theme, userPreferences.language);
+        } catch {
+          console.warn("Error saving user preferences.");
+        }
+      }
+    }
+  };
+
+  const handleLogout = async () => {
+    logout().finally(() => {
+      setError("");
+      setUser(undefined);
+      router.replace("/login");
+    });
+  };
+
+  const clearSession = (msg: string) => {
+    setUser(undefined);
+    setError(msg);
+    router.replace("/login");
+  };
 
   return (
     <AuthContext.Provider
@@ -33,7 +117,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         user,
         isAdmin,
         logout,
-        login,
+        login: handleLogin,
+        handleLogout,
+        clearSession,
+        getUserPreferences,
+        storeUserPreferences,
+        processLogin,
       }}
     >
       {children}
@@ -50,5 +139,3 @@ export const useAuthContext = () => {
 
   return context;
 };
-
-export default AuthContext;
