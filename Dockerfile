@@ -14,13 +14,15 @@ RUN npm install
 COPY . .
 
 # Construir a aplicação Next.js
-RUN npm run build
+RUN npm run build  
 
 # Etapa 2: Produção
 FROM nginx:alpine AS production
 
-# Copiar arquivos de build para o NGINX
-COPY --from=builder /app/.next /usr/share/nginx/html
+RUN rm -rf /usr/share/nginx/html/*
+
+# Copiar os arquivos estáticos exportados para o diretório padrão do NGINX
+COPY --from=builder /app/out /usr/share/nginx/html
 
 # Expor a porta do NGINX
 EXPOSE 80

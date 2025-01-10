@@ -1,17 +1,5 @@
-import {
-  createContext,
-  Dispatch,
-  ReactNode,
-  RefObject,
-  SetStateAction,
-  useContext,
-  useEffect,
-  useRef,
-  useMemo,
-  useState,
-} from "react";
+import { createContext, ReactNode, useContext, useMemo, useState } from "react";
 import { PermissionLevel, User } from "../../services/api/types";
-import { useSearchParams } from "next/navigation";
 
 export type AvailableLanguages = "pt" | "en";
 export type AvailableThemes = "dark" | "light" | "system";
@@ -28,7 +16,7 @@ const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 AuthContext.displayName = "AuthContext";
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | undefined>(undefined);
+  const [user] = useState<User | undefined>(undefined);
 
   const isAdmin = useMemo(
     () => user?.permission_level === PermissionLevel.Admin,
