@@ -3,7 +3,7 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   /* config options here */
   reactStrictMode: true,
-  output: "export",
+  ...(process.env.NEXT_PUBLIC_DOCKER_ENV === 'true' && { output: 'export' }),
   eslint: {
     ignoreDuringBuilds: true,
   },

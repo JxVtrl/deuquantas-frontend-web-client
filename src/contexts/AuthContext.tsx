@@ -32,7 +32,7 @@ AuthContext.displayName = "AuthContext";
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | undefined>(undefined);
-  const [_, setError] = useState<string>("");
+  const [, setError] = useState<string>("");
   const [theme, setTheme] = useState<AvailableThemes>("dark");
   const [language, setLanguage] = useState<AvailableLanguages>("pt");
   const router = useRouter();
@@ -43,12 +43,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   );
 
   const handleLogin = async (code: string, _: string, sessionState: string) => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
     try {
       const redirect_url_path = "/auth/callback";
       const res = await login(code, sessionState, redirect_url_path);
 
-      processLogin(res.data);
-    } catch (e) {
+      await processLogin(res.data);
+    } catch (err: any) {
       setError("There was an error logging in. Please try again.");
       setUser(undefined);
       router.replace("/login");
@@ -56,18 +60,28 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const processLogin = async (token: string) => {
-    const user = jwtDecode(token) as User;
-    setDefaultHeaderToken(token);
-    setUser(user);
-    storage.setItem("deuquantas_token", token);
+    if (typeof window === "undefined") {
+      // Evita que o código execute no lado do servidor
+      return;
+    }
 
-    await getUserPreferences();
+    try {
+      const user = jwtDecode(token) as User;
+      setDefaultHeaderToken(token);
+      setUser(user);
+      storage.setItem("deuquantas_token", token);
 
-    const pageBeforeLogin = router.query.state;
-    if (pageBeforeLogin) {
-      router.back();
-    } else {
-      router.replace("/");
+      await getUserPreferences();
+
+      const pageBeforeLogin = router.query.state;
+      if (pageBeforeLogin) {
+        router.back();
+      } else {
+        router.replace("/");
+      }
+    } catch (error) {
+      console.error("Erro durante o processamento do login:", error);
+      setUser(undefined);
     }
   };
 
