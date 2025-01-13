@@ -5,6 +5,7 @@ import {
   editProduct,
   getProducts,
 } from "@/services/products";
+import Link from "next/link";
 import React, { useEffect, useState } from "react";
 
 const Page: React.FC = () => {
@@ -42,7 +43,12 @@ const Page: React.FC = () => {
   return (
     <div>
       <h1>Produtos</h1>
-      <button onClick={handleAdd}>Adicionar Produto</button>
+      <div>
+        <Link href="/estabelecimento/cardapio">
+          <button>Voltar</button>
+        </Link>
+        <button onClick={handleAdd}>Adicionar Produto</button>
+      </div>
       <ul>
         {products.map((product) => (
           <li key={product.id}>
