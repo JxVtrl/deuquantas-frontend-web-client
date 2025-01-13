@@ -1,21 +1,22 @@
-import { useRouter } from 'next/router';
-import { useEffect } from 'react';
-
+import { useRouter } from "next/router";
+import { useEffect } from "react";
 
 export function withAuthAdmin(Component: React.FC) {
-    return withAuth(Component, 'admin');
+  return withAuth(Component, "admin");
 }
 
 export function withAuth(Component: React.FC, requiredRole?: string) {
-  return function AuthenticatedComponent(props: React.ComponentProps<typeof Component>) {
+  return function AuthenticatedComponent(
+    props: React.ComponentProps<typeof Component>
+  ) {
     const router = useRouter();
     const user = getUserFromLocalStorage(); // Simulação de autenticação
 
     useEffect(() => {
       if (!user) {
-        router.replace('/login');
+        router.replace("/login");
       } else if (requiredRole && user.role !== requiredRole) {
-        router.replace('/unauthorized');
+        router.replace("/unauthorized");
       }
     }, [user, router]);
 
@@ -29,9 +30,9 @@ export function withAuth(Component: React.FC, requiredRole?: string) {
 
 // Simulação de recuperação do usuário
 function getUserFromLocalStorage() {
-  if (typeof window !== 'undefined') {
-    const token = localStorage.getItem('auth_token');
-    return token ? JSON.parse(atob(token.split('.')[1])) : null;
+  if (typeof window !== "undefined") {
+    const token = localStorage.getItem("auth_token");
+    return token ? JSON.parse(atob(token.split(".")[1])) : null;
   }
   return null;
 }
