@@ -1,5 +1,23 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
-# Use npx para rodar o build
-npx npm run build
+export PATH="/c/Program Files/nodejs:$PATH"
+
+node -e "
+  const { execSync } = require('child_process');
+  const Spinner = require('./node_modules/cli-spinner').Spinner;
+
+  const spinner = new Spinner(\`⏳ Realizando o build... %s\`);
+  spinner.setSpinnerString('|/-\\\\');
+  spinner.start();
+
+  try {
+    execSync('npm run build', { stdio: 'inherit' });
+    spinner.stop(true);
+    console.log('✅ Build concluído com sucesso!');
+  } catch (error) {
+    spinner.stop(true);
+    console.error('❌ O build falhou. Corrija os erros antes de commitar.');
+    process.exit(1);
+  }
+"
