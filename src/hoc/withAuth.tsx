@@ -30,7 +30,7 @@ export function withAuth(Component: React.FC, requiredRole?: string) {
 // Simulação de recuperação do usuário
 function getUserFromLocalStorage() {
   if (typeof window !== 'undefined') {
-    const token = localStorage.getItem('auth_token');
+    const token = localStorage.getItem('deuquantas_token');
     return token ? JSON.parse(atob(token.split('.')[1])) : null;
   }
   return null;
