@@ -4,6 +4,7 @@
 # Adicionar o diretório do Node.js ao PATH
 export PATH="/c/Program Files/nodejs:$PATH"
 
+
 node -e "
   const { execSync } = require('child_process');
   const Spinner = require('./node_modules/cli-spinner').Spinner;
