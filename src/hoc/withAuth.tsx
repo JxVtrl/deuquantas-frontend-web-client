@@ -19,6 +19,8 @@ export function withAuth(Component: React.FC, requiredRole?: string) {
   ) {
     const router = useRouter();
     const user = getUserFromLocalStorage(); // Simulação de autenticação
+    console.log(user);
+
 
     useEffect(() => {
       if (!user) {
