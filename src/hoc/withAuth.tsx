@@ -5,6 +5,14 @@ export function withAuthAdmin(Component: React.FC) {
   return withAuth(Component, "admin");
 }
 
+export function withAuthEstablishment(Component: React.FC) {
+  return withAuth(Component, "establishment");
+}
+
+export function withAuthCustomer(Component: React.FC) {
+  return withAuth(Component, "customer");
+}
+
 export function withAuth(Component: React.FC, requiredRole?: string) {
   return function AuthenticatedComponent(
     props: React.ComponentProps<typeof Component>

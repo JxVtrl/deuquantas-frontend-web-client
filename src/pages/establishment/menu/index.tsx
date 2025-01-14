@@ -3,7 +3,7 @@ import { getProducts } from "@/services/products";
 import { ProductType } from "@/interfaces/product";
 import Link from "next/link";
 
-export default function Page() {
+const Page: React.FC = () => {
   const [products, setProducts] = useState<ProductType[]>([]);
 
   useEffect(() => {
@@ -38,3 +38,5 @@ export default function Page() {
     </div>
   );
 }
+
+export default Page;
