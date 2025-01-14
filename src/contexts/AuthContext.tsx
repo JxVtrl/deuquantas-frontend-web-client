@@ -6,6 +6,7 @@ import { jwtDecode } from "jwt-decode";
 import { useRouter } from "next/router";
 import { saveUserPreferences, viewUserPreferences } from "../../services/user";
 import { login, logout } from "../../services/sessions";
+import axios from "axios";
 export type AvailableLanguages = "pt" | "en";
 export type AvailableThemes = "dark" | "light" | "system";
 
@@ -52,10 +53,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const res = await login(code, sessionState, redirect_url_path);
 
       await processLogin(res.data);
-    } catch (err: any) {
+    } catch {
       setError("There was an error logging in. Please try again.");
       setUser(undefined);
-      router.replace("/login");
+      router.replace("/customer/login");
     }
   };
 
@@ -97,9 +98,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       const userPreferences = await viewUserPreferences();
       storeUserPreferences(userPreferences.theme, userPreferences.language);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.warn("Error getting user preferences.");
-      if (err.response?.status === 404) {
+      if (axios.isAxiosError(err) && err.response?.status === 404) {
         try {
           const userPreferences = await saveUserPreferences(theme, language);
           storeUserPreferences(userPreferences.theme, userPreferences.language);
@@ -114,14 +115,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     logout().finally(() => {
       setError("");
       setUser(undefined);
-      router.replace("/login");
+      router.replace("/customer/login");
     });
   };
 
   const clearSession = (msg: string) => {
     setUser(undefined);
     setError(msg);
-    router.replace("/login");
+    router.replace("/customer/login");
   };
 
   return (

@@ -17,6 +17,9 @@ export function withAuth(Component: React.FC, requiredRole?: string) {
   return function AuthenticatedComponent(
     props: React.ComponentProps<typeof Component>
   ) {
+
+    return <Component {...props} />; // TODO: REMOVER
+
     const router = useRouter();
     const user = getUserFromLocalStorage(); // Simulação de autenticação
     console.log(user);
@@ -24,7 +27,7 @@ export function withAuth(Component: React.FC, requiredRole?: string) {
 
     useEffect(() => {
       if (!user) {
-        router.replace("/login");
+        router.replace("/customer/login");
       } else if (requiredRole && user.role !== requiredRole) {
         router.replace("/unauthorized");
       }

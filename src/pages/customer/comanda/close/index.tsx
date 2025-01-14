@@ -1,8 +1,13 @@
-import { withAuthCustomer } from '@/hoc/withAuth';
-import React from 'react';
+import { withAuthCustomer } from "@/hoc/withAuth";
+import CustomerLayout from "@/layout/CustomerLayout";
+import React from "react";
 
 const Page: React.FC = () => {
-  return <div />;
-}
+  return (
+    <CustomerLayout>
+      <div />
+    </CustomerLayout>
+  );
+};
 
 export default withAuthCustomer(Page);
