@@ -1,10 +1,12 @@
 import Link from "next/link";
+import { useRouter } from "next/router";
 
 export default function CustomerLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const router = useRouter();
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       {/* Cabeçalho */}
@@ -12,18 +14,23 @@ export default function CustomerLayout({
         <div className="container mx-auto flex justify-between items-center py-4 px-6">
           <h1 className="text-lg font-bold">DeuQuantas</h1>
           <nav className="flex gap-4">
-            <Link
-              href="/customer/menu"
-              className="text-indigo-600 font-medium hover:underline"
-            >
-              Menu
-            </Link>
-            <Link
-              href="/customer/settings"
-              className="text-indigo-600 font-medium hover:underline"
-            >
-              Configurações
-            </Link>
+            {router.pathname === "/customer/menu" || (
+              <Link
+                href="/customer/menu"
+                className="text-indigo-600 font-medium hover:underline"
+              >
+                Menu
+              </Link>
+            )}
+
+            {router.pathname === "/customer/settings" || (
+              <Link
+                href="/customer/settings"
+                className="text-indigo-600 font-medium hover:underline"
+              >
+                Configurações
+              </Link>
+            )}
           </nav>
         </div>
       </header>
