@@ -3,13 +3,14 @@ import React from "react";
 
 const HomeCard: React.FC = () => {
   return (
-    <div className="h-[320px] w-[369px] bg-[#F5F5F5] relative z-[1] flex">
+    <div className="h-[320px] w-full max-w-[369px] bg-[#F5F5F5] relative z-[1] flex">
       <Image
         src="/benefits/card.svg"
         alt="benefits"
         quality={100}
         className="relative"
         layout="fill"
+        objectFit="cover"
       />
       <div className="flex flex-col justify-end gap-[16px] h-full z-[1] pl-[23px] pr-[24px] pb-[27px]">
         <h1 className="text-[20px] text-white font-[400] m-0 h-[40]">
