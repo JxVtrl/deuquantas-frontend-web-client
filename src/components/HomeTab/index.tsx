@@ -1,6 +1,8 @@
 import React from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useCustomerContext } from "@/contexts/CustomerContext";
+import QrCodeCard from "../QrCodeCard";
+import Benefits from "@/sections/Benefits";
 
 const HomeTab: React.FC = () => {
   const { setActiveHomeTab, activeHomeTab } = useCustomerContext();
@@ -10,7 +12,12 @@ const HomeTab: React.FC = () => {
       id: 0,
       value: "qr-code",
       title: "QrCode",
-      content: <></>,
+      content: (
+        <>
+          <QrCodeCard />
+          <Benefits/>
+        </>
+      ),
     },
     {
       id: 1,

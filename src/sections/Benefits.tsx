@@ -8,7 +8,7 @@ const Benefits: React.FC = () => {
   return (
     <div
       style={{
-        paddingInline: "16px",
+        marginTop: "24px",
       }}
     >
       <SectionTitle title="Saiba mais" />
