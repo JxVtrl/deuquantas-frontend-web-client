@@ -1,6 +1,6 @@
 import axios from "axios";
 
-import { Errors } from "../../src/util/constants";
+import { Errors } from "../../src/utils/constants";
 
 const api = axios.create({ baseURL: process.env.NEXT_PUBLIC_BASE_URL });
 
