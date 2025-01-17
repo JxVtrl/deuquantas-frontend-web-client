@@ -3,7 +3,7 @@ import React from "react";
 
 const HomeCard: React.FC = () => {
   return (
-    <div className="h-[320px] bg-[#F5F5F5] relative z-[1] flex">
+    <div className="h-[320px] w-[369px] bg-[#F5F5F5] relative z-[1] flex">
       <Image
         src="/benefits/card.svg"
         alt="benefits"
