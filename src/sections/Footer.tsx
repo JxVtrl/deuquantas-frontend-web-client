@@ -5,12 +5,10 @@ import React from "react";
 const Footer: React.FC = () => {
   return (
     <footer className="w-full shadow-md mt-8">
-      <div className="container mx-auto text-center py-4">
-        <p className="text-sm text-gray-600">
-          © {new Date().getFullYear()} DeuQuantas. Todos os direitos
-          reservados.
-        </p>
-      </div>
+      <p className="text-[12px] text-gray-600 text-center">
+        © {new Date().getFullYear()} DeuQuantas. Todos os direitos
+        reservados.
+      </p>
     </footer>
   );
 };
