@@ -6,13 +6,18 @@ const HeadTitle: React.FC<HeadTitleProps> = ({
     <>
       Bem-vindo ao
       <br />
-      <b>DeuQuantas</b>
+      <span className="font-[700]">DeuQuantas</span>
     </>
   ),
 }) => {
   return (
-    <div>
-      <h1 className="text-3xl font-bold text-gray-800">{title}</h1>
+    <div className="px-[16px]">
+      <h1
+        className="text-[24px] font-[300] text-black
+        leading-[30px] m-0"
+      >
+        {title}
+      </h1>
     </div>
   );
 };

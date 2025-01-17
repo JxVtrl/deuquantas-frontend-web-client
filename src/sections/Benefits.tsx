@@ -6,7 +6,11 @@ import React from "react";
 
 const Benefits: React.FC = () => {
   return (
-    <div>
+    <div
+      style={{
+        paddingInline: "16px",
+      }}
+    >
       <SectionTitle title="Saiba mais" />
       <HomeCard />
     </div>

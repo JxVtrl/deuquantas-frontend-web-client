@@ -16,9 +16,9 @@ export default function CustomerLayout({
         quality={100}
         className="absolute z-0"
       />
-      <div className="flex z-[1] flex flex-col h-full">
+      <div className="flex z-[1] flex flex-col h-full w-full">
         <Header />
-        <div className="flex-grow container mx-auto py-6 px-4 h-full">
+        <div className="flex flex-col mx-auto py-6 h-full w-full">
           {children}
         </div>
         <Footer />
