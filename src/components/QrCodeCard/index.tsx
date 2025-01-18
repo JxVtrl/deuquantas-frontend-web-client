@@ -6,6 +6,7 @@ import {
   CardHeader,
 } from "@/components/ui/card";
 import Image from "next/image";
+import QrCodeReader from "../QrCodeReader";
 const QrCodeCard: React.FC = () => {
   return (
     <Card
@@ -21,6 +22,7 @@ const QrCodeCard: React.FC = () => {
         <p className="font-[400] text-black text-[14px] leading-[24px] m-0">
           Escanear <span className="font-[700]">QrCode</span>
         </p>
+        <QrCodeReader/>
       </CardContent>
       <CardFooter>
         <p className="font-[400] text-black text-[12px] leading-[16px] m-0">
