@@ -1,4 +1,4 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
   /* config options here */
@@ -6,7 +6,7 @@ const nextConfig: NextConfig = {
   trailingSlash: true,
   ...(process.env.NEXT_PUBLIC_DOCKER_ENV === 'true' && { output: 'export' }),
   eslint: {
-    ignoreDuringBuilds: true,
+    ignoreDuringBuilds: false,
   },
 };
 
