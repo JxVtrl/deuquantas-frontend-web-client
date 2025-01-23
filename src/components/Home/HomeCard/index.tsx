@@ -3,7 +3,7 @@ import React from "react";
 
 const HomeCard: React.FC = () => {
   return (
-    <div className="h-[320px] w-full max-w-[369px] bg-[#F5F5F5] relative z-[1] flex ">
+    <div className="h-[320px] w-full max-w-[369px] bg-[#F5F5F5] relative z-[1] flex cursor-pointer" onClick={() => alert("Benefícios")}>
       <Image
         src="/benefits/card.svg"
         alt="benefits"

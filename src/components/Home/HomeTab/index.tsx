@@ -1,13 +1,15 @@
 import React from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useCustomerContext } from "@/contexts/CustomerContext";
-import QrCodeCard from "../QrCodeCard";
+import QrCodeCard from "../../QrCode/QrCodeCard";
 import Benefits from "@/sections/Benefits";
+import { PurchaseHistory } from "@/sections/PurchaseHistory";
+import { HomeTabs } from "@/interfaces/tab";
 
 const HomeTab: React.FC = () => {
   const { setActiveHomeTab, activeHomeTab } = useCustomerContext();
 
-  const tabs = [
+  const tabs: HomeTabs[] = [
     {
       id: 0,
       value: "qr-code",
@@ -15,7 +17,7 @@ const HomeTab: React.FC = () => {
       content: (
         <>
           <QrCodeCard />
-          <Benefits/>
+          <Benefits />
         </>
       ),
     },
@@ -23,7 +25,9 @@ const HomeTab: React.FC = () => {
       id: 1,
       value: "purchase-history",
       title: "Histórico de compras",
-      content: <></>,
+      content: <>
+        <PurchaseHistory />
+      </>,
     },
     {
       id: 2,

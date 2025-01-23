@@ -1,0 +1,68 @@
+.history_list_block {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin-top: 20px;
+    width: 100%;
+    gap: 12px;
+
+    .history_list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+
+
+
+        .history_list_item {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+
+            .history_list_item_left {
+                display: flex;
+                gap: 16px;
+                align-items: center;
+
+
+                .history_list_item_left_info {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 4px;
+
+                    .history_list_item_left_info_title {
+                        font-size: 16px;
+                        font-weight: 500;
+                        color: #000000;
+                        line-height: 20px;
+                        margin: 0;
+                        padding: 0;
+
+                    }
+
+                    .history_list_item_left_info_date {
+                        font-size: 12px;
+                        font-weight: 500;
+                        color: #737373;
+                        line-height: 15px;
+
+                    }
+
+
+
+                }
+
+            }
+
+
+            .history_list_item_right {
+                height: 100%;
+                align-self: start;
+                font-size: 16px;
+                font-weight: 500;
+                color: #737373;
+                line-height: 20px;
+            }
+        }
+    }
+}

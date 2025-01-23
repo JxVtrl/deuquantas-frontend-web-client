@@ -1,4 +1,4 @@
-import HomeCard from "@/components/HomeCard";
+import HomeCard from "@/components/Home/HomeCard";
 import SectionTitle from "@/components/SectionTitle";
 import React from "react";
 

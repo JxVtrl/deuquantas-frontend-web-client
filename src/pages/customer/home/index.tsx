@@ -1,5 +1,5 @@
 import HeadTitle from "@/components/HeadTitle";
-import HomeTab from "@/components/HomeTab";
+import HomeTab from "@/components/Home/HomeTab";
 import { withAuthCustomer } from "@/hoc/withAuth";
 import CustomerLayout from "@/layout/CustomerLayout";
 import React from "react";

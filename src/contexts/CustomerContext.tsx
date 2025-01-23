@@ -1,8 +1,13 @@
+import { PurchaseHistoryItem } from "@/interfaces/purchase";
+import { HomeTabList } from "@/interfaces/tab";
+import { purchase_history_mock } from "@/mocks/purchase";
 import { createContext, ReactNode, useContext, useState } from "react";
 
 interface CustomerContextData {
-  activeHomeTab: string;
-  setActiveHomeTab: (tab: string) => void;
+  activeHomeTab: HomeTabList;
+  setActiveHomeTab: (tab: HomeTabList) => void;
+  purchaseHistory: PurchaseHistoryItem[];
+  setPurchaseHistory: (history: PurchaseHistoryItem[]) => void;
 }
 
 export const CustomerContext = createContext<CustomerContextData>(
@@ -11,13 +16,16 @@ export const CustomerContext = createContext<CustomerContextData>(
 CustomerContext.displayName = "CustomerContext";
 
 export const CustomerProvider = ({ children }: { children: ReactNode }) => {
-  const [activeHomeTab, setActiveHomeTab] = useState("qr-code");
+  const [activeHomeTab, setActiveHomeTab] = useState<HomeTabList>("qr-code");
+  const [purchaseHistory, setPurchaseHistory] = useState<PurchaseHistoryItem[]>(purchase_history_mock);
 
   return (
     <CustomerContext.Provider
       value={{
         activeHomeTab,
         setActiveHomeTab,
+        purchaseHistory,
+        setPurchaseHistory,
       }}
     >
       {children}

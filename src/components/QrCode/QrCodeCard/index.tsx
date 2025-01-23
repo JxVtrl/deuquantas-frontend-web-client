@@ -12,35 +12,35 @@ import { useRouter } from "next/router";
 const QrCodeCard: React.FC = () => {
 
   const router = useRouter();
-  const  [openQrCodeReaderScreen, setOpenQrCodeReaderScreen] = useState(false);
+  const [openQrCodeReaderScreen, setOpenQrCodeReaderScreen] = useState(false);
 
   const QrCodeReader = () => {
     return <Scanner
-    styles={{
+      styles={{
         finderBorder: 2,
         container: {
-            width: '100%',
-            height: '100%',
+          width: '100%',
+          height: '100%',
         },
         video: {
-            width: '100%',
-            height: '100%',
+          width: '100%',
+          height: '100%',
         },
-    }}
-    onError={err => console.log('Error scanning QRCode', err)} onScan={(result) => {
-      console.log(result)
-      setOpenQrCodeReaderScreen(false);
+      }}
+      onError={err => console.log('Error scanning QRCode', err)} onScan={(result) => {
+        console.log(result)
+        setOpenQrCodeReaderScreen(false);
 
-      const mesaId = result[0].rawValue.slice(-1);
-      const clienteId = 129;
-      
-      router.push(`/customer/comanda/${mesaId}?clienteId=${clienteId}`);
-    }} />
-};
+        const mesaId = result[0].rawValue.slice(-1);
+        const clienteId = 129;
+
+        router.push(`/customer/comanda/${mesaId}?clienteId=${clienteId}`);
+      }} />
+  };
 
 
   return openQrCodeReaderScreen ? (
-  <QrCodeReader />
+    <QrCodeReader />
   ) : (
     <Card
       className="w-[50%] max-w-[175px] h-[282px] flex flex-col justify-between cursor-pointer bg-[#E7CDBD] backdrop-filter backdrop-blur-[20px] rounded-xl border border-[#E7CDBD] shadow-lg"
@@ -62,7 +62,7 @@ const QrCodeCard: React.FC = () => {
         </p>
       </CardFooter>
     </Card>
-    );
+  );
 };
 
 export default QrCodeCard;
