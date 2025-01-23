@@ -1,6 +1,6 @@
 import { useCustomerContext } from '@/contexts/CustomerContext';
 import { handlePurchaseHistory } from '@/utils/handlePurchaseHistory';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import styles from './HistoryList.module.scss';
 import {
     Avatar,
@@ -14,19 +14,29 @@ import { PurchaseHistoryItem } from '@/interfaces/purchase';
 import { HistoryEmpty } from '../HistoryEmpty';
 
 export const HistoryList: React.FC = () => {
-    const [search, setSearch] = React.useState('');
-    const [filteredHistory, setFilteredHistory] = React.useState<Record<string, PurchaseHistoryItem[]>>({});
-    const { purchaseHistory } = useCustomerContext()
+    const [search, setSearch] = useState('');
+    const [filteredHistory, setFilteredHistory] = useState<Record<string, PurchaseHistoryItem[]>>({});
+    
+    const { purchaseHistory } = useCustomerContext();
     const purchase_list = handlePurchaseHistory(purchaseHistory);
 
     useEffect(() => {
         if (search.trim() === '') {
             setFilteredHistory(purchase_list);
         } else {
+            const searchLower = search.toLowerCase();
+
             const filtered = Object.keys(purchase_list).reduce((acc, dateKey) => {
-                const filteredItems = purchase_list[dateKey].filter(purchase =>
-                    purchase.establishment.name.toLowerCase().includes(search.toLowerCase())
-                );
+                const filteredItems = purchase_list[dateKey].filter(purchase => {
+                    // Convertendo o objeto em uma string única para pesquisa em qualquer campo
+                    const purchaseText = JSON.stringify({
+                        name: purchase.establishment.name,
+                        date: timeFormatter(purchase.date),
+                        total: currencyFormatter(purchase.total),
+                    }).toLowerCase();
+
+                    return purchaseText.includes(searchLower);
+                });
 
                 if (filteredItems.length > 0) {
                     acc[dateKey] = filteredItems;
