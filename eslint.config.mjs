@@ -21,4 +21,7 @@ const eslintConfig = [
   },
 ];
 
+// Adicionar a configuração de ignore corretamente
+export const ignores = ['.next/', 'node_modules/', 'dist/'];
+
 export default eslintConfig;

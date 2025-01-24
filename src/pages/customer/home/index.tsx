@@ -1,13 +1,13 @@
-import HeadTitle from "@/components/HeadTitle";
-import HomeTab from "@/components/Home/HomeTab";
-import { withAuthCustomer } from "@/hoc/withAuth";
-import CustomerLayout from "@/layout/CustomerLayout";
-import React from "react";
+import HeadTitle from '@/components/HeadTitle';
+import HomeTab from '@/components/Home/HomeTab';
+import { withAuthCustomer } from '@/hoc/withAuth';
+import { CustomerLayout } from '@/layout';
+import React from 'react';
 
 const CustomerHome: React.FC = () => {
   return (
     <CustomerLayout>
-      <HeadTitle /> 
+      <HeadTitle />
       <HomeTab />
     </CustomerLayout>
   );
