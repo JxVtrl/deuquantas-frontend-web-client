@@ -13,7 +13,7 @@ const QrCodeCard: React.FC = () => {
 
   return (
     <Card
-      className='w-[50%] max-w-[175px] h-[282px] flex flex-col justify-between cursor-pointer bg-[#E7CDBD] backdrop-filter backdrop-blur-[20px] rounded-xl border border-[#E7CDBD] shadow-lg'
+      className='w-[50%] max-w-[43.53vw] h-[282px] flex flex-col justify-between cursor-pointer bg-[#E7CDBD] backdrop-filter backdrop-blur-[20px] rounded-xl border border-[#E7CDBD] shadow-lg'
       onClick={() => {
         router.push('/customer/home/qr-code');
       }}

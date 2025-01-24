@@ -1,0 +1,12 @@
+.container {
+  margin-top: 24px;
+
+  display: flex;
+  flex-direction: column;
+
+  .confirmCardContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+}

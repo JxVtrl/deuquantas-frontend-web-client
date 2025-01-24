@@ -1,0 +1,1 @@
+export { ComandaCard } from './ComandaCard';
