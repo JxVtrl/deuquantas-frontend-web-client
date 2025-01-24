@@ -1,1 +1,1 @@
-export * from './PurchaseHistory'
+export { PurchaseHistory } from './PurchaseHistory.section';

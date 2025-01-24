@@ -1,70 +1,25 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useCustomerContext } from '@/contexts/CustomerContext';
-import QrCodeCard from '@/components/QrCodeCard';
-import Benefits from '@/sections/Benefits';
-import { PurchaseHistory } from '@/sections/PurchaseHistory';
 import { HomeTabs } from '@/interfaces/tab';
 import { useRouter } from 'next/router';
-import { ComandaCards, ComandaConfirm } from '@/components/Comanda';
+import { tabs } from '@/data/home_tabs.data';
 
 const HomeTab: React.FC = () => {
+  const [filteredTabs, setFilteredTabs] = React.useState<HomeTabs[]>([]);
   const { setActiveHomeTab, activeHomeTab } = useCustomerContext();
 
   const router = useRouter();
 
-  const tabs: HomeTabs[] = [
-    {
-      id: 0,
-      value: 'qr-code',
-      title: 'QrCode',
-      content: (
-        <>
-          <QrCodeCard />
-          <Benefits />
-        </>
-      ),
-    },
-    {
-      id: 1,
-      value: 'comanda',
-      title: 'Comanda',
-      content: (
-        <>
-          <ComandaCards />
-          <ComandaConfirm />
-          <Benefits />
-        </>
-      ),
-    },
-    {
-      id: 2,
-      value: 'purchase-history',
-      title: 'Histórico de compras',
-      content: (
-        <>
-          <PurchaseHistory />
-        </>
-      ),
-    },
-    {
-      id: 3,
-      value: 'payment-credit',
-      title: 'Crédito de compras',
-      content: <></>,
-    },
-    {
-      id: 4,
-      value: 'purchase-limit',
-      title: 'Limite de gastos',
-      content: <></>,
-    },
-  ];
-
-  const filteredTabs =
-    router.pathname === '/customer/home'
-      ? tabs.filter((tab) => tab.value !== 'comanda')
-      : tabs.filter((tab) => tab.value !== 'qr-code');
+  useEffect(() => {
+    if (router.pathname === '/customer/comanda/[mesa_id]') {
+      setActiveHomeTab('comanda');
+      setFilteredTabs(tabs.filter((tab) => tab.value !== 'qr-code'));
+    } else {
+      setActiveHomeTab('qr-code');
+      setFilteredTabs(tabs.filter((tab) => tab.value !== 'comanda'));
+    }
+  }, [router.pathname]);
 
   return (
     <div className='w-full px-[16px] my-[24px]'>

@@ -1,5 +1,4 @@
-import Footer from '@/sections/Footer';
-import Header from '@/sections/Header';
+import { Footer, Header } from '@/sections';
 import Image from 'next/image';
 import styles from './CustomerLayout.module.scss';
 
