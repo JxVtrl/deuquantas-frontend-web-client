@@ -11,7 +11,7 @@ const HeadTitle: React.FC<HeadTitleProps> = ({ title = <></> }) => {
   const establishment_name = 'Bar do Cazé';
 
   return (
-    <div className='px-[16px]'>
+    <div className='px-[16px] mb-[24px]'>
       <h1
         className='text-[24px] font-[300] text-black
         leading-[30px] m-0'
