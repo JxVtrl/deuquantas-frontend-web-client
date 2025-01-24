@@ -1,9 +1,18 @@
 import { useRouter } from 'next/router';
 import { CustomerLayout } from '@/layout';
+import HeadTitle from '@/components/HeadTitle';
+import HomeTab from '@/components/Home/HomeTab';
+import { useCustomerContext } from '@/contexts/CustomerContext';
+import { useEffect } from 'react';
 
 const ComandaPage = () => {
+  const { setActiveHomeTab } = useCustomerContext();
   const router = useRouter();
   const { mesa_id, clienteId } = router.query;
+
+  useEffect(() => {
+    setActiveHomeTab('comanda');
+  }, []);
 
   if (!mesa_id || !clienteId) {
     return (
@@ -17,17 +26,8 @@ const ComandaPage = () => {
 
   return (
     <CustomerLayout>
-      <div className='flex flex-col items-center justify-center h-full p-4'>
-        <div className='bg-white shadow-lg rounded-lg p-6 w-full max-w-md'>
-          <h1 className='text-2xl font-bold text-gray-800 mb-4 text-center'>
-            Bem-vindo, Cliente {clienteId}!
-          </h1>
-          <p className='text-lg text-gray-600 text-center'>
-            Comanda aberta para a mesa{' '}
-            <span className='font-semibold text-blue-500'>{mesa_id}</span>.
-          </p>
-        </div>
-      </div>
+      <HeadTitle />
+      <HomeTab />
     </CustomerLayout>
   );
 };

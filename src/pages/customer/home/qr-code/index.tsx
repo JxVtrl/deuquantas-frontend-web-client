@@ -3,9 +3,11 @@ import React from 'react';
 import { CustomerLayout } from '@/layout';
 import { Scanner } from '@yudiel/react-qr-scanner';
 import { useRouter } from 'next/router';
+import { useCustomerContext } from '@/contexts/CustomerContext';
 
 const CustomerQrCode: React.FC = () => {
   const router = useRouter();
+  const { setActiveHomeTab } = useCustomerContext();
 
   return (
     <CustomerLayout>
@@ -29,6 +31,7 @@ const CustomerQrCode: React.FC = () => {
           const clienteId = 129;
 
           router.push(`/customer/comanda/${mesaId}?clienteId=${clienteId}`);
+          setActiveHomeTab('comanda');
         }}
       />
     </CustomerLayout>
