@@ -1,9 +1,10 @@
 import React from 'react';
+import styles from './Footer.module.scss';
 
 export const Footer: React.FC = () => {
   return (
-    <footer className='w-full shadow-md mt-8'>
-      <p className='text-[12px] text-gray-600 text-center'>
+    <footer className={styles.footer}>
+      <p>
         © {new Date().getFullYear()} DeuQuantas. Todos os direitos reservados.
       </p>
     </footer>

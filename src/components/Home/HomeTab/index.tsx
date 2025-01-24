@@ -22,7 +22,7 @@ const HomeTab: React.FC = () => {
   }, [router.pathname]);
 
   return (
-    <div className='w-full px-[16px] my-[24px]'>
+    <div className='w-full px-[16px] my-[24px]overflow-scroll'>
       <Tabs defaultValue={activeHomeTab}>
         <TabsList>
           {filteredTabs.map((tab) => (
