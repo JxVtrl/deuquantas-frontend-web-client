@@ -22,37 +22,193 @@ export interface ComandaResponse {
   codItem: string;
   numQuant: number;
   valPreco: number;
+  isTestData?: boolean;
 }
 
-// URL base da API
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
+// URL base da API - Tente diferentes URLs para encontrar o servidor
+const possibleUrls = [
+  process.env.NEXT_PUBLIC_API_URL,
+  'http://localhost:3000',
+  'http://localhost:3003',
+  'http://127.0.0.1:3000',
+  'http://backend:3000', // URL do Docker
+];
+
+// Filtra URLs vazias ou undefined
+const validUrls = possibleUrls.filter((url) => url);
+
+// URL padrão caso nenhuma das URLs acima funcione
+let API_URL = validUrls[0] || 'http://localhost:3000';
+
+// Flag para indicar se estamos em modo offline
+let isOfflineMode = false;
+
+// Interface para comanda offline
+interface OfflineComanda extends CreateComandaDto {
+  createdAt: string;
+  synced: boolean;
+  isTestData?: boolean;
+}
 
 /**
  * Serviço para gerenciar comandas
  */
 export const ComandaService = {
   /**
+   * Tenta encontrar um servidor backend disponível
+   * @returns Promise<string> - URL do servidor disponível ou null se nenhum estiver disponível
+   */
+  async findAvailableServer(): Promise<string | null> {
+    // Se já estamos em modo offline, não tenta novamente
+    if (isOfflineMode) {
+      console.log('Modo offline ativado. Não tentando conectar ao servidor.');
+      return null;
+    }
+
+    console.log('Tentando encontrar um servidor disponível...');
+
+    // Tenta cada URL possível
+    for (const url of validUrls) {
+      if (!url) continue;
+
+      try {
+        console.log(`Tentando conectar a ${url}/health...`);
+        await axios.get(`${url}/health`, { timeout: 3000 });
+        console.log(`Servidor encontrado em ${url}`);
+        API_URL = url;
+        isOfflineMode = false;
+        return url;
+      } catch (error) {
+        console.warn(`Servidor em ${url} não está disponível:`, error);
+      }
+    }
+
+    console.error(
+      'Nenhum servidor disponível encontrado. Ativando modo offline.',
+    );
+    isOfflineMode = true;
+    return null;
+  },
+
+  /**
+   * Verifica se o backend está acessível
+   * @returns Promise<boolean> - true se o backend estiver acessível, false caso contrário
+   */
+  async isBackendAvailable(): Promise<boolean> {
+    // Se já estamos em modo offline, retorna false imediatamente
+    if (isOfflineMode) {
+      return false;
+    }
+
+    try {
+      const server = await this.findAvailableServer();
+      return server !== null;
+    } catch (error) {
+      console.warn('Erro ao verificar disponibilidade do backend:', error);
+      isOfflineMode = true;
+      return false;
+    }
+  },
+
+  /**
    * Cria uma nova comanda
    * @param comandaData Dados da comanda a ser criada
    * @param token Token de autenticação
+   * @param isTest Indica se deve criar uma comanda de teste
    * @returns Promise com a resposta da API
    */
   async criarComanda(
     comandaData: CreateComandaDto,
     token: string,
+    isTest: boolean = false,
   ): Promise<ComandaResponse> {
+    // Verifica se o backend está acessível
+    const backendAvailable = await this.isBackendAvailable();
+
+    // Se o backend não estiver acessível e estamos em modo de teste,
+    // simula uma resposta bem-sucedida imediatamente
+    if (!backendAvailable && isTest) {
+      console.warn('Modo offline: simulando resposta bem-sucedida');
+
+      // Salva os dados no localStorage para sincronização futura
+      this.saveOfflineComanda(comandaData);
+
+      // Cria uma resposta simulada com os dados da comanda
+      const mockResponse: ComandaResponse = {
+        ...comandaData,
+        isTestData: true,
+      };
+
+      return mockResponse;
+    }
+
+    // Se chegou aqui, temos um servidor disponível
     try {
-      const response = await axios.post(`${API_URL}/comandas`, comandaData, {
+      // Adiciona o parâmetro isTest à URL se necessário
+      const url = `${API_URL}/comandas${isTest ? '?isTest=true' : ''}`;
+
+      console.log('Tentando criar comanda em:', url);
+
+      const response = await axios.post(url, comandaData, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
+        // Aumenta o timeout para 10 segundos
+        timeout: 10000,
       });
 
+      console.log('Comanda criada com sucesso:', response.data);
       return response.data;
     } catch (error) {
       console.error('Erro ao criar comanda:', error);
+
+      // Se estamos em modo de teste, simula uma resposta bem-sucedida mesmo com erro
+      if (isTest) {
+        console.warn(
+          'Modo de teste: simulando resposta bem-sucedida após erro',
+        );
+
+        // Salva os dados no localStorage para sincronização futura
+        this.saveOfflineComanda(comandaData);
+
+        // Cria uma resposta simulada com os dados da comanda
+        const mockResponse: ComandaResponse = {
+          ...comandaData,
+          isTestData: true,
+        };
+
+        return mockResponse;
+      }
+
       throw error;
+    }
+  },
+
+  /**
+   * Salva uma comanda offline no localStorage para sincronização futura
+   * @param comandaData Dados da comanda a ser salva
+   */
+  saveOfflineComanda(comandaData: CreateComandaDto): void {
+    try {
+      // Obtém comandas offline existentes
+      const offlineComandas = JSON.parse(
+        localStorage.getItem('offlineComandas') || '[]',
+      );
+
+      // Adiciona a nova comanda
+      offlineComandas.push({
+        ...comandaData,
+        createdAt: new Date().toISOString(),
+        synced: false,
+      });
+
+      // Salva no localStorage
+      localStorage.setItem('offlineComandas', JSON.stringify(offlineComandas));
+
+      console.log('Comanda salva offline para sincronização futura');
+    } catch (error) {
+      console.error('Erro ao salvar comanda offline:', error);
     }
   },
 
@@ -60,14 +216,30 @@ export const ComandaService = {
    * Obtém as comandas de um cliente
    * @param clienteId ID do cliente (CPF)
    * @param token Token de autenticação
+   * @param isTest Indica se deve obter comandas de teste
    * @returns Promise com a resposta da API
    */
   async getComandaByCliente(
     clienteId: string,
     token: string,
+    isTest: boolean = false,
   ): Promise<ComandaResponse[]> {
+    // Verifica se o backend está acessível
+    const backendAvailable = await this.isBackendAvailable();
+
+    // Se o backend não estiver acessível, retorna comandas do localStorage
+    if (!backendAvailable) {
+      console.warn('Modo offline: retornando comandas do localStorage');
+      return this.getOfflineComandas(clienteId);
+    }
+
     try {
-      const response = await axios.get(`${API_URL}/comandas/${clienteId}`, {
+      // Usa a rota de teste se necessário
+      const url = isTest
+        ? `${API_URL}/comandas/test/${clienteId}`
+        : `${API_URL}/comandas/${clienteId}`;
+
+      const response = await axios.get(url, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -76,7 +248,83 @@ export const ComandaService = {
       return response.data;
     } catch (error) {
       console.error('Erro ao obter comandas do cliente:', error);
-      throw error;
+
+      // Se ocorrer um erro, retorna comandas do localStorage
+      return this.getOfflineComandas(clienteId);
+    }
+  },
+
+  /**
+   * Obtém comandas offline do localStorage
+   * @param clienteId ID do cliente (CPF)
+   * @returns Array de comandas offline
+   */
+  getOfflineComandas(clienteId: string): ComandaResponse[] {
+    try {
+      // Obtém comandas offline existentes
+      const offlineComandas = JSON.parse(
+        localStorage.getItem('offlineComandas') || '[]',
+      ) as OfflineComanda[];
+
+      // Filtra por clienteId
+      return offlineComandas
+        .filter((comanda: OfflineComanda) => comanda.numCpf === clienteId)
+        .map((comanda: OfflineComanda) => ({
+          ...comanda,
+          isTestData: true,
+        }));
+    } catch (error) {
+      console.error('Erro ao obter comandas offline:', error);
+      return [];
+    }
+  },
+
+  /**
+   * Obtém todas as comandas de teste
+   * @returns Promise com a resposta da API
+   */
+  async getAllTestComandas(): Promise<ComandaResponse[]> {
+    // Verifica se o backend está acessível
+    const backendAvailable = await this.isBackendAvailable();
+
+    // Se o backend não estiver acessível, retorna comandas do localStorage
+    if (!backendAvailable) {
+      console.warn(
+        'Modo offline: retornando todas as comandas do localStorage',
+      );
+      return this.getAllOfflineComandas();
+    }
+
+    try {
+      const response = await axios.get(`${API_URL}/comandas/test`);
+      return response.data;
+    } catch (error) {
+      console.error('Erro ao obter comandas de teste:', error);
+
+      // Se ocorrer um erro, retorna comandas do localStorage
+      return this.getAllOfflineComandas();
+    }
+  },
+
+  /**
+   * Obtém todas as comandas offline do localStorage
+   * @returns Array de todas as comandas offline
+   */
+  getAllOfflineComandas(): ComandaResponse[] {
+    try {
+      // Obtém comandas offline existentes
+      const offlineComandas = JSON.parse(
+        localStorage.getItem('offlineComandas') || '[]',
+      ) as OfflineComanda[];
+
+      // Adiciona flag isTestData
+      return offlineComandas.map((comanda: OfflineComanda) => ({
+        ...comanda,
+        isTestData: true,
+      }));
+    } catch (error) {
+      console.error('Erro ao obter todas as comandas offline:', error);
+      return [];
     }
   },
 };
