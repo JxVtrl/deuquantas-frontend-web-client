@@ -52,6 +52,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   useEffect(() => {
     // Verificar se o usuário está autenticado ao carregar a página
     const token = AuthService.getAuthToken();
+    console.log('Token recuperado:', token);
     if (token) {
       try {
         const decodedToken = jwtDecode<User>(token);
@@ -71,7 +72,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     try {
       setLoading(true);
       const response = await AuthService.login(credentials);
-      const { access_token } = response;
+      const access_token = response?.access_token;
+
+      if (!access_token || typeof access_token !== 'string') {
+        throw new Error('Token inválido ou não fornecido pela API.');
+      }
 
       AuthService.setAuthToken(access_token);
       const decodedToken = jwtDecode<User>(access_token);
@@ -155,7 +160,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
           }
 
           try {
-            const user = jwtDecode(token) as User;
+            if (!token || typeof token !== 'string') {
+              console.error('Token inválido recebido:', token);
+              return;
+            }
+            const user = jwtDecode<User>(token);
             setDefaultHeaderToken(token);
             setUser(user);
             // Usar apenas o token auth_token

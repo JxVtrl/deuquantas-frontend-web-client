@@ -12,7 +12,7 @@ export default async function handler(
   res: NextApiResponse,
 ) {
   return httpProxyMiddleware(req, res, {
-    target: 'http://deuquantas-backend:3000',
+    target: 'http://localhost:3000',
     pathRewrite: [
       {
         patternStr: '^/api/proxy',

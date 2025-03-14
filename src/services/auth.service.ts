@@ -37,10 +37,7 @@ export class AuthService {
     try {
       // Adaptando os dados para o formato esperado pelo backend
       const loginData = {
-        numCpf: credentials.email
-          .replace(/[^0-9]/g, '')
-          .substring(0, 11)
-          .padEnd(11, '0'),
+        email: credentials.email,
         password: credentials.senha,
       };
 
