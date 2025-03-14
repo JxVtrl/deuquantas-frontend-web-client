@@ -1,6 +1,7 @@
 import React from 'react';
 import { HeadTitleProps } from './HeadTitle.interface';
 import { useRouter } from 'next/router';
+import { LogoutButton } from '../LogoutButton';
 
 const HeadTitle: React.FC<HeadTitleProps> = ({ title = <></> }) => {
   const router = useRouter();
@@ -21,6 +22,7 @@ const HeadTitle: React.FC<HeadTitleProps> = ({ title = <></> }) => {
             Bem-vindo ao
             <br />
             <span className='font-[700]'>DeuQuantas</span>
+            <LogoutButton />
           </>
         ) : mesa_id && clienteId ? (
           <>

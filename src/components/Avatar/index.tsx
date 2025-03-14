@@ -1,14 +1,14 @@
-import React from "react";
+import React from 'react';
 import {
   Avatar as AvatarLayout,
   AvatarFallback,
   AvatarImage,
-} from "@/components/ui/avatar";
+} from '@/components/ui/avatar';
 
 const Avatar: React.FC = () => {
   return (
     <AvatarLayout>
-      <AvatarImage src="https://github.com/shadcn.png" />
+      <AvatarImage src='https://github.com/shadcn.png' />
       <AvatarFallback>CN</AvatarFallback>
     </AvatarLayout>
   );
