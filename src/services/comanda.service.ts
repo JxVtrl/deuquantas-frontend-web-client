@@ -22,7 +22,6 @@ export interface ComandaResponse {
   codItem: string;
   numQuant: number;
   valPreco: number;
-  isTestData?: boolean;
 }
 
 // URL base da API - Tente diferentes URLs para encontrar o servidor
@@ -47,7 +46,6 @@ let isOfflineMode = false;
 interface OfflineComanda extends CreateComandaDto {
   createdAt: string;
   synced: boolean;
-  isTestData?: boolean;
 }
 
 /**
@@ -114,38 +112,23 @@ export const ComandaService = {
    * Cria uma nova comanda
    * @param comandaData Dados da comanda a ser criada
    * @param token Token de autenticação
-   * @param isTest Indica se deve criar uma comanda de teste
    * @returns Promise com a resposta da API
    */
   async criarComanda(
     comandaData: CreateComandaDto,
     token: string,
-    isTest: boolean = false,
   ): Promise<ComandaResponse> {
     // Verifica se o backend está acessível
     const backendAvailable = await this.isBackendAvailable();
 
-    // Se o backend não estiver acessível e estamos em modo de teste,
-    // simula uma resposta bem-sucedida imediatamente
-    if (!backendAvailable && isTest) {
-      console.warn('Modo offline: simulando resposta bem-sucedida');
-
-      // Salva os dados no localStorage para sincronização futura
-      this.saveOfflineComanda(comandaData);
-
-      // Cria uma resposta simulada com os dados da comanda
-      const mockResponse: ComandaResponse = {
-        ...comandaData,
-        isTestData: true,
-      };
-
-      return mockResponse;
+    // Se o backend não estiver acessível, não podemos continuar
+    if (!backendAvailable) {
+      throw new Error('Servidor não disponível. Tente novamente mais tarde.');
     }
 
     // Se chegou aqui, temos um servidor disponível
     try {
-      // Adiciona o parâmetro isTest à URL se necessário
-      const url = `${API_URL}/comandas${isTest ? '?isTest=true' : ''}`;
+      const url = `${API_URL}/comandas`;
 
       console.log('Tentando criar comanda em:', url);
 
@@ -162,25 +145,6 @@ export const ComandaService = {
       return response.data;
     } catch (error) {
       console.error('Erro ao criar comanda:', error);
-
-      // Se estamos em modo de teste, simula uma resposta bem-sucedida mesmo com erro
-      if (isTest) {
-        console.warn(
-          'Modo de teste: simulando resposta bem-sucedida após erro',
-        );
-
-        // Salva os dados no localStorage para sincronização futura
-        this.saveOfflineComanda(comandaData);
-
-        // Cria uma resposta simulada com os dados da comanda
-        const mockResponse: ComandaResponse = {
-          ...comandaData,
-          isTestData: true,
-        };
-
-        return mockResponse;
-      }
-
       throw error;
     }
   },
@@ -216,13 +180,11 @@ export const ComandaService = {
    * Obtém as comandas de um cliente
    * @param clienteId ID do cliente (CPF)
    * @param token Token de autenticação
-   * @param isTest Indica se deve obter comandas de teste
    * @returns Promise com a resposta da API
    */
   async getComandaByCliente(
     clienteId: string,
     token: string,
-    isTest: boolean = false,
   ): Promise<ComandaResponse[]> {
     // Verifica se o backend está acessível
     const backendAvailable = await this.isBackendAvailable();
@@ -234,10 +196,7 @@ export const ComandaService = {
     }
 
     try {
-      // Usa a rota de teste se necessário
-      const url = isTest
-        ? `${API_URL}/comandas/test/${clienteId}`
-        : `${API_URL}/comandas/${clienteId}`;
+      const url = `${API_URL}/comandas/${clienteId}`;
 
       const response = await axios.get(url, {
         headers: {
@@ -249,7 +208,7 @@ export const ComandaService = {
     } catch (error) {
       console.error('Erro ao obter comandas do cliente:', error);
 
-      // Se ocorrer um erro, retorna comandas do localStorage
+      // Se ocorrer um erro, tenta retornar comandas do localStorage
       return this.getOfflineComandas(clienteId);
     }
   },
@@ -266,12 +225,18 @@ export const ComandaService = {
         localStorage.getItem('offlineComandas') || '[]',
       ) as OfflineComanda[];
 
-      // Filtra por clienteId
+      // Filtra comandas pelo ID do cliente
       return offlineComandas
-        .filter((comanda: OfflineComanda) => comanda.numCpf === clienteId)
-        .map((comanda: OfflineComanda) => ({
-          ...comanda,
-          isTestData: true,
+        .filter((comanda) => comanda.numCpf === clienteId)
+        .map((comanda) => ({
+          numCpf: comanda.numCpf,
+          numCnpj: comanda.numCnpj,
+          numMesa: comanda.numMesa,
+          datApropriacao: comanda.datApropriacao,
+          horPedido: comanda.horPedido,
+          codItem: comanda.codItem,
+          numQuant: comanda.numQuant,
+          valPreco: comanda.valPreco,
         }));
     } catch (error) {
       console.error('Erro ao obter comandas offline:', error);
@@ -280,34 +245,7 @@ export const ComandaService = {
   },
 
   /**
-   * Obtém todas as comandas de teste
-   * @returns Promise com a resposta da API
-   */
-  async getAllTestComandas(): Promise<ComandaResponse[]> {
-    // Verifica se o backend está acessível
-    const backendAvailable = await this.isBackendAvailable();
-
-    // Se o backend não estiver acessível, retorna comandas do localStorage
-    if (!backendAvailable) {
-      console.warn(
-        'Modo offline: retornando todas as comandas do localStorage',
-      );
-      return this.getAllOfflineComandas();
-    }
-
-    try {
-      const response = await axios.get(`${API_URL}/comandas/test`);
-      return response.data;
-    } catch (error) {
-      console.error('Erro ao obter comandas de teste:', error);
-
-      // Se ocorrer um erro, retorna comandas do localStorage
-      return this.getAllOfflineComandas();
-    }
-  },
-
-  /**
-   * Obtém todas as comandas offline do localStorage
+   * Obtém todas as comandas offline
    * @returns Array de todas as comandas offline
    */
   getAllOfflineComandas(): ComandaResponse[] {
@@ -317,10 +255,15 @@ export const ComandaService = {
         localStorage.getItem('offlineComandas') || '[]',
       ) as OfflineComanda[];
 
-      // Adiciona flag isTestData
-      return offlineComandas.map((comanda: OfflineComanda) => ({
-        ...comanda,
-        isTestData: true,
+      return offlineComandas.map((comanda) => ({
+        numCpf: comanda.numCpf,
+        numCnpj: comanda.numCnpj,
+        numMesa: comanda.numMesa,
+        datApropriacao: comanda.datApropriacao,
+        horPedido: comanda.horPedido,
+        codItem: comanda.codItem,
+        numQuant: comanda.numQuant,
+        valPreco: comanda.valPreco,
       }));
     } catch (error) {
       console.error('Erro ao obter todas as comandas offline:', error);

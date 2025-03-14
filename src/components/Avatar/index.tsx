@@ -1,14 +1,15 @@
-import React from "react";
+import React from 'react';
 import {
   Avatar as AvatarLayout,
   AvatarFallback,
   AvatarImage,
-} from "@/components/ui/avatar";
+} from '@/components/ui/avatar';
+import { AvatarProps } from '@radix-ui/react-avatar';
 
-const Avatar: React.FC = () => {
+const Avatar: React.FC<AvatarProps> = (props) => {
   return (
-    <AvatarLayout>
-      <AvatarImage src="https://github.com/shadcn.png" />
+    <AvatarLayout {...props}>
+      <AvatarImage src='https://github.com/shadcn.png' />
       <AvatarFallback>CN</AvatarFallback>
     </AvatarLayout>
   );

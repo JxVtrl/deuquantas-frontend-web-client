@@ -1,94 +1,116 @@
-import { createContext, ReactNode, useContext, useMemo, useState } from "react";
-import { PermissionLevel, User } from "../../services/api/types";
-import { setDefaultHeaderToken } from "../../services/api";
-import storage from "../../services/storage/storage";
-import { jwtDecode } from "jwt-decode";
-import { useRouter } from "next/router";
-import { saveUserPreferences, viewUserPreferences } from "../../services/user";
-import { login, logout } from "../../services/sessions";
-import axios from "axios";
-export type AvailableLanguages = "pt" | "en";
-export type AvailableThemes = "dark" | "light" | "system";
+import React, {
+  createContext,
+  ReactNode,
+  useContext,
+  useState,
+  useEffect,
+} from 'react';
+import { useRouter } from 'next/router';
+import {
+  AuthService,
+  LoginCredentials,
+  RegisterData,
+} from '@/services/auth.service';
+import { jwtDecode } from 'jwt-decode';
+import { PermissionLevel, User } from '../../services/api/types';
+import { setDefaultHeaderToken } from '../../services/api';
+import { saveUserPreferences, viewUserPreferences } from '../../services/user';
+import axios from 'axios';
+
+export type AvailableLanguages = 'pt' | 'en';
+export type AvailableThemes = 'dark' | 'light' | 'system';
 
 interface AuthContextData {
-  signed: boolean;
-  user?: User;
+  user: User | null;
+  loading: boolean;
+  login: (credentials: LoginCredentials) => Promise<void>;
+  register: (userData: RegisterData) => Promise<void>;
   logout: () => void;
-  handleLogout: () => void;
-  login: (code: string, state: string, session_state: string) => Promise<void>;
+  isAuthenticated: boolean;
   isAdmin: boolean;
   processLogin: (token: string) => void;
   storeUserPreferences: (
     theme: AvailableThemes,
-    language: AvailableLanguages
+    language: AvailableLanguages,
   ) => void;
-  clearSession: (msg: string) => void;
+  clearSession: () => void;
   getUserPreferences: () => void;
 }
 
-export const AuthContext = createContext<AuthContextData>(
-  {} as AuthContextData
-);
-AuthContext.displayName = "AuthContext";
+const AuthContext = createContext<AuthContextData>({} as AuthContextData);
+AuthContext.displayName = 'AuthContext';
 
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | undefined>(undefined);
-  const [, setError] = useState<string>("");
-  const [theme, setTheme] = useState<AvailableThemes>("dark");
-  const [language, setLanguage] = useState<AvailableLanguages>("pt");
+export const AuthProvider: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [theme, setTheme] = useState<AvailableThemes>('dark');
+  const [language, setLanguage] = useState<AvailableLanguages>('pt');
   const router = useRouter();
 
-  const isAdmin = useMemo(
-    () => user?.permission_level === PermissionLevel.Admin,
-    [user?.permission_level]
-  );
-
-  const handleLogin = async (code: string, _: string, sessionState: string) => {
-    if (typeof window === "undefined") {
-      return;
+  useEffect(() => {
+    // Verificar se o usuário está autenticado ao carregar a página
+    const token = AuthService.getAuthToken();
+    if (token) {
+      try {
+        const decodedToken = jwtDecode<User>(token);
+        setUser(decodedToken);
+        AuthService.setAuthToken(token);
+      } catch (error) {
+        console.error('Token inválido:', error);
+        AuthService.removeAuthToken();
+      }
     }
+    setLoading(false);
+  }, []);
 
+  const isAdmin = user?.permission_level === PermissionLevel.Admin;
+
+  const login = async (credentials: LoginCredentials) => {
     try {
-      const redirect_url_path = "/auth/callback";
-      const res = await login(code, sessionState, redirect_url_path);
+      setLoading(true);
+      const response = await AuthService.login(credentials);
+      const { access_token } = response;
 
-      await processLogin(res.data);
-    } catch {
-      setError("There was an error logging in. Please try again.");
-      setUser(undefined);
-      router.replace("/customer/login");
+      AuthService.setAuthToken(access_token);
+      const decodedToken = jwtDecode<User>(access_token);
+      setUser(decodedToken);
+
+      router.push('/');
+    } catch (error) {
+      console.error('Erro ao fazer login:', error);
+      throw error;
+    } finally {
+      setLoading(false);
     }
   };
 
-  const processLogin = async (token: string) => {
-    if (typeof window === "undefined") {
-      // Evita que o código execute no lado do servidor
-      return;
-    }
-
+  const register = async (userData: RegisterData) => {
     try {
-      const user = jwtDecode(token) as User;
-      setDefaultHeaderToken(token);
-      setUser(user);
-      storage.setItem("deuquantas_token", token);
+      setLoading(true);
+      // Registrando o usuário no backend real
+      await AuthService.register(userData);
 
-      await getUserPreferences();
-
-      const pageBeforeLogin = router.query.state;
-      if (pageBeforeLogin) {
-        router.back();
-      } else {
-        router.replace("/");
-      }
+      // Após o registro bem-sucedido, redirecionar para a página de login
+      router.push('/auth/login?registered=true');
     } catch (error) {
-      console.error("Erro durante o processamento do login:", error);
-      setUser(undefined);
+      console.error('Erro ao registrar:', error);
+      throw error;
+    } finally {
+      setLoading(false);
     }
+  };
+
+  const logout = () => {
+    AuthService.removeAuthToken();
+    setUser(null);
+    router.push('/auth/login');
   };
 
   const storeUserPreferences = (
     theme: AvailableThemes,
-    language: AvailableLanguages
+    language: AvailableLanguages,
   ) => {
     setTheme(theme);
     setLanguage(language);
@@ -99,45 +121,62 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const userPreferences = await viewUserPreferences();
       storeUserPreferences(userPreferences.theme, userPreferences.language);
     } catch (err: unknown) {
-      console.warn("Error getting user preferences.");
+      console.warn('Error getting user preferences.');
       if (axios.isAxiosError(err) && err.response?.status === 404) {
         try {
           const userPreferences = await saveUserPreferences(theme, language);
           storeUserPreferences(userPreferences.theme, userPreferences.language);
         } catch {
-          console.warn("Error saving user preferences.");
+          console.warn('Error saving user preferences.');
         }
       }
     }
   };
 
-  const handleLogout = async () => {
-    logout().finally(() => {
-      setError("");
-      setUser(undefined);
-      router.replace("/customer/login");
-    });
-  };
-
-  const clearSession = (msg: string) => {
-    setUser(undefined);
-    setError(msg);
-    router.replace("/customer/login");
+  const clearSession = () => {
+    setUser(null);
+    router.push('/auth/login');
   };
 
   return (
     <AuthContext.Provider
       value={{
-        signed: Boolean(user),
         user,
-        isAdmin,
+        loading,
+        login,
+        register,
         logout,
-        login: handleLogin,
-        handleLogout,
-        clearSession,
-        getUserPreferences,
+        isAuthenticated: !!user,
+        isAdmin,
+        processLogin: async (token: string) => {
+          if (typeof window === 'undefined') {
+            // Evita que o código execute no lado do servidor
+            return;
+          }
+
+          try {
+            const user = jwtDecode(token) as User;
+            setDefaultHeaderToken(token);
+            setUser(user);
+            // Usar apenas o token auth_token
+            AuthService.setAuthToken(token);
+
+            await getUserPreferences();
+
+            const pageBeforeLogin = router.query.state;
+            if (pageBeforeLogin) {
+              router.back();
+            } else {
+              router.replace('/customer/home');
+            }
+          } catch (error) {
+            console.error('Erro durante o processamento do login:', error);
+            setUser(null);
+          }
+        },
         storeUserPreferences,
-        processLogin,
+        getUserPreferences,
+        clearSession,
       }}
     >
       {children}
@@ -145,12 +184,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-export const useAuthContext = () => {
+export const useAuth = () => {
   const context = useContext(AuthContext);
-
   if (!context) {
-    throw new Error("useAuthContext must be used under AuthProvider");
+    throw new Error('useAuth deve ser usado dentro de um AuthProvider');
   }
-
   return context;
 };
