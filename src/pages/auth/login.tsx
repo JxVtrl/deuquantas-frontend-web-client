@@ -15,7 +15,7 @@ export default function Login() {
     setLoading(true);
 
     try {
-      await login({ email, senha });
+      await login({ email, password: senha });
       // O redirecionamento é feito dentro da função login no AuthContext
     } catch (err: unknown) {
       console.error('Erro ao fazer login:', err);

@@ -33,7 +33,7 @@ export default function Register() {
       await register({
         nome,
         email,
-        senha,
+        password: senha,
         telefone: telefone || undefined,
       });
       // O redirecionamento é feito dentro da função register no AuthContext

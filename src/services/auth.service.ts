@@ -7,13 +7,13 @@ const API_URL = '/api/proxy';
 
 export interface LoginCredentials {
   email: string;
-  senha: string;
+  password: string;
 }
 
 export interface RegisterData {
   email: string;
   nome: string;
-  senha: string;
+  password: string;
   telefone?: string;
 }
 
@@ -38,7 +38,7 @@ export class AuthService {
       // Adaptando os dados para o formato esperado pelo backend
       const loginData = {
         email: credentials.email,
-        password: credentials.senha,
+        password: credentials.password,
       };
 
       const response = await axios.post(`${API_URL}/auth/login`, loginData);
@@ -55,7 +55,7 @@ export class AuthService {
       const registerData = {
         email: userData.email,
         nome: userData.nome,
-        senha: userData.senha,
+        password: userData.password,
         telefone: userData.telefone || '',
       };
 
