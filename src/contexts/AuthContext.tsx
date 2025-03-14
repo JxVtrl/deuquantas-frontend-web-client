@@ -58,6 +58,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         const decodedToken = jwtDecode<User>(token);
         setUser(decodedToken);
         AuthService.setAuthToken(token);
+        // router.push('/customer/home');
       } catch (error) {
         console.error('Token inválido:', error);
         AuthService.removeAuthToken();
@@ -80,9 +81,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
       AuthService.setAuthToken(access_token);
       const decodedToken = jwtDecode<User>(access_token);
+
+      console.log('Token decodificado:', decodedToken);
+
       setUser(decodedToken);
 
-      router.push('/');
+      router.push('/customer/home');
     } catch (error) {
       console.error('Erro ao fazer login:', error);
       throw error;
@@ -164,7 +168,36 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
               console.error('Token inválido recebido:', token);
               return;
             }
-            const user = jwtDecode<User>(token);
+
+            // Definir uma interface para o token decodificado
+            interface DecodedToken {
+              sub: number;
+              nome?: string;
+              email?: string;
+              isAdmin?: boolean;
+              permission_level?: number;
+              exp: number;
+              iat: number;
+            }
+
+            const decodedToken = jwtDecode<DecodedToken>(token);
+            console.log('Token decodificado:', decodedToken);
+
+            // Mapear os campos do token para a interface User
+            const user: User = {
+              id: decodedToken.sub,
+              name: decodedToken.nome || '',
+              givenName: decodedToken.nome || '',
+              email: decodedToken.email || '',
+              permission_level:
+                decodedToken.permission_level ||
+                (decodedToken.isAdmin
+                  ? PermissionLevel.Admin
+                  : PermissionLevel.Customer),
+            };
+
+            console.log('Usuário mapeado:', user);
+
             setDefaultHeaderToken(token);
             setUser(user);
             // Usar apenas o token auth_token

@@ -5,6 +5,9 @@ import { jwtDecode, JwtPayload } from 'jwt-decode';
 // Interface para o payload do token JWT com o nível de permissão
 interface UserPayload extends JwtPayload {
   permission_level?: number;
+  isAdmin?: boolean;
+  email?: string;
+  nome?: string;
 }
 
 export function withAuthAdmin(Component: React.FC) {
@@ -27,13 +30,27 @@ export function withAuth(Component: React.FC, requiredRole?: string) {
     const user = getUserFromToken(); // Usa o token JWT real
 
     useEffect(() => {
+      console.log('User data:', user);
+      console.log('Required role:', requiredRole);
+
+      if (requiredRole) {
+        console.log(
+          'Required permission level:',
+          getPermissionLevel(requiredRole),
+        );
+      }
+
       if (!user) {
+        console.log('Usuário não autenticado, redirecionando para login');
         router.replace('/auth/login');
       } else if (
         requiredRole &&
         user.permission_level !== getPermissionLevel(requiredRole)
       ) {
-        router.replace('/unauthorized');
+        console.log(
+          `Permissão insuficiente. Usuário tem nível ${user.permission_level}, mas precisa de ${getPermissionLevel(requiredRole)}`,
+        );
+        router.replace('/auth/login');
       }
     }, [user, router]);
 
@@ -70,7 +87,9 @@ function getUserFromToken(): UserPayload | null {
     if (!token) return null;
 
     try {
-      return jwtDecode<UserPayload>(token);
+      const decoded = jwtDecode<UserPayload>(token);
+      console.log('Token decodificado:', decoded);
+      return decoded;
     } catch (error) {
       console.error('Erro ao decodificar token:', error);
       localStorage.removeItem('auth_token');
