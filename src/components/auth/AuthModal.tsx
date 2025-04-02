@@ -19,28 +19,27 @@ const AuthModal: React.FC<AuthModalProps> = ({
   };
 
   return (
-    <div className='w-full bg-[#F0F0F0] rounded-lg shadow-xl py-[20px] px-[24px]'>
-      <motion.div
-        key={isLogin ? 'login' : 'register'}
-        initial={{ opacity: 0, rotateY: 180 }}
-        animate={{ opacity: 1, rotateY: 0 }}
-        exit={{ opacity: 0, rotateY: -180 }}
-        transition={{ duration: 0.5, ease: 'easeInOut' }}
-      >
-        {children}
-        <div className='mt-6 text-end '>
-          <p>
-            {isLogin ? 'Não tem uma conta?' : 'Já tem uma conta?'}{' '}
-            <span
-              className='underline cursor-pointer'
-              onClick={handleToggleClick}
-            >
-              {isLogin ? 'Cadastrar' : 'Faça Login'}
-            </span>
-          </p>
-        </div>
-      </motion.div>
-    </div>
+    <motion.div
+      key={isLogin ? 'login' : 'register'}
+      initial={{ opacity: 0, rotateY: 90, width: '0%' }}
+      animate={{ opacity: 1, rotateY: 0, width: '100%' }}
+      exit={{ opacity: 0, rotateY: -90, width: '0%' }}
+      transition={{ duration: 0.5, ease: 'easeInOut' }}
+      className='bg-[#F0F0F0] rounded-lg shadow-xl py-[20px] px-[24px] mx-auto'
+    >
+      {children}
+      <div className='mt-6 text-end '>
+        <p>
+          {isLogin ? 'Não tem uma conta?' : 'Já tem uma conta?'}{' '}
+          <span
+            className='underline cursor-pointer'
+            onClick={handleToggleClick}
+          >
+            {isLogin ? 'Cadastrar' : 'Faça Login'}
+          </span>
+        </p>
+      </div>
+    </motion.div>
   );
 };
 
