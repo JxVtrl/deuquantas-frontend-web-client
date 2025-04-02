@@ -1,1 +1,2 @@
-export { CustomerLayout } from './CustomerLayout';
+export { default as MaxWidthLayout } from './MaxWidthLayout';
+export { default as CustomerLayout } from './CustomerLayout';

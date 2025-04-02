@@ -2,7 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { PlusIcon } from '@/components/Icons';
-import MaxWidthLayout from '@/layout/MaxWidthLayout';
+import { MaxWidthLayout } from '@/layout';
 export interface NavigationItem {
   icon: React.FC;
   label: string;

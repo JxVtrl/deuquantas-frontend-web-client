@@ -1,15 +1,12 @@
 import React from 'react';
 import Link from 'next/link';
-import MaxWidthLayout from '@/layout/MaxWidthLayout';
+import { MaxWidthLayout } from '@/layout';
+import { useNavigation } from '@/hooks/useNavigation';
 
 export interface ActionItem {
   icon: React.FC;
   label: string;
   href: string;
-}
-
-interface ActionGridProps {
-  items: ActionItem[];
 }
 
 const ActionGridItem: React.FC<ActionItem & { isScanQR?: boolean }> = ({
@@ -36,11 +33,13 @@ const ActionGridItem: React.FC<ActionItem & { isScanQR?: boolean }> = ({
   );
 };
 
-export const ActionGrid: React.FC<ActionGridProps> = ({ items }) => {
+export const ActionGrid: React.FC = () => {
+  const { actionItems } = useNavigation();
+
   return (
     <MaxWidthLayout>
       <div className='grid grid-cols-5 gap-4 px-4 py-6'>
-        {items.map((item, index) => (
+        {actionItems.map((item, index) => (
           <ActionGridItem
             key={item.href}
             {...item}

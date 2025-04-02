@@ -1,14 +1,11 @@
-import MaxWidthLayout from '@/layout/MaxWidthLayout';
+import { useNavigation } from '@/hooks/useNavigation';
+import { MaxWidthLayout } from '@/layout';
 import React from 'react';
 
 interface NavigationPill {
   label: string;
   isActive?: boolean;
   onClick?: () => void;
-}
-
-interface NavigationPillsProps {
-  pills: NavigationPill[];
 }
 
 const Pill: React.FC<NavigationPill> = ({ label, isActive, onClick }) => (
@@ -22,11 +19,13 @@ const Pill: React.FC<NavigationPill> = ({ label, isActive, onClick }) => (
   </button>
 );
 
-export const NavigationPills: React.FC<NavigationPillsProps> = ({ pills }) => {
+export const NavigationPills: React.FC = () => {
+  const { navigationPills } = useNavigation();
+
   return (
     <MaxWidthLayout>
       <div className='px-4 py-2 flex gap-2 overflow-x-auto'>
-        {pills.map((pill) => (
+        {navigationPills.map((pill) => (
           <Pill key={pill.label} {...pill} />
         ))}
       </div>

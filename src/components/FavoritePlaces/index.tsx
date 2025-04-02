@@ -1,15 +1,11 @@
 import React from 'react';
 import { LocationIcon } from '@/components/Icons';
-import MaxWidthLayout from '@/layout/MaxWidthLayout';
+import { MaxWidthLayout } from '@/layout';
 
 interface Place {
   id: string;
   name: string;
   icon?: React.ReactNode;
-}
-
-interface FavoritePlacesProps {
-  places: Place[];
 }
 
 const PlaceItem: React.FC<Place> = ({ name, icon = <LocationIcon /> }) => (
@@ -21,7 +17,15 @@ const PlaceItem: React.FC<Place> = ({ name, icon = <LocationIcon /> }) => (
   </div>
 );
 
-export const FavoritePlaces: React.FC<FavoritePlacesProps> = ({ places }) => {
+export const FavoritePlaces: React.FC = () => {
+  const places: Place[] = [
+    { id: '1', name: 'Bar do Gomez' },
+    { id: '2', name: 'Braseiro' },
+    { id: '3', name: 'Belmonte' },
+    { id: '4', name: 'Quartinho' },
+    { id: '5', name: 'Rio Tap' },
+  ];
+
   return (
     <MaxWidthLayout>
       <div className='px-4 py-6'>

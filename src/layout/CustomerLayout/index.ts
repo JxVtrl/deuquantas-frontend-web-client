@@ -1,1 +1,1 @@
-export { CustomerLayout } from './CustomerLayout';
+export { default } from './CustomerLayout';

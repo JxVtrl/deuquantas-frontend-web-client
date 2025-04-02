@@ -1,11 +1,10 @@
 import React from 'react';
-import MaxWidthLayout from '@/layout/MaxWidthLayout';
+import { MaxWidthLayout } from '@/layout';
+import { useAuth } from '@/contexts/AuthContext';
 
-interface HeaderProps {
-  firstName: string;
-}
-
-export const Header: React.FC<HeaderProps> = ({ firstName }) => {
+export const Header: React.FC = () => {
+  const { user } = useAuth();
+  const firstName = user?.name?.split(' ')[0] || 'Usuário';
   return (
     <MaxWidthLayout backgroundColor='#FFCC00'>
       <header className='px-4 py-2 flex justify-between items-center'>

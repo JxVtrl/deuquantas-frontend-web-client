@@ -1,5 +1,5 @@
 import React from 'react';
-import MaxWidthLayout from '@/layout/MaxWidthLayout';
+import { MaxWidthLayout } from '@/layout';
 export const StatusBar: React.FC = () => {
   return (
     <MaxWidthLayout backgroundColor='#FFCC00'>
