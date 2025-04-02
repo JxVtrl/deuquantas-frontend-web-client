@@ -12,7 +12,7 @@ export default async function handler(
   res: NextApiResponse,
 ) {
   return httpProxyMiddleware(req, res, {
-    target: 'http://localhost:3000',
+    target: 'http://localhost:3001',
     pathRewrite: [
       {
         patternStr: '^/api/proxy',

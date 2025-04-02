@@ -28,16 +28,20 @@ export interface ComandaResponse {
 const possibleUrls = [
   process.env.NEXT_PUBLIC_API_URL,
   'http://localhost:3000',
+  'http://localhost:3001',
+  'http://localhost:3002',
   'http://localhost:3003',
   'http://127.0.0.1:3000',
+  'http://127.0.0.1:3001',
   'http://backend:3000', // URL do Docker
+  'http://backend:3001', // URL do Docker
 ];
 
 // Filtra URLs vazias ou undefined
 const validUrls = possibleUrls.filter((url) => url);
 
 // URL padrão caso nenhuma das URLs acima funcione
-let API_URL = validUrls[0] || 'http://localhost:3000';
+let API_URL = validUrls[0] || 'http://localhost:3001';
 
 // Flag para indicar se estamos em modo offline
 let isOfflineMode = false;
@@ -71,7 +75,7 @@ export const ComandaService = {
 
       try {
         console.log(`Tentando conectar a ${url}/health...`);
-        await axios.get(`${url}/health`, { timeout: 3000 });
+        await axios.get(`${url}/health`, { timeout: 3001 });
         console.log(`Servidor encontrado em ${url}`);
         API_URL = url;
         isOfflineMode = false;

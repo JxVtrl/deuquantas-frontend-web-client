@@ -12,8 +12,8 @@ export default function Home() {
             <Link href='/login'>
               <Button variant='default'>Entrar</Button>
             </Link>
-            <Link href='/login'>
-              <Button variant='secondary'>Cadastrar</Button>
+            <Link href='/register'>
+              <Button variant='secondary'>Registrar</Button>
             </Link>
           </nav>
         </div>
