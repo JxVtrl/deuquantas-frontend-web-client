@@ -40,27 +40,28 @@ export function withAuth(Component: React.FC, requiredRole?: string) {
         );
       }
 
-      if (!user) {
-        console.log('Usuário não autenticado, redirecionando para login');
-        router.replace('/auth/login');
-      } else if (
-        requiredRole &&
-        user.permission_level !== getPermissionLevel(requiredRole)
-      ) {
-        console.log(
-          `Permissão insuficiente. Usuário tem nível ${user.permission_level}, mas precisa de ${getPermissionLevel(requiredRole)}`,
-        );
-        router.replace('/auth/login');
-      }
+      // TODO: Verificar se o usuário está autenticado
+      // if (!user) {
+      //   console.log('Usuário não autenticado, redirecionando para login');
+      //   router.replace('/auth/login');
+      // } else if (
+      //   requiredRole &&
+      //   user.permission_level !== getPermissionLevel(requiredRole)
+      // ) {
+      //   console.log(
+      //     `Permissão insuficiente. Usuário tem nível ${user.permission_level}, mas precisa de ${getPermissionLevel(requiredRole)}`,
+      //   );
+      //   router.replace('/auth/login');
+      // }
     }, [user, router]);
 
-    if (
-      !user ||
-      (requiredRole &&
-        user.permission_level !== getPermissionLevel(requiredRole))
-    ) {
-      return null; // Renderiza nada até redirecionar
-    }
+    // if (
+    //   !user ||
+    //   (requiredRole &&
+    //     user.permission_level !== getPermissionLevel(requiredRole))
+    // ) {
+    //   return null; // Renderiza nada até redirecionar
+    // }
 
     return <Component {...props} />;
   };
