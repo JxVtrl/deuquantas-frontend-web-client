@@ -2,7 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { PlusIcon } from '@/components/Icons';
-
+import MaxWidthLayout from '@/layout/MaxWidthLayout';
 export interface NavigationItem {
   icon: React.FC;
   label: string;
@@ -40,7 +40,10 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = ({
   const router = useRouter();
 
   return (
-    <div className='fixed bottom-0 left-0 right-0 bg-black'>
+    <MaxWidthLayout
+      backgroundColor='#000'
+      className='fixed bottom-0 left-0 right-0'
+    >
       <div className='flex justify-around py-4'>
         {items.map((item) => (
           <NavigationItem
@@ -58,6 +61,6 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = ({
           </div>
         </button>
       </div>
-    </div>
+    </MaxWidthLayout>
   );
 };

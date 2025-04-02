@@ -1,3 +1,4 @@
+import MaxWidthLayout from '@/layout/MaxWidthLayout';
 import React from 'react';
 
 interface NavigationPill {
@@ -23,10 +24,12 @@ const Pill: React.FC<NavigationPill> = ({ label, isActive, onClick }) => (
 
 export const NavigationPills: React.FC<NavigationPillsProps> = ({ pills }) => {
   return (
-    <div className='px-4 py-2 flex gap-2 overflow-x-auto'>
-      {pills.map((pill) => (
-        <Pill key={pill.label} {...pill} />
-      ))}
-    </div>
+    <MaxWidthLayout>
+      <div className='px-4 py-2 flex gap-2 overflow-x-auto'>
+        {pills.map((pill) => (
+          <Pill key={pill.label} {...pill} />
+        ))}
+      </div>
+    </MaxWidthLayout>
   );
 };

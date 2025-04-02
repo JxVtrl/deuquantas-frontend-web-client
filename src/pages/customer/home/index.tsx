@@ -25,14 +25,14 @@ const CustomerHome: React.FC = () => {
   ];
 
   return (
-    <div className='min-h-screen bg-[#FFCC00]'>
+    <>
       <StatusBar />
       <Header firstName={firstName} />
       <NavigationPills pills={navigationPills} />
       <ActionGrid items={actionItems} />
       <FavoritePlaces places={favoritePlaces} />
       <BottomNavigation items={bottomNavItems} onAddClick={handleAddClick} />
-    </div>
+    </>
   );
 };
 

@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import MaxWidthLayout from '@/layout/MaxWidthLayout';
 
 export interface ActionItem {
   icon: React.FC;
@@ -37,14 +38,16 @@ const ActionGridItem: React.FC<ActionItem & { isScanQR?: boolean }> = ({
 
 export const ActionGrid: React.FC<ActionGridProps> = ({ items }) => {
   return (
-    <div className='grid grid-cols-5 gap-4 px-4 py-6'>
-      {items.map((item, index) => (
-        <ActionGridItem
-          key={item.href}
-          {...item}
-          isScanQR={index === 0} // First item is Scan QR
-        />
-      ))}
-    </div>
+    <MaxWidthLayout>
+      <div className='grid grid-cols-5 gap-4 px-4 py-6'>
+        {items.map((item, index) => (
+          <ActionGridItem
+            key={item.href}
+            {...item}
+            isScanQR={index === 0} // First item is Scan QR
+          />
+        ))}
+      </div>
+    </MaxWidthLayout>
   );
 };

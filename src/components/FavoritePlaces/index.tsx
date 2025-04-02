@@ -1,5 +1,6 @@
 import React from 'react';
 import { LocationIcon } from '@/components/Icons';
+import MaxWidthLayout from '@/layout/MaxWidthLayout';
 
 interface Place {
   id: string;
@@ -22,13 +23,15 @@ const PlaceItem: React.FC<Place> = ({ name, icon = <LocationIcon /> }) => (
 
 export const FavoritePlaces: React.FC<FavoritePlacesProps> = ({ places }) => {
   return (
-    <div className='px-4 py-6'>
-      <h2 className='text-lg font-bold mb-4'>Locais favoritos</h2>
-      <div className='flex gap-4 overflow-x-auto pb-4'>
-        {places.map((place) => (
-          <PlaceItem key={place.id} {...place} />
-        ))}
+    <MaxWidthLayout>
+      <div className='px-4 py-6'>
+        <h2 className='text-lg font-bold mb-4'>Locais favoritos</h2>
+        <div className='flex gap-4 overflow-x-auto pb-4'>
+          {places.map((place) => (
+            <PlaceItem key={place.id} {...place} />
+          ))}
+        </div>
       </div>
-    </div>
+    </MaxWidthLayout>
   );
 };
