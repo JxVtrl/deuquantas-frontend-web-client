@@ -24,14 +24,14 @@ const AuthModal: React.FC<AuthModalProps> = ({
       exit={{ opacity: 0, rotateY: -90 }}
       transition={{ duration: 0.5, ease: 'easeInOut' }}
       style={{ transformStyle: 'preserve-3d' }}
-      className='bg-[#F0F0F0] w-full  rounded-lg shadow-xl py-[20px] px-[24px] mx-auto'
+      className='bg-[#F0F0F0] w-full  rounded-lg shadow-xl py-[20px] px-[24px] mx-auto h-fit'
     >
       {children}
-      <div className='mt-6 text-end'>
-        <p>
+      <div className='mt-[12px] text-end'>
+        <p className='text-[#272727] text-[12px] leading-[120%] font-[500]'>
           {isLogin ? 'Não tem uma conta?' : 'Já tem uma conta?'}{' '}
           <span
-            className='underline cursor-pointer'
+            className='underline cursor-pointer font-[700]'
             onClick={handleToggleClick}
           >
             {isLogin ? 'Cadastrar' : 'Faça Login'}
