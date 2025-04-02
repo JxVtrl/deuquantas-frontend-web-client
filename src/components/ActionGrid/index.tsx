@@ -36,7 +36,7 @@ export const ActionGrid: React.FC = () => {
 
   return (
     <MaxWidthLayout>
-      <div className='flex gap-[15px] overflow-x-auto pb-[6px]'>
+      <div className='flex gap-[15px] overflow-x-auto pb-[6px] pt-[20px]'>
         {actionItems.map((item, index) => (
           <ActionGridItem
             key={item.href}
