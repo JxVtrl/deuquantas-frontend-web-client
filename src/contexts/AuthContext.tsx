@@ -171,7 +171,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
             // Definir uma interface para o token decodificado
             interface DecodedToken {
-              sub: number;
+              sub: string;
               nome?: string;
               email?: string;
               isAdmin?: boolean;
@@ -185,10 +185,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
             // Mapear os campos do token para a interface User
             const user: User = {
-              id: decodedToken.sub,
-              name: decodedToken.nome || '',
-              givenName: decodedToken.nome || '',
+              id: Number(decodedToken.sub),
+              nome: decodedToken.nome || '',
               email: decodedToken.email || '',
+              isAdmin: decodedToken.isAdmin || false,
+              sub: decodedToken.sub || '',
               permission_level:
                 decodedToken.permission_level ||
                 (decodedToken.isAdmin

@@ -15,7 +15,7 @@ const ProfilePage: React.FC = () => {
 
   useEffect(() => {
     if (user) {
-      setNome(user.name || '');
+      setNome(user.nome || '');
       setTelefone('');
     }
   }, [user]);

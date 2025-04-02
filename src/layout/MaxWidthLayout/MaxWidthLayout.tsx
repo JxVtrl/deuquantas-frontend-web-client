@@ -18,6 +18,7 @@ const MaxWidthLayout: React.FC<MaxWidthLayoutProps> = ({
           maxWidth: 1024,
           width: '100%',
           margin: '0 auto',
+          padding: '0 16px',
         }}
       >
         {children}

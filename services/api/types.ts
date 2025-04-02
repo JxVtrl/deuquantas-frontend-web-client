@@ -6,9 +6,10 @@ export enum PermissionLevel {
 
 export interface User {
   id: number;
-  name: string;
-  givenName: string;
+  nome: string;
   email: string;
+  isAdmin: boolean;
+  sub: string;
   permission_level: PermissionLevel;
 }
 
