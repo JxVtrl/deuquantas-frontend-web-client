@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { motion, px } from 'framer-motion';
 import React from 'react';
 
 interface AuthModalProps {
@@ -24,7 +24,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
       exit={{ opacity: 0, rotateY: -90 }}
       transition={{ duration: 0.5, ease: 'easeInOut' }}
       style={{ transformStyle: 'preserve-3d' }}
-      className='bg-[#F0F0F0] w-full  rounded-lg shadow-xl py-[20px] px-[24px] mx-auto h-fit'
+      className='bg-[#F0F0F0] w-full rounded-lg shadow-[0px_1px_2px_0px_#0000000D] py-[20px] px-[24px] mx-auto h-fit'
     >
       {children}
       <div className='mt-[12px] text-end'>
