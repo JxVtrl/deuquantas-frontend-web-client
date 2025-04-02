@@ -1,3 +1,4 @@
+import { AuthService } from '@/services/auth.service';
 import { useState } from 'react';
 
 interface LoginFormData {
@@ -38,6 +39,9 @@ export function useAuthForm({ login, register, onSuccess }: UseAuthFormProps) {
 
   const handleSubmit = async (data: LoginFormData | RegisterFormData) => {
     setError('');
+
+    // remove token dos cookies
+    AuthService.removeAuthToken();
 
     if (!isLogin) {
       const registerData = data as RegisterFormData;
