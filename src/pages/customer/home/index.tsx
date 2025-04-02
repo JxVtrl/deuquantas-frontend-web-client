@@ -4,6 +4,7 @@ import { NavigationPills } from '@/components/NavigationPills';
 import { ActionGrid } from '@/components/ActionGrid';
 import { FavoritePlaces } from '@/components/FavoritePlaces';
 import { CustomerLayout } from '@/layout';
+import { PromotionSlider } from '@/components/PromotionSlider';
 
 const CustomerHome: React.FC = () => {
   return (
@@ -11,6 +12,7 @@ const CustomerHome: React.FC = () => {
       <NavigationPills />
       <ActionGrid />
       <FavoritePlaces />
+      <PromotionSlider />
     </CustomerLayout>
   );
 };

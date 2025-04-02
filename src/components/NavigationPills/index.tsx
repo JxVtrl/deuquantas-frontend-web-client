@@ -24,7 +24,7 @@ export const NavigationPills: React.FC = () => {
 
   return (
     <MaxWidthLayout>
-      <div className='px-4 py-2 flex gap-2 overflow-x-auto'>
+      <div className='py-[16px] flex gap-2 overflow-x-auto border-b border-[#F0F0F0]'>
         {navigationPills.map((pill) => (
           <Pill key={pill.label} {...pill} />
         ))}

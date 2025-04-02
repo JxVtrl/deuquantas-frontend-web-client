@@ -28,9 +28,11 @@ export const FavoritePlaces: React.FC = () => {
 
   return (
     <MaxWidthLayout>
-      <div className='px-4 py-6'>
-        <h2 className='text-lg font-bold mb-4'>Locais favoritos</h2>
-        <div className='flex gap-4 overflow-x-auto pb-4'>
+      <div>
+        <h2 className='text-[11px] leading-[24px] font-[500] mb-[12px]'>
+          Locais favoritos
+        </h2>
+        <div className='flex gap-[24px] overflow-x-auto pb-[6px]'>
           {places.map((place) => (
             <PlaceItem key={place.id} {...place} />
           ))}
