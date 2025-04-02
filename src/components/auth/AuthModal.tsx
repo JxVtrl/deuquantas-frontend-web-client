@@ -13,22 +13,21 @@ const AuthModal: React.FC<AuthModalProps> = ({
   onToggleForm,
 }) => {
   const handleToggleClick = () => {
-    console.log('Botão clicado no AuthModal');
-    console.log('Estado atual isLogin:', isLogin);
     onToggleForm();
   };
 
   return (
     <motion.div
       key={isLogin ? 'login' : 'register'}
-      initial={{ opacity: 0, rotateY: 90, width: '0%' }}
-      animate={{ opacity: 1, rotateY: 0, width: '100%' }}
-      exit={{ opacity: 0, rotateY: -90, width: '0%' }}
+      initial={{ opacity: 0, rotateY: 90 }}
+      animate={{ opacity: 1, rotateY: 0 }}
+      exit={{ opacity: 0, rotateY: -90 }}
       transition={{ duration: 0.5, ease: 'easeInOut' }}
-      className='bg-[#F0F0F0] rounded-lg shadow-xl py-[20px] px-[24px] mx-auto'
+      style={{ transformStyle: 'preserve-3d' }}
+      className='bg-[#F0F0F0] w-full  rounded-lg shadow-xl py-[20px] px-[24px] mx-auto'
     >
       {children}
-      <div className='mt-6 text-end '>
+      <div className='mt-6 text-end'>
         <p>
           {isLogin ? 'Não tem uma conta?' : 'Já tem uma conta?'}{' '}
           <span
