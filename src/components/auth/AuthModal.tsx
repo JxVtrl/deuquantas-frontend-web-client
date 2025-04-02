@@ -28,15 +28,16 @@ const AuthModal: React.FC<AuthModalProps> = ({
         transition={{ duration: 0.5, ease: 'easeInOut' }}
       >
         {children}
-        <div className='mt-6 text-center'>
-          <button
-            onClick={handleToggleClick}
-            className='text-yellow-600 hover:text-yellow-700 font-medium'
-          >
-            {isLogin
-              ? 'Não tem uma conta? Registre-se'
-              : 'Já tem uma conta? Faça login'}
-          </button>
+        <div className='mt-6 text-end '>
+          <p>
+            {isLogin ? 'Não tem uma conta?' : 'Já tem uma conta?'}{' '}
+            <span
+              className='underline cursor-pointer'
+              onClick={handleToggleClick}
+            >
+              {isLogin ? 'Cadastrar' : 'Faça Login'}
+            </span>
+          </p>
         </div>
       </motion.div>
     </div>

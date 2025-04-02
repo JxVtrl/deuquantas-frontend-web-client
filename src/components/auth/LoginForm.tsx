@@ -1,4 +1,5 @@
 import React from 'react';
+import Button from '../Button';
 
 interface LoginFormProps {
   email: string;
@@ -17,6 +18,21 @@ export function LoginForm({
   onInputChange,
   onSubmit,
 }: LoginFormProps) {
+  const list_of_inputs = [
+    {
+      id: 'email',
+      type: 'email',
+      label: 'E-mail',
+      placeholder: 'your-email@email.com',
+    },
+    {
+      id: 'senha',
+      type: 'password',
+      label: 'Senha',
+      placeholder: '••••••••••',
+    },
+  ];
+
   return (
     <form onSubmit={onSubmit}>
       {error && (
@@ -24,45 +40,42 @@ export function LoginForm({
           {error}
         </div>
       )}
-
-      <div className='mb-4'>
-        <label htmlFor='email' className='block text-[#272727] mb-2'>
-          Email
-        </label>
-        <input
-          id='email'
-          type='email'
-          value={email}
-          onChange={onInputChange}
-          className='w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500'
-          required
-        />
+      <div className='flex flex-col gap-[12px] mb-[32px]'>
+        {list_of_inputs.map((input) => (
+          <div key={input.id}>
+            <label
+              htmlFor={input.id}
+              className='block text-[#272727] mb-[6px] text-[12px] leading-[120%] font-[500]'
+            >
+              {input.label}
+            </label>
+            <input
+              id={input.id}
+              type={input.type}
+              value={input.id === 'email' ? email : senha}
+              onChange={onInputChange}
+              className='w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500
+                placeholder:text-[#A1A1AA] placeholder:text-[14px] placeholder:leading-[140%] placeholder:font-[400]
+              '
+              required
+              placeholder={input.placeholder}
+            />
+          </div>
+        ))}
       </div>
 
-      <div className='mb-4'>
-        <label htmlFor='senha' className='block text-[#272727] mb-2'>
-          Senha
-        </label>
-        <input
-          id='senha'
-          type='password'
-          value={senha}
-          onChange={onInputChange}
-          className='w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500'
-          required
-          minLength={6}
+      <div className='flex flex-col gap-[12px]'>
+        <Button
+          disabled={loading}
+          variant='primary'
+          text={loading ? 'Entrando...' : 'Entrar'}
+        />
+        <Button
+          disabled={loading}
+          variant='secondary'
+          text={loading ? 'Entrando...' : 'Entrar com Google'}
         />
       </div>
-
-      <button
-        type='submit'
-        disabled={loading}
-        className={`w-full bg-yellow-500 text-white py-2 px-4 rounded-md hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-500 ${
-          loading ? 'opacity-70 cursor-not-allowed' : ''
-        }`}
-      >
-        {loading ? 'Entrando...' : 'Entrar'}
-      </button>
     </form>
   );
 }

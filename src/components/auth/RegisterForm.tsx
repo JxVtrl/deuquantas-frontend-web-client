@@ -1,4 +1,5 @@
 import React from 'react';
+import Button from '../Button';
 
 interface RegisterFormProps {
   nome: string;
@@ -23,6 +24,44 @@ export function RegisterForm({
   onInputChange,
   onSubmit,
 }: RegisterFormProps) {
+  const list_of_inputs = [
+    {
+      id: 'nome',
+      type: 'text',
+      label: 'Nome Completo',
+      placeholder: 'Digite seu nome completo',
+      value: nome,
+    },
+    {
+      id: 'email',
+      type: 'email',
+      label: 'E-mail',
+      placeholder: 'Digite seu e-mail',
+      value: email,
+    },
+    {
+      id: 'telefone',
+      type: 'tel',
+      label: 'Telefone (opcional)',
+      placeholder: 'Digite seu telefone',
+      value: telefone,
+    },
+    {
+      id: 'senha',
+      type: 'password',
+      label: 'Senha',
+      placeholder: 'Digite sua senha',
+      value: senha,
+    },
+    {
+      id: 'confirmSenha',
+      type: 'password',
+      label: 'Confirmar Senha',
+      placeholder: 'Confirme sua senha',
+      value: confirmSenha,
+    },
+  ];
+
   return (
     <form onSubmit={onSubmit}>
       {error && (
@@ -31,85 +70,37 @@ export function RegisterForm({
         </div>
       )}
 
-      <div className='mb-4'>
-        <label htmlFor='nome' className='block text-gray-700 mb-2'>
-          Nome Completo
-        </label>
-        <input
-          id='nome'
-          type='text'
-          value={nome}
-          onChange={onInputChange}
-          className='w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500'
-          required
-        />
+      <div className='flex flex-col gap-[12px] mb-[32px]'>
+        {list_of_inputs.map((input) => (
+          <div key={input.id}>
+            <label
+              htmlFor={input.id}
+              className='block text-[#272727] mb-[6px] text-[12px] leading-[120%] font-[500]'
+            >
+              {input.label}
+            </label>
+            <input
+              type={input.type}
+              id={input.id}
+              placeholder={input.placeholder}
+              onChange={onInputChange}
+              value={input.value}
+              className='w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500
+                placeholder:text-[#A1A1AA] placeholder:text-[14px] placeholder:leading-[140%] placeholder:font-[400]
+              '
+            />
+          </div>
+        ))}
       </div>
 
-      <div className='mb-4'>
-        <label htmlFor='email' className='block text-gray-700 mb-2'>
-          Email
-        </label>
-        <input
-          id='email'
-          type='email'
-          value={email}
-          onChange={onInputChange}
-          className='w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500'
-          required
+      <div className='flex flex-col gap-[12px]'>
+        <Button
+          disabled={loading}
+          variant='primary'
+          text={loading ? 'Registrando...' : 'Registrar'}
+          onClick={onSubmit}
         />
       </div>
-
-      <div className='mb-4'>
-        <label htmlFor='telefone' className='block text-gray-700 mb-2'>
-          Telefone (opcional)
-        </label>
-        <input
-          id='telefone'
-          type='tel'
-          value={telefone}
-          onChange={onInputChange}
-          className='w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500'
-        />
-      </div>
-
-      <div className='mb-4'>
-        <label htmlFor='senha' className='block text-gray-700 mb-2'>
-          Senha
-        </label>
-        <input
-          id='senha'
-          type='password'
-          value={senha}
-          onChange={onInputChange}
-          className='w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500'
-          required
-          minLength={6}
-        />
-      </div>
-
-      <div className='mb-6'>
-        <label htmlFor='confirmSenha' className='block text-gray-700 mb-2'>
-          Confirmar Senha
-        </label>
-        <input
-          id='confirmSenha'
-          type='password'
-          value={confirmSenha}
-          onChange={onInputChange}
-          className='w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500'
-          required
-        />
-      </div>
-
-      <button
-        type='submit'
-        disabled={loading}
-        className={`w-full bg-yellow-500 text-white py-2 px-4 rounded-md hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-500 ${
-          loading ? 'opacity-70 cursor-not-allowed' : ''
-        }`}
-      >
-        {loading ? 'Registrando...' : 'Registrar'}
-      </button>
     </form>
   );
 }
