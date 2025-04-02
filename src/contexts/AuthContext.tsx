@@ -102,7 +102,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       await AuthService.register(userData);
 
       // Após o registro bem-sucedido, redirecionar para a página de login
-      router.push('/auth/login?registered=true');
+      router.push('/login');
     } catch (error) {
       console.error('Erro ao registrar:', error);
       throw error;
@@ -114,7 +114,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   const logout = () => {
     AuthService.removeAuthToken();
     setUser(null);
-    router.push('/auth/login');
+    router.push('/login');
   };
 
   const storeUserPreferences = (
@@ -144,7 +144,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
   const clearSession = () => {
     setUser(null);
-    router.push('/auth/login');
+    router.push('/login');
   };
 
   return (

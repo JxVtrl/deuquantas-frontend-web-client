@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { LoginForm } from './LoginForm';
 import { RegisterForm } from './RegisterForm';
@@ -8,37 +8,30 @@ import { useAuthForm } from '@/hooks/useAuthForm';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/router';
 
-interface LoginFormData {
-  email: string;
-  senha: string;
-}
-
-interface RegisterFormData {
-  nome: string;
-  email: string;
-  telefone: string;
-  senha: string;
-  confirmSenha: string;
-}
-
 interface AuthContainerProps {
   loading: boolean;
   error?: string;
-  onSubmit: (data: LoginFormData | RegisterFormData) => void;
+  isRegistered: boolean;
 }
 
 export function AuthContainer({
   loading,
   error,
-  onSubmit,
+  isRegistered,
 }: AuthContainerProps) {
   const router = useRouter();
   const { login, register } = useAuth();
-  const { isLogin, toggleForm } = useAuthForm({
+  const { isLogin, toggleForm, handleSubmit } = useAuthForm({
     login,
     register,
-    onSuccess: () => router.push('/dashboard'),
+    onSuccess: () => router.push('/login'),
   });
+
+  useEffect(() => {
+    if (isRegistered) {
+      toggleForm();
+    }
+  }, [isRegistered, toggleForm]);
 
   return (
     <div className='min-h-screen flex items-center justify-center bg-[#FFCC00] p-4'>
@@ -61,13 +54,13 @@ export function AuthContainer({
               <LoginForm
                 loading={loading}
                 error={error}
-                onSubmit={onSubmit as (data: LoginFormData) => void}
+                onSubmit={handleSubmit}
               />
             ) : (
               <RegisterForm
                 loading={loading}
                 error={error}
-                onSubmit={onSubmit as (data: RegisterFormData) => void}
+                onSubmit={handleSubmit}
               />
             )}
           </AuthModal>

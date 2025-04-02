@@ -1,4 +1,4 @@
-import { motion, px } from 'framer-motion';
+import { motion } from 'framer-motion';
 import React from 'react';
 
 interface AuthModalProps {

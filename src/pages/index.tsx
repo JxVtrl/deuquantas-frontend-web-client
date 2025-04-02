@@ -9,10 +9,10 @@ export default function Home() {
         <div className='container mx-auto flex items-center justify-between py-4 px-6'>
           <h1 className='text-lg font-bold'>DeuQuantas</h1>
           <nav className='flex gap-4'>
-            <Link href='/auth/login'>
+            <Link href='/login'>
               <Button variant='default'>Entrar</Button>
             </Link>
-            <Link href='/auth/login'>
+            <Link href='/login'>
               <Button variant='secondary'>Cadastrar</Button>
             </Link>
           </nav>
@@ -30,7 +30,7 @@ export default function Home() {
             estabelecimentos.
           </p>
           <div className='mt-6 flex justify-center gap-4'>
-            <Link href='/auth/login'>
+            <Link href='/login'>
               <Button variant='default' size='lg'>
                 Comece Agora
               </Button>

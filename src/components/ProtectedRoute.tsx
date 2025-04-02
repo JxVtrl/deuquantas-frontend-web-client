@@ -19,7 +19,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
       if (!isAuthenticated) {
         // Redireciona para a página de login se não estiver autenticado
         router.push({
-          pathname: '/auth/login',
+          pathname: '/login',
           query: { state: router.asPath }, // Salva a página atual para redirecionar após o login
         });
       } else if (adminOnly && !isAdmin) {

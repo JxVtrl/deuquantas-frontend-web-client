@@ -42,7 +42,7 @@ export function withAuth(Component: React.FC, requiredRole?: string) {
 
       if (!user) {
         console.log('Usuário não autenticado, redirecionando para login');
-        router.replace('/auth/login');
+        router.replace('/login');
       } else if (
         requiredRole &&
         user.permission_level !== getPermissionLevel(requiredRole)
@@ -50,7 +50,7 @@ export function withAuth(Component: React.FC, requiredRole?: string) {
         console.log(
           `Permissão insuficiente. Usuário tem nível ${user.permission_level}, mas precisa de ${getPermissionLevel(requiredRole)}`,
         );
-        router.replace('/auth/login');
+        router.replace('/login');
       }
     }, [user, router]);
 
