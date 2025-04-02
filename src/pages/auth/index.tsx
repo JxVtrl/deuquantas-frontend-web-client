@@ -7,29 +7,20 @@ import { useAuthForm } from '../../hooks/useAuthForm';
 export default function AuthPage() {
   const router = useRouter();
   const { login, register } = useAuth();
-  const {
-    isLogin,
-    formData,
-    loading,
-    error,
-    handleInputChange,
-    handleSubmit,
-    toggleForm,
-  } = useAuthForm({
-    login,
-    register,
-    onSuccess: () => router.push('/dashboard'),
-  });
+  const { formData, loading, error, handleInputChange, handleSubmit } =
+    useAuthForm({
+      login,
+      register,
+      onSuccess: () => router.push('/dashboard'),
+    });
 
   return (
     <AuthContainer
-      isLogin={isLogin}
       loading={loading}
       error={error}
       formData={formData}
       onInputChange={handleInputChange}
       onSubmit={handleSubmit}
-      onToggleForm={toggleForm}
     />
   );
 }

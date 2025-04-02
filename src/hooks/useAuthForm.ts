@@ -38,6 +38,8 @@ export function useAuthForm({ login, register, onSuccess }: UseAuthFormProps) {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  console.log('useAuthForm render - isLogin:', isLogin);
+
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
     setFormData((prev) => ({ ...prev, [id]: value }));
@@ -97,7 +99,11 @@ export function useAuthForm({ login, register, onSuccess }: UseAuthFormProps) {
   };
 
   const toggleForm = () => {
-    setIsLogin(!isLogin);
+    console.log('toggleForm chamado no hook - estado atual:', isLogin);
+    setIsLogin((prev) => {
+      console.log('Alterando isLogin de', prev, 'para', !prev);
+      return !prev;
+    });
     setError('');
   };
 
