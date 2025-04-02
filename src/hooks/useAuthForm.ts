@@ -1,10 +1,15 @@
-import { useState, FormEvent, ChangeEvent } from 'react';
+import { useState } from 'react';
 
-interface AuthFormData {
+interface LoginFormData {
   email: string;
   senha: string;
+}
+
+interface RegisterFormData {
   nome: string;
+  email: string;
   telefone: string;
+  senha: string;
   confirmSenha: string;
 }
 
@@ -28,34 +33,20 @@ interface UseAuthFormProps {
 
 export function useAuthForm({ login, register, onSuccess }: UseAuthFormProps) {
   const [isLogin, setIsLogin] = useState(true);
-  const [formData, setFormData] = useState<AuthFormData>({
-    email: '',
-    senha: '',
-    nome: '',
-    telefone: '',
-    confirmSenha: '',
-  });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  console.log('useAuthForm render - isLogin:', isLogin);
-
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { id, value } = e.target;
-    setFormData((prev) => ({ ...prev, [id]: value }));
-  };
-
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (data: LoginFormData | RegisterFormData) => {
     setError('');
 
     if (!isLogin) {
-      if (formData.senha !== formData.confirmSenha) {
+      const registerData = data as RegisterFormData;
+      if (registerData.senha !== registerData.confirmSenha) {
         setError('As senhas não coincidem.');
         return;
       }
 
-      if (formData.senha.length < 6) {
+      if (registerData.senha.length < 6) {
         setError('A senha deve ter pelo menos 6 caracteres.');
         return;
       }
@@ -65,16 +56,18 @@ export function useAuthForm({ login, register, onSuccess }: UseAuthFormProps) {
 
     try {
       if (isLogin) {
+        const loginData = data as LoginFormData;
         await login({
-          email: formData.email,
-          password: formData.senha,
+          email: loginData.email,
+          password: loginData.senha,
         });
       } else {
+        const registerData = data as RegisterFormData;
         await register({
-          nome: formData.nome,
-          email: formData.email,
-          password: formData.senha,
-          telefone: formData.telefone || undefined,
+          nome: registerData.nome,
+          email: registerData.email,
+          password: registerData.senha,
+          telefone: registerData.telefone || undefined,
         });
       }
       onSuccess();
@@ -99,20 +92,14 @@ export function useAuthForm({ login, register, onSuccess }: UseAuthFormProps) {
   };
 
   const toggleForm = () => {
-    console.log('toggleForm chamado no hook - estado atual:', isLogin);
-    setIsLogin((prev) => {
-      console.log('Alterando isLogin de', prev, 'para', !prev);
-      return !prev;
-    });
+    setIsLogin((prev) => !prev);
     setError('');
   };
 
   return {
     isLogin,
-    formData,
     loading,
     error,
-    handleInputChange,
     handleSubmit,
     toggleForm,
   };

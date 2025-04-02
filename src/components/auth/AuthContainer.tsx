@@ -8,25 +8,28 @@ import { useAuthForm } from '@/hooks/useAuthForm';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/router';
 
+interface LoginFormData {
+  email: string;
+  senha: string;
+}
+
+interface RegisterFormData {
+  nome: string;
+  email: string;
+  telefone: string;
+  senha: string;
+  confirmSenha: string;
+}
+
 interface AuthContainerProps {
   loading: boolean;
   error?: string;
-  formData: {
-    email: string;
-    senha: string;
-    nome: string;
-    telefone: string;
-    confirmSenha: string;
-  };
-  onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onSubmit: (e: React.FormEvent) => void;
+  onSubmit: (data: LoginFormData | RegisterFormData) => void;
 }
 
 export function AuthContainer({
   loading,
   error,
-  formData,
-  onInputChange,
   onSubmit,
 }: AuthContainerProps) {
   const router = useRouter();
@@ -36,8 +39,6 @@ export function AuthContainer({
     register,
     onSuccess: () => router.push('/dashboard'),
   });
-
-  console.log('AuthContainer render - isLogin:', isLogin);
 
   return (
     <div className='min-h-screen flex items-center justify-center bg-[#FFCC00] p-4'>
@@ -58,24 +59,15 @@ export function AuthContainer({
           >
             {isLogin ? (
               <LoginForm
-                email={formData.email}
-                senha={formData.senha}
                 loading={loading}
                 error={error}
-                onInputChange={onInputChange}
-                onSubmit={onSubmit}
+                onSubmit={onSubmit as (data: LoginFormData) => void}
               />
             ) : (
               <RegisterForm
-                nome={formData.nome}
-                email={formData.email}
-                telefone={formData.telefone}
-                senha={formData.senha}
-                confirmSenha={formData.confirmSenha}
                 loading={loading}
                 error={error}
-                onInputChange={onInputChange}
-                onSubmit={onSubmit}
+                onSubmit={onSubmit as (data: RegisterFormData) => void}
               />
             )}
           </AuthModal>
