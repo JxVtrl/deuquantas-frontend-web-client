@@ -17,8 +17,10 @@ export function LoginForm({ loading, error, onSubmit }: LoginFormProps) {
   const {
     register,
     handleSubmit,
-    formState: { errors },
-  } = useForm<LoginFormData>();
+    formState: { errors, isSubmitting },
+  } = useForm<LoginFormData>({
+    mode: 'onChange',
+  });
 
   const list_of_inputs: Array<{
     id: keyof LoginFormData;
@@ -40,9 +42,19 @@ export function LoginForm({ loading, error, onSubmit }: LoginFormProps) {
     },
   ];
 
+  const getErrorMessage = (field: keyof LoginFormData) => {
+    if (errors[field]) {
+      return errors[field]?.message;
+    }
+    if (error && field === 'email') {
+      return 'E-mail ou senha incorretos. Verifique suas credenciais.';
+    }
+    return '';
+  };
+
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      {error && (
+      {error && !errors.email && (
         <div className='bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4'>
           {error}
         </div>
@@ -62,20 +74,21 @@ export function LoginForm({ loading, error, onSubmit }: LoginFormProps) {
                 ...(input.id === 'email' && {
                   pattern: {
                     value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                    message: 'E-mail inválido',
+                    message: 'Digite um e-mail válido',
                   },
                 }),
               })}
               id={input.id}
               type={input.type}
-              className='w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500
+              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500
                 placeholder:text-[#A1A1AA] placeholder:text-[14px] placeholder:leading-[140%] placeholder:font-[400]
-              '
+                ${errors[input.id] ? 'border-red-500' : 'border-gray-300'}
+              `}
               placeholder={input.placeholder}
             />
-            {errors[input.id as keyof LoginFormData] && (
+            {getErrorMessage(input.id) && (
               <span className='text-red-500 text-xs mt-1'>
-                {errors[input.id as keyof LoginFormData]?.message}
+                {getErrorMessage(input.id)}
               </span>
             )}
           </div>
@@ -84,15 +97,15 @@ export function LoginForm({ loading, error, onSubmit }: LoginFormProps) {
 
       <div className='flex flex-col gap-[12px]'>
         <Button
-          disabled={loading}
+          disabled={loading || isSubmitting}
           variant='primary'
-          text={loading ? 'Entrando...' : 'Entrar'}
+          text={loading || isSubmitting ? 'Entrando...' : 'Entrar'}
           type='submit'
         />
         <Button
-          disabled={loading}
+          disabled={loading || isSubmitting}
           variant='secondary'
-          text={loading ? 'Entrando...' : 'Entrar com Google'}
+          text={loading || isSubmitting ? 'Entrando...' : 'Entrar com Google'}
           type='button'
         />
       </div>

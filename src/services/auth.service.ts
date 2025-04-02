@@ -56,7 +56,7 @@ export class AuthService {
         email: userData.email,
         nome: userData.nome,
         password: userData.password,
-        telefone: userData.telefone || '',
+        telefone: userData.telefone || undefined,
       };
 
       const response = await axios.post(

@@ -21,8 +21,10 @@ export function RegisterForm({ loading, error, onSubmit }: RegisterFormProps) {
     register,
     handleSubmit,
     watch,
-    formState: { errors },
-  } = useForm<RegisterFormData>();
+    formState: { errors, isSubmitting },
+  } = useForm<RegisterFormData>({
+    mode: 'onChange',
+  });
 
   const senha = watch('senha');
 
@@ -64,9 +66,19 @@ export function RegisterForm({ loading, error, onSubmit }: RegisterFormProps) {
     },
   ];
 
+  const getErrorMessage = (field: keyof RegisterFormData) => {
+    if (errors[field]) {
+      return errors[field]?.message;
+    }
+    if (error && field === 'email') {
+      return 'Este e-mail já está em uso. Por favor, use outro e-mail.';
+    }
+    return '';
+  };
+
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      {error && (
+      {error && !errors.email && (
         <div className='bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4'>
           {error}
         </div>
@@ -88,7 +100,7 @@ export function RegisterForm({ loading, error, onSubmit }: RegisterFormProps) {
                 ...(input.id === 'email' && {
                   pattern: {
                     value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                    message: 'E-mail inválido',
+                    message: 'Digite um e-mail válido',
                   },
                 }),
                 ...(input.id === 'confirmSenha' && {
@@ -105,13 +117,14 @@ export function RegisterForm({ loading, error, onSubmit }: RegisterFormProps) {
               type={input.type}
               id={input.id.toString()}
               placeholder={input.placeholder}
-              className='w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500
+              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500
                 placeholder:text-[#A1A1AA] placeholder:text-[14px] placeholder:leading-[140%] placeholder:font-[400]
-              '
+                ${errors[input.id] ? 'border-red-500' : 'border-gray-300'}
+              `}
             />
-            {errors[input.id as keyof RegisterFormData] && (
+            {getErrorMessage(input.id) && (
               <span className='text-red-500 text-xs mt-1'>
-                {errors[input.id as keyof RegisterFormData]?.message}
+                {getErrorMessage(input.id)}
               </span>
             )}
           </div>
@@ -120,9 +133,9 @@ export function RegisterForm({ loading, error, onSubmit }: RegisterFormProps) {
 
       <div className='flex flex-col gap-[12px]'>
         <Button
-          disabled={loading}
+          disabled={loading || isSubmitting}
           variant='primary'
-          text={loading ? 'Registrando...' : 'Registrar'}
+          text={loading || isSubmitting ? 'Registrando...' : 'Registrar'}
           type='submit'
         />
       </div>

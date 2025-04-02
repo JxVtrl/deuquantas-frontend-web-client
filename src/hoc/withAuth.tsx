@@ -54,13 +54,13 @@ export function withAuth(Component: React.FC, requiredRole?: string) {
       }
     }, [user, router]);
 
-    if (
-      !user ||
-      (requiredRole &&
-        user.permission_level !== getPermissionLevel(requiredRole))
-    ) {
-      return null; // Renderiza nada até redirecionar
-    }
+    // if (
+    //   !user ||
+    //   (requiredRole &&
+    //     user.permission_level !== getPermissionLevel(requiredRole))
+    // ) {
+    //   return null; // Renderiza nada até redirecionar
+    // }
 
     return <Component {...props} />;
   };
