@@ -1,14 +1,6 @@
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
-import { jwtDecode, JwtPayload } from 'jwt-decode';
-
-// Interface para o payload do token JWT com o nível de permissão
-interface UserPayload extends JwtPayload {
-  permission_level?: number;
-  isAdmin?: boolean;
-  email?: string;
-  nome?: string;
-}
+import { useAuth } from '@/contexts/AuthContext';
 
 export function withAuthAdmin(Component: React.FC) {
   return withAuth(Component, 'admin');
@@ -27,40 +19,51 @@ export function withAuth(Component: React.FC, requiredRole?: string) {
     props: React.ComponentProps<typeof Component>,
   ) {
     const router = useRouter();
-    const user = getUserFromToken(); // Usa o token JWT real
+    const { user, isAuthenticated } = useAuth();
 
     useEffect(() => {
-      console.log('User data:', user);
-      console.log('Required role:', requiredRole);
+      const checkAuth = async () => {
+        console.log('Verificando autenticação...');
+        console.log('Usuário:', user);
+        console.log('Está autenticado:', isAuthenticated);
 
-      if (requiredRole) {
-        console.log(
-          'Required permission level:',
-          getPermissionLevel(requiredRole),
-        );
-      }
+        if (!isAuthenticated || !user) {
+          console.log('Usuário não autenticado, redirecionando para /auth');
+          await router.replace('/auth');
+          return;
+        }
 
-      if (!user) {
-        console.log('Usuário não autenticado, redirecionando para login');
-        router.replace('/login');
-      } else if (
-        requiredRole &&
-        user.permission_level !== getPermissionLevel(requiredRole)
-      ) {
-        console.log(
-          `Permissão insuficiente. Usuário tem nível ${user.permission_level}, mas precisa de ${getPermissionLevel(requiredRole)}`,
-        );
-        router.replace('/login');
-      }
-    }, [user, router]);
+        if (requiredRole) {
+          const requiredLevel = getPermissionLevel(requiredRole);
+          const userLevel = user.permission_level || 3; // Default para customer
 
-    // if (
-    //   !user ||
-    //   (requiredRole &&
-    //     user.permission_level !== getPermissionLevel(requiredRole))
-    // ) {
-    //   return null; // Renderiza nada até redirecionar
-    // }
+          console.log('Nível de permissão requerido:', requiredLevel);
+          console.log('Nível de permissão do usuário:', userLevel);
+
+          if (userLevel !== requiredLevel) {
+            console.log(
+              `Permissão insuficiente. Usuário tem nível ${userLevel}, mas precisa de ${requiredLevel}`,
+            );
+            await router.replace('/auth');
+            return;
+          }
+        }
+
+        console.log('Autenticação verificada com sucesso!');
+      };
+
+      checkAuth();
+    }, [user, isAuthenticated, router]);
+
+    // Renderiza o componente apenas se o usuário estiver autenticado e tiver as permissões necessárias
+    if (
+      !isAuthenticated ||
+      !user ||
+      (requiredRole &&
+        user.permission_level !== getPermissionLevel(requiredRole))
+    ) {
+      return null;
+    }
 
     return <Component {...props} />;
   };
@@ -78,23 +81,4 @@ function getPermissionLevel(role: string): number {
     default:
       return 0;
   }
-}
-
-// Função para obter o usuário a partir do token JWT
-function getUserFromToken(): UserPayload | null {
-  if (typeof window !== 'undefined') {
-    const token = localStorage.getItem('auth_token');
-    if (!token) return null;
-
-    try {
-      const decoded = jwtDecode<UserPayload>(token);
-      console.log('Token decodificado:', decoded);
-      return decoded;
-    } catch (error) {
-      console.error('Erro ao decodificar token:', error);
-      localStorage.removeItem('auth_token');
-      return null;
-    }
-  }
-  return null;
 }

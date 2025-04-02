@@ -1,7 +1,7 @@
 import axios from 'axios';
+import Cookies from 'js-cookie';
 
-// Ajustando a URL da API para usar o proxy CORS
-const API_URL = '/api/proxy';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
 // Removendo as configurações de CORS que não funcionam no cliente
 
@@ -73,13 +73,17 @@ export class AuthService {
   static setAuthToken(token: string): void {
     axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     if (typeof window !== 'undefined') {
-      localStorage.setItem('auth_token', token);
+      Cookies.set('auth_token', token, {
+        expires: 1, // expira em 1 dia
+        path: '/',
+        sameSite: 'strict',
+      });
     }
   }
 
   static getAuthToken(): string | null {
     if (typeof window !== 'undefined') {
-      return localStorage.getItem('auth_token');
+      return Cookies.get('auth_token') || null;
     }
     return null;
   }
@@ -87,7 +91,7 @@ export class AuthService {
   static removeAuthToken(): void {
     delete axios.defaults.headers.common['Authorization'];
     if (typeof window !== 'undefined') {
-      localStorage.removeItem('auth_token');
+      Cookies.remove('auth_token', { path: '/' });
     }
   }
 
