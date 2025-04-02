@@ -26,7 +26,7 @@ export function LoginForm({
       )}
 
       <div className='mb-4'>
-        <label htmlFor='email' className='block text-gray-700 mb-2'>
+        <label htmlFor='email' className='block text-[#272727] mb-2'>
           Email
         </label>
         <input
@@ -40,7 +40,7 @@ export function LoginForm({
       </div>
 
       <div className='mb-4'>
-        <label htmlFor='senha' className='block text-gray-700 mb-2'>
+        <label htmlFor='senha' className='block text-[#272727] mb-2'>
           Senha
         </label>
         <input

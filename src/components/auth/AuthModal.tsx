@@ -19,7 +19,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
   };
 
   return (
-    <div className='w-full bg-white rounded-lg shadow-xl py-[20px] px-[24px]'>
+    <div className='w-full bg-[#F0F0F0] rounded-lg shadow-xl py-[20px] px-[24px]'>
       <motion.div
         key={isLogin ? 'login' : 'register'}
         initial={{ opacity: 0, rotateY: 180 }}
