@@ -18,7 +18,7 @@ const ActionGridItem: React.FC<ActionItem & { isScanQR?: boolean }> = ({
   return (
     <Link href={href} className='flex flex-col text-black items-center'>
       <div
-        className={`w-[64px] h-[64px] rounded-2xl flex flex-col items-center justify-center gap-[6px] mb-2 bg-[#F0F0F0] shadow-lg transform hover:scale-105 transition-transform duration-200 `}
+        className={`w-[64px] h-[64px] rounded-2xl flex flex-col items-center justify-center gap-[6px] bg-[#F0F0F0] shadow-lg transform hover:scale-105 transition-transform duration-200 `}
       >
         <Icon />
         <p
@@ -36,7 +36,7 @@ export const ActionGrid: React.FC = () => {
 
   return (
     <MaxWidthLayout>
-      <div className='flex gap-[15px] overflow-x-auto pb-[6px] pt-[20px]'>
+      <div className='flex gap-[15px] overflow-x-auto py-[20px]'>
         {actionItems.map((item, index) => (
           <ActionGridItem
             key={item.href}
