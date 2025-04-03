@@ -23,11 +23,18 @@ export default function AuthPage() {
     }
   }, [isRegistered, toggleForm]);
 
+  const backgroundColor = isRegisterAsEstablishment ? '#000' : '#FFCC00';
+  const logoSrc = isRegisterAsEstablishment
+    ? '/brand/logo.svg'
+    : '/brand/logo-dark.svg';
+
   return (
-    <div className='min-h-screen flex items-center justify-center bg-[#FFCC00] p-4'>
+    <div
+      className={`min-h-screen flex items-center justify-center bg-[${backgroundColor}] p-4`}
+    >
       <div className='w-[75vw] max-w-[314px] flex flex-col items-end'>
         <Image
-          src='/brand/logo-dark.svg'
+          src={logoSrc}
           alt='Logo'
           width={202}
           height={86}
