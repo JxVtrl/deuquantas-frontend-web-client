@@ -1,10 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useFormSteps } from '@/hooks/useFormSteps';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { api } from '@/lib/axios';
 import Cookies from 'js-cookie';
+import { Input } from '@/components/ui/input';
+import { MaskedInput } from '@/components/ui/masked-input';
+import { useToast } from '@/components/ui/use-toast';
+import { Label } from '@radix-ui/react-label';
 
 export interface RegisterEstablishmentFormData {
   // Dados do usuário
@@ -57,7 +61,7 @@ const RegisterEstablishmentForm: React.FC = () => {
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors },
     watch,
     trigger,
   } = useForm<RegisterEstablishmentFormData>();
@@ -72,6 +76,9 @@ const RegisterEstablishmentForm: React.FC = () => {
     totalSteps,
   } = useFormSteps(steps);
 
+  const { toast } = useToast();
+  const [loading, setLoading] = useState(false);
+
   const onSubmit = async (data: RegisterEstablishmentFormData) => {
     if (!isLastStep) {
       const isValid = await trigger(
@@ -82,28 +89,19 @@ const RegisterEstablishmentForm: React.FC = () => {
       }
     } else {
       try {
-        // Registra o estabelecimento com todos os dados
-        const response = await api.post('/estabelecimentos', {
-          // Dados do usuário
-          nome: data.nome,
-          email: data.email,
-          senha: data.senha,
-          telefone: data.telefone,
+        setLoading(true);
 
-          // Dados do estabelecimento
-          numCnpj: data.cnpj,
-          nomeEstab: data.nomeFantasia,
-          razaoSocial: data.razaoSocial,
-          nomeContato: data.nome,
-          numCelular: data.telefone,
-          endereco: data.endereco,
-          numero: data.numero,
-          complemento: data.complemento,
-          bairro: data.bairro,
-          cidade: data.cidade,
-          estado: data.estado,
-          cep: data.cep,
-        });
+        // Remove máscaras antes de enviar
+        const cleanedData = {
+          ...data,
+          numCnpj: data.cnpj.replace(/\D/g, ''),
+          telefone: data.telefone.replace(/\D/g, ''),
+          numCelular: data.telefone.replace(/\D/g, ''),
+          cep: data.cep.replace(/\D/g, ''),
+        };
+
+        // Registra o estabelecimento com todos os dados
+        const response = await api.post('/estabelecimentos', cleanedData);
 
         // Salva o token nos cookies
         Cookies.set('auth_token', response.data.token, { expires: 7 });
@@ -111,8 +109,20 @@ const RegisterEstablishmentForm: React.FC = () => {
         // Configura o token para as próximas requisições
         api.defaults.headers.common['Authorization'] =
           `Bearer ${response.data.token}`;
+
+        toast({
+          title: 'Sucesso!',
+          description: 'Cadastro realizado com sucesso.',
+        });
       } catch (error) {
-        console.error('Erro ao registrar:', error);
+        console.error('Erro ao cadastrar:', error);
+        toast({
+          title: 'Erro!',
+          description: 'Ocorreu um erro ao realizar o cadastro.',
+          variant: 'destructive',
+        });
+      } finally {
+        setLoading(false);
       }
     }
   };
@@ -146,7 +156,7 @@ const RegisterEstablishmentForm: React.FC = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form onSubmit={handleSubmit(onSubmit)} className='space-y-4 w-full'>
       <div className='mb-6'>
         <h2 className='text-[#272727] text-[16px] font-[700] mb-2'>
           {currentStepData.title}
@@ -173,43 +183,60 @@ const RegisterEstablishmentForm: React.FC = () => {
           className='flex flex-col gap-[12px] mb-[32px]'
         >
           {currentStepData.fields.map((field) => (
-            <div key={field}>
-              <label
-                htmlFor={field}
-                className='block text-[#272727] mb-[6px] text-[12px] leading-[120%] font-[500]'
-              >
-                {getFieldLabel(field)}
-              </label>
-              <input
-                {...register(field as keyof RegisterEstablishmentFormData, {
-                  required:
-                    field !== 'complemento'
-                      ? 'Este campo é obrigatório'
-                      : false,
-                  ...(field === 'email' && {
-                    pattern: {
-                      value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                      message: 'Digite um e-mail válido',
-                    },
-                  }),
-                  ...(field === 'confirmSenha' && {
-                    validate: (value) =>
-                      value === watch('senha') || 'As senhas não coincidem',
-                  }),
-                  ...(field === 'senha' && {
-                    minLength: {
-                      value: 6,
-                      message: 'A senha deve ter no mínimo 6 caracteres',
-                    },
-                  }),
-                })}
-                type={getFieldType(field)}
-                id={field}
-                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500
-                  placeholder:text-[#A1A1AA] placeholder:text-[14px] placeholder:leading-[140%] placeholder:font-[400]
-                  ${errors[field as keyof RegisterEstablishmentFormData] ? 'border-red-500' : 'border-gray-300'}
-                `}
-              />
+            <div key={field} className='grid gap-2'>
+              <Label htmlFor={field}>{getFieldLabel(field)}</Label>
+              {field === 'cnpj' ? (
+                <MaskedInput
+                  maskType='cnpj'
+                  {...register(field as keyof RegisterEstablishmentFormData)}
+                  error={!!errors[field as keyof RegisterEstablishmentFormData]}
+                  value={watch('cnpj') || ''}
+                />
+              ) : field === 'telefone' ? (
+                <MaskedInput
+                  maskType='telefone'
+                  {...register(field as keyof RegisterEstablishmentFormData)}
+                  error={!!errors[field as keyof RegisterEstablishmentFormData]}
+                  value={watch('telefone') || ''}
+                />
+              ) : field === 'cep' ? (
+                <MaskedInput
+                  maskType='cep'
+                  {...register(field as keyof RegisterEstablishmentFormData)}
+                  error={!!errors[field as keyof RegisterEstablishmentFormData]}
+                  value={watch('cep') || ''}
+                />
+              ) : (
+                <Input
+                  {...register(field as keyof RegisterEstablishmentFormData, {
+                    required:
+                      field !== 'complemento'
+                        ? 'Este campo é obrigatório'
+                        : false,
+                    ...(field === 'email' && {
+                      pattern: {
+                        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                        message: 'Digite um e-mail válido',
+                      },
+                    }),
+                    ...(field === 'confirmSenha' && {
+                      validate: (value) =>
+                        value === watch('senha') || 'As senhas não coincidem',
+                    }),
+                    ...(field === 'senha' && {
+                      minLength: {
+                        value: 6,
+                        message: 'A senha deve ter no mínimo 6 caracteres',
+                      },
+                    }),
+                  })}
+                  type={getFieldType(field)}
+                  id={field}
+                  className={`flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background
+                    ${errors[field as keyof RegisterEstablishmentFormData] ? 'border-red-500' : 'border-gray-300'}
+                  `}
+                />
+              )}
               {errors[field as keyof RegisterEstablishmentFormData]
                 ?.message && (
                 <span className='text-red-500 text-xs mt-1'>
@@ -235,12 +262,8 @@ const RegisterEstablishmentForm: React.FC = () => {
             Voltar
           </Button>
         )}
-        <Button disabled={isSubmitting} type='submit' className='w-full'>
-          {isSubmitting
-            ? 'Processando...'
-            : isLastStep
-              ? 'Registrar'
-              : 'Próximo'}
+        <Button disabled={loading} type='submit' className='w-full'>
+          {loading ? 'Cadastrando...' : isLastStep ? 'Registrar' : 'Próximo'}
         </Button>
       </div>
     </form>

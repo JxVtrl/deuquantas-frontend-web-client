@@ -1,10 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useFormSteps } from '@/hooks/useFormSteps';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { api } from '@/lib/axios';
 import Cookies from 'js-cookie';
+import { Label } from '@radix-ui/react-label';
+import { Input } from '@/components/ui/input';
+import { MaskedInput } from '@/components/ui/masked-input';
+import { useToast } from '@/components/ui/use-toast';
 
 export interface RegisterFormData {
   // Dados do usuário
@@ -56,7 +60,7 @@ const RegisterForm: React.FC = () => {
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors },
     watch,
     trigger,
   } = useForm<RegisterFormData>();
@@ -71,6 +75,9 @@ const RegisterForm: React.FC = () => {
     totalSteps,
   } = useFormSteps(steps);
 
+  const { toast } = useToast();
+  const [loading, setLoading] = useState(false);
+
   const onSubmit = async (data: RegisterFormData) => {
     if (!isLastStep) {
       const isValid = await trigger(
@@ -81,25 +88,18 @@ const RegisterForm: React.FC = () => {
       }
     } else {
       try {
-        // Registra o cliente com todos os dados
-        const response = await api.post('/clientes', {
-          // Dados do usuário
-          nome: data.nome,
-          email: data.email,
-          senha: data.senha,
-          telefone: data.telefone,
+        setLoading(true);
 
-          // Dados do cliente
-          cpf: data.cpf,
-          dataNascimento: data.dataNascimento,
-          endereco: data.endereco,
-          numero: data.numero,
-          complemento: data.complemento,
-          bairro: data.bairro,
-          cidade: data.cidade,
-          estado: data.estado,
-          cep: data.cep,
-        });
+        // Remove máscaras antes de enviar
+        const cleanedData = {
+          ...data,
+          cpf: data.cpf.replace(/\D/g, ''),
+          telefone: data.telefone.replace(/\D/g, ''),
+          cep: data.cep.replace(/\D/g, ''),
+        };
+
+        // Registra o cliente com todos os dados
+        const response = await api.post('/clientes', cleanedData);
 
         // Salva o token nos cookies
         Cookies.set('auth_token', response.data.token, { expires: 7 });
@@ -107,8 +107,20 @@ const RegisterForm: React.FC = () => {
         // Configura o token para as próximas requisições
         api.defaults.headers.common['Authorization'] =
           `Bearer ${response.data.token}`;
+
+        toast({
+          title: 'Sucesso!',
+          description: 'Cadastro realizado com sucesso.',
+        });
       } catch (error) {
-        console.error('Erro ao registrar:', error);
+        console.error('Erro ao cadastrar:', error);
+        toast({
+          title: 'Erro!',
+          description: 'Ocorreu um erro ao realizar o cadastro.',
+          variant: 'destructive',
+        });
+      } finally {
+        setLoading(false);
       }
     }
   };
@@ -142,7 +154,7 @@ const RegisterForm: React.FC = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form onSubmit={handleSubmit(onSubmit)} className='space-y-4 w-full'>
       <div className='mb-6'>
         <h2 className='text-[#272727] text-[16px] font-[700] mb-2'>
           {currentStepData.title}
@@ -169,47 +181,65 @@ const RegisterForm: React.FC = () => {
           className='flex flex-col gap-[12px] mb-[32px]'
         >
           {currentStepData.fields.map((field) => (
-            <div key={field}>
-              <label
-                htmlFor={field}
-                className='block text-[#272727] mb-[6px] text-[12px] leading-[120%] font-[500]'
-              >
-                {getFieldLabel(field)}
-              </label>
-              <input
-                {...register(field as keyof RegisterFormData, {
-                  required:
-                    field !== 'complemento'
-                      ? 'Este campo é obrigatório'
-                      : false,
-                  ...(field === 'email' && {
-                    pattern: {
-                      value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                      message: 'Digite um e-mail válido',
-                    },
-                  }),
-                  ...(field === 'confirmSenha' && {
-                    validate: (value) =>
-                      value === watch('senha') || 'As senhas não coincidem',
-                  }),
-                  ...(field === 'senha' && {
-                    minLength: {
-                      value: 6,
-                      message: 'A senha deve ter no mínimo 6 caracteres',
-                    },
-                  }),
-                })}
-                type={getFieldType(field)}
-                id={field}
-                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500
-                  placeholder:text-[#A1A1AA] placeholder:text-[14px] placeholder:leading-[140%] placeholder:font-[400]
-                  ${errors[field as keyof RegisterFormData] ? 'border-red-500' : 'border-gray-300'}
-                `}
-              />
+            <div key={field} className='grid gap-2'>
+              <Label htmlFor={field}>{getFieldLabel(field)}</Label>
+              {field === 'cpf' ? (
+                <MaskedInput
+                  maskType='cpf'
+                  {...register(field as keyof RegisterFormData)}
+                  error={!!errors[field as keyof RegisterFormData]}
+                  value={watch(field as keyof RegisterFormData) || ''}
+                />
+              ) : field === 'telefone' ? (
+                <MaskedInput
+                  maskType='telefone'
+                  {...register(field as keyof RegisterFormData)}
+                  error={!!errors[field as keyof RegisterFormData]}
+                  value={watch(field as keyof RegisterFormData) || ''}
+                />
+              ) : field === 'cep' ? (
+                <MaskedInput
+                  maskType='cep'
+                  {...register(field as keyof RegisterFormData)}
+                  error={!!errors[field as keyof RegisterFormData]}
+                  value={watch(field as keyof RegisterFormData) || ''}
+                />
+              ) : (
+                <Input
+                  {...register(field as keyof RegisterFormData, {
+                    required:
+                      field !== 'complemento'
+                        ? 'Este campo é obrigatório'
+                        : false,
+                    ...(field === 'email' && {
+                      pattern: {
+                        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                        message: 'Digite um e-mail válido',
+                      },
+                    }),
+                    ...(field === 'confirmSenha' && {
+                      validate: (value) =>
+                        value === watch('senha') || 'As senhas não coincidem',
+                    }),
+                    ...(field === 'senha' && {
+                      minLength: {
+                        value: 6,
+                        message: 'A senha deve ter no mínimo 6 caracteres',
+                      },
+                    }),
+                  })}
+                  type={getFieldType(field)}
+                  id={field}
+                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500
+                    placeholder:text-[#A1A1AA] placeholder:text-[14px] placeholder:leading-[140%] placeholder:font-[400]
+                    ${errors[field as keyof RegisterFormData] ? 'border-red-500' : 'border-gray-300'}
+                  `}
+                />
+              )}
               {errors[field as keyof RegisterFormData]?.message && (
-                <span className='text-red-500 text-xs mt-1'>
+                <p className='text-red-500 text-sm'>
                   {errors[field as keyof RegisterFormData]?.message}
-                </span>
+                </p>
               )}
             </div>
           ))}
@@ -227,12 +257,8 @@ const RegisterForm: React.FC = () => {
             Voltar
           </Button>
         )}
-        <Button disabled={isSubmitting} type='submit' className='w-full'>
-          {isSubmitting
-            ? 'Processando...'
-            : isLastStep
-              ? 'Registrar'
-              : 'Próximo'}
+        <Button disabled={loading} type='submit' className='w-full'>
+          {loading ? 'Cadastrando...' : isLastStep ? 'Registrar' : 'Próximo'}
         </Button>
       </div>
     </form>
