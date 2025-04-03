@@ -1,4 +1,4 @@
 export interface QRCodeAlertType {
-    type: 'success' | 'error';
-    message: string;
+  type: 'success' | 'error';
+  message: string;
 }

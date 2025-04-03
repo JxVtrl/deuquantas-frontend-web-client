@@ -11,11 +11,14 @@ export const addProduct = async (product: ProductType) => {
   return response.data;
 };
 
-export const editProduct = async (id: string, updates: {
-  name?: string;
-  description?: string;
-  price?: number;
-}) => {
+export const editProduct = async (
+  id: string,
+  updates: {
+    name?: string;
+    description?: string;
+    price?: number;
+  },
+) => {
   const response = await axios.put(`/api/products/${id}`, updates);
   return response.data;
 };

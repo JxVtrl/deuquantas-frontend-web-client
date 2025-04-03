@@ -3,6 +3,10 @@
 
 # Adicionar o diretório do Node.js ao PATH
 export PATH="/c/Program Files/nodejs:$PATH"
+
+echo "🎨 Formatando arquivos com Prettier..."
+npx prettier --write "src/**/*.{ts,tsx}"
+
 echo "⏳ Iniciando o build. Por favor, aguarde..."
 node -e "
   const { execSync } = require('child_process');

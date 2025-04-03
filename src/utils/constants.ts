@@ -1,12 +1,12 @@
 export const Errors = {
-  InvalidOrExpiredJWT: "invalid or expired jwt",
-  MissingToken: "missing token",
-  InvalidToken: "invalid token",
+  InvalidOrExpiredJWT: 'invalid or expired jwt',
+  MissingToken: 'missing token',
+  InvalidToken: 'invalid token',
 };
 
-const Version = process.env.NEXT_PUBLIC_APP_VERSION || "";
+const Version = process.env.NEXT_PUBLIC_APP_VERSION || '';
 
-export const DrawioExtension = ".drawio.png.base64";
+export const DrawioExtension = '.drawio.png.base64';
 
 export { Version };
 

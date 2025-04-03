@@ -1,3 +1,3 @@
 export interface HeadTitleProps {
-    title?: string | React.ReactNode;
+  title?: string | React.ReactNode;
 }
