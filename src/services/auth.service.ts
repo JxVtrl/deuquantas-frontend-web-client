@@ -39,7 +39,6 @@ export interface UserResponse {
 class AuthService {
   async login(data: LoginData): Promise<AuthResponse> {
     try {
-      console.log('Dados de login:', data);
       const response = await api.post<AuthApiResponse>('/auth/login', {
         email: data.email.toLowerCase(),
         password: data.password,
