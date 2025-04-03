@@ -25,6 +25,8 @@ interface AuthContextData {
   logout: () => void;
   isAuthenticated: boolean;
   isAdmin: boolean;
+  isCliente: boolean;
+  isEstabelecimento: boolean;
   processLogin: (token: string) => void;
   storeUserPreferences: (
     theme: AvailableThemes,
@@ -95,13 +97,23 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   }, [router.pathname, processToken]);
 
   const isAdmin = user?.permission_level === PermissionLevel.Admin;
+  const isCliente = user?.hasCliente ?? false;
+  const isEstabelecimento = user?.hasEstabelecimento ?? false;
   const isAuthenticated = !!user;
 
   const login = async (data: LoginData) => {
     try {
       const response = await authService.login(data);
       await processToken(response.token);
-      router.replace('/customer/home');
+
+      // Redireciona com base no tipo de usuário
+      if (response.user.estabelecimento) {
+        router.replace('/estabelecimento/dashboard');
+      } else if (response.user.cliente) {
+        router.replace('/customer/home');
+      } else {
+        router.replace('/auth');
+      }
     } catch (error) {
       console.error('Erro no login:', error);
       throw error;
@@ -160,6 +172,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         logout,
         isAuthenticated,
         isAdmin,
+        isCliente,
+        isEstabelecimento,
         processLogin,
         storeUserPreferences,
         clearSession,

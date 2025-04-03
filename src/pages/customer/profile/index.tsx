@@ -9,7 +9,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 const ProfilePage: React.FC = () => {
   const { user, logout } = useAuth();
   const [nome, setNome] = useState('');
-  const [telefone, setTelefone] = useState('');
+  const [numCelular, setNumCelular] = useState('');
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -17,7 +17,7 @@ const ProfilePage: React.FC = () => {
   useEffect(() => {
     if (user) {
       setNome(user.nome || '');
-      setTelefone('');
+      setNumCelular('');
     }
   }, [user]);
 
@@ -31,7 +31,7 @@ const ProfilePage: React.FC = () => {
       const token = Cookies.get('auth_token');
       await axios.put(
         `${API_URL}/usuarios/${user?.id}`,
-        { name: nome, phone: telefone },
+        { nome, numCelular },
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -107,16 +107,16 @@ const ProfilePage: React.FC = () => {
 
               <div className='mb-6'>
                 <label
-                  htmlFor='telefone'
+                  htmlFor='numCelular'
                   className='block text-gray-700 font-bold mb-2'
                 >
-                  Telefone
+                  Número de celular
                 </label>
                 <input
                   type='tel'
-                  id='telefone'
-                  value={telefone}
-                  onChange={(e) => setTelefone(e.target.value)}
+                  id='numCelular'
+                  value={numCelular}
+                  onChange={(e) => setNumCelular(e.target.value)}
                   className='w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500'
                 />
               </div>

@@ -12,7 +12,7 @@ export interface RegisterData {
   nome: string;
   email: string;
   password: string;
-  telefone: string;
+  numCelular: string;
   numCpf: string;
   cep: string;
   endereco: string;
@@ -37,7 +37,6 @@ export interface UserResponse {
   id: string;
   email: string;
   nome: string;
-  telefone?: string;
   isAdmin: boolean;
   isAtivo: boolean;
   dataCriacao: string;
@@ -117,9 +116,9 @@ export class AuthService {
     }
   }
 
-  async checkCPFExists(cpf: string): Promise<boolean> {
+  async checkCPFExists(numCpf: string): Promise<boolean> {
     try {
-      const response = await api.get(`/clientes/check-document/${cpf}`);
+      const response = await api.get(`/clientes/check-cpf/${numCpf}`);
       return response.data.exists;
     } catch (error) {
       console.error('Erro ao verificar CPF:', error);
@@ -127,19 +126,33 @@ export class AuthService {
     }
   }
 
-  async checkPhoneExists(telefone: string): Promise<boolean> {
+  async checkPhoneExists(numCelular: string): Promise<boolean> {
     try {
-      const response = await api.get(`/clientes/check-phone/${telefone}`);
+      const response = await api.get(`/clientes/check-phone/${numCelular}`);
       return response.data.exists;
     } catch (error) {
-      console.error('Erro ao verificar telefone:', error);
+      console.error('Erro ao verificar número de celular:', error);
       throw error;
     }
   }
 
-  async checkCNPJExists(cnpj: string): Promise<boolean> {
+  async checkCNPJExists(numCnpj: string): Promise<boolean> {
     try {
-      const response = await api.get(`/auth/check-cnpj/${cnpj}`);
+      const response = await api.get(`/auth/check-cnpj/${numCnpj}`);
+      return response.data.exists;
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response?.status === 404) {
+        return false;
+      }
+      throw error;
+    }
+  }
+
+  async checkEstablishmentPhoneExists(numCelular: string): Promise<boolean> {
+    try {
+      const response = await api.get(
+        `/estabelecimentos/check-phone/${numCelular}`,
+      );
       return response.data.exists;
     } catch (error) {
       if (axios.isAxiosError(error) && error.response?.status === 404) {

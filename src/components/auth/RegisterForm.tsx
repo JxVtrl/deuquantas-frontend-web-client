@@ -20,8 +20,8 @@ export interface RegisterFormData {
   confirmSenha: string;
 
   // Dados pessoais
-  cpf: string;
-  telefone: string;
+  numCpf: string;
+  numCelular: string;
   dataNascimento: string;
   endereco: string;
   numero: string;
@@ -41,7 +41,7 @@ const steps = [
   {
     id: 'pessoal',
     title: 'Dados Pessoais',
-    fields: ['cpf', 'telefone', 'dataNascimento'],
+    fields: ['numCpf', 'numCelular', 'dataNascimento'],
   },
   {
     id: 'endereco',
@@ -143,19 +143,19 @@ const RegisterForm: React.FC = () => {
           }
         }
 
-        // Se estiver na segunda etapa, verifica CPF e telefone
+        // Se estiver na segunda etapa, verifica CPF e número de celular
         if (currentStep === 1) {
           try {
             setCheckingDocument(true);
             const cpfExists = await authService.checkCPFExists(
-              data.cpf.replace(/\D/g, ''),
+              data.numCpf.replace(/\D/g, ''),
             );
             const phoneExists = await authService.checkPhoneExists(
-              data.telefone.replace(/\D/g, ''),
+              data.numCelular.replace(/\D/g, ''),
             );
 
             if (cpfExists) {
-              setError('cpf', {
+              setError('numCpf', {
                 type: 'manual',
                 message: 'Este CPF já está cadastrado',
               });
@@ -163,9 +163,9 @@ const RegisterForm: React.FC = () => {
             }
 
             if (phoneExists) {
-              setError('telefone', {
+              setError('numCelular', {
                 type: 'manual',
-                message: 'Este telefone já está cadastrado',
+                message: 'Este número de celular já está cadastrado',
               });
               return;
             }
@@ -193,8 +193,8 @@ const RegisterForm: React.FC = () => {
           nome: data.nome,
           email: data.email,
           password: data.password,
-          telefone: data.telefone.replace(/\D/g, ''),
-          numCpf: data.cpf.replace(/\D/g, ''),
+          numCelular: data.numCelular.replace(/\D/g, ''),
+          numCpf: data.numCpf.replace(/\D/g, ''),
           cep: data.cep.replace(/\D/g, ''),
           endereco: data.endereco,
           numero: data.numero,
@@ -237,8 +237,8 @@ const RegisterForm: React.FC = () => {
       email: 'E-mail',
       password: 'Senha',
       confirmSenha: 'Confirmar Senha',
-      cpf: 'CPF',
-      telefone: 'Telefone',
+      numCpf: 'CPF',
+      numCelular: 'Número de Celular',
       dataNascimento: 'Data de Nascimento',
       endereco: 'Endereço',
       numero: 'Número',
@@ -254,7 +254,7 @@ const RegisterForm: React.FC = () => {
   const getFieldType = (field: string) => {
     if (field === 'email') return 'email';
     if (field === 'password' || field === 'confirmSenha') return 'password';
-    if (field === 'telefone') return 'tel';
+    if (field === 'numCelular') return 'tel';
     if (field === 'dataNascimento') return 'date';
     return 'text';
   };
@@ -289,9 +289,9 @@ const RegisterForm: React.FC = () => {
           {currentStepData.fields.map((field) => (
             <div key={field} className='grid gap-2'>
               <Label htmlFor={field}>{getFieldLabel(field)}</Label>
-              {field === 'cpf' ? (
+              {field === 'numCpf' ? (
                 <MaskedInput
-                  maskType='cpf'
+                  maskType='numCpf'
                   {...register(field as keyof RegisterFormData, {
                     required: 'Este campo é obrigatório',
                     validate: (value) => {
@@ -303,9 +303,9 @@ const RegisterForm: React.FC = () => {
                   error={!!errors[field as keyof RegisterFormData]}
                   value={watch(field as keyof RegisterFormData) || ''}
                 />
-              ) : field === 'telefone' ? (
+              ) : field === 'numCelular' ? (
                 <MaskedInput
-                  maskType='telefone'
+                  maskType='numCelular'
                   {...register(field as keyof RegisterFormData, {
                     required: 'Este campo é obrigatório',
                     validate: (value) => {
@@ -313,7 +313,7 @@ const RegisterForm: React.FC = () => {
                       return (
                         numbers.length === 10 ||
                         numbers.length === 11 ||
-                        'Telefone inválido'
+                        'Número de celular inválido'
                       );
                     },
                   })}

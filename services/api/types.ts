@@ -1,31 +1,62 @@
 export enum PermissionLevel {
-  Admin = 1,
-  Establishment = 2,
-  Customer = 3,
+  Basic = 1,
+  Cliente = 2,
+  Estabelecimento = 3,
+  Admin = 5,
 }
 
-export interface User {
-  id: number;
-  nome: string;
-  email: string;
-  telefone: string;
-  cpf: string;
-  dataNascimento: string;
+export interface Cliente {
+  id: string;
+  numCpf: string;
+  dataNascimento: Date;
   endereco: string;
   numero: string;
-  complemento: string;
+  complemento?: string;
   bairro: string;
   cidade: string;
   estado: string;
   cep: string;
+  isAtivo: boolean;
+  numCelular: string;
+}
+
+export interface Estabelecimento {
+  numCnpj: string;
+  nomeEstab: string;
+  razaoSocial: string;
+  numCelular: string;
+  endereco: string;
+  numero: string;
+  complemento?: string;
+  bairro: string;
+  cidade: string;
+  estado: string;
+  cep: string;
+  isAtivo: boolean;
+  imgLogo?: string;
+  latitude?: number;
+  longitude?: number;
+  status: 'ativo' | 'em_breve';
+}
+
+export interface User {
+  id: string;
+  nome: string;
+  email: string;
   isAdmin: boolean;
-  sub: string;
-  avatar?: string;
+  isAtivo: boolean;
+  dataCriacao: Date;
+  dataAtualizacao: Date;
   permission_level: PermissionLevel;
+  hasCliente: boolean;
+  hasEstabelecimento: boolean;
+  cliente?: Cliente;
+  estabelecimento?: Estabelecimento;
 }
 
 export type UserJwt = User & {
   exp: number;
+  sub: string;
 };
 
 export type UserYjs = User & {

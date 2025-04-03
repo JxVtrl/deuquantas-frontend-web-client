@@ -1,7 +1,7 @@
 export interface User {
   name: string;
   phone: string;
-  cpf: string;
+  numCpf: string;
   email?: string;
   password: string;
   notifications: boolean;

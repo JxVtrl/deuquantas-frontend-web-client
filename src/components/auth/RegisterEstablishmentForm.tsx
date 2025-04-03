@@ -22,8 +22,9 @@ export interface RegisterEstablishmentFormData {
 
   // Dados do estabelecimento
   nomeEstab: string;
-  cnpj: string;
-  telefone: string;
+  razaoSocial: string;
+  numCnpj: string;
+  numCelular: string; // Número de celular comercial do estabelecimento
   endereco: string;
   numero: string;
   complemento?: string;
@@ -42,7 +43,7 @@ const steps = [
   {
     id: 'estabelecimento',
     title: 'Dados do Estabelecimento',
-    fields: ['nomeEstab', 'cnpj', 'telefone'],
+    fields: ['nomeEstab', 'razaoSocial', 'numCnpj', 'numCelular'],
   },
   {
     id: 'endereco',
@@ -144,27 +145,39 @@ const RegisterEstablishmentForm: React.FC = () => {
           }
         }
 
-        // Se estiver na segunda etapa, verifica CNPJ
+        // Se estiver na segunda etapa, verifica CNPJ e número de celular
         if (currentStep === 1) {
           try {
             setCheckingCNPJ(true);
-            const cnpjExists = await authService.checkCNPJExists(
-              data.cnpj.replace(/\D/g, ''),
-            );
+            const [cnpjExists, phoneExists] = await Promise.all([
+              authService.checkCNPJExists(data.numCnpj.replace(/\D/g, '')),
+              authService.checkEstablishmentPhoneExists(
+                data.numCelular.replace(/\D/g, ''),
+              ),
+            ]);
 
             if (cnpjExists) {
-              setError('cnpj', {
+              setError('numCnpj', {
                 type: 'manual',
                 message: 'Este CNPJ já está cadastrado',
               });
               return;
             }
+
+            if (phoneExists) {
+              setError('numCelular', {
+                type: 'manual',
+                message:
+                  'Este número de celular já está cadastrado para outro estabelecimento',
+              });
+              return;
+            }
           } catch (error) {
-            console.error('Erro ao verificar CNPJ:', error);
+            console.error('Erro ao verificar CNPJ/Número de celular:', error);
             toast({
               title: 'Erro!',
               description:
-                'Não foi possível verificar o CNPJ. Tente novamente.',
+                'Não foi possível verificar os dados. Tente novamente.',
               variant: 'destructive',
             });
             return;
@@ -182,9 +195,8 @@ const RegisterEstablishmentForm: React.FC = () => {
         // Remove máscaras antes de enviar
         const cleanedData = {
           ...data,
-          numCnpj: data.cnpj.replace(/\D/g, ''),
-          telefone: data.telefone.replace(/\D/g, ''),
-          numCelular: data.telefone.replace(/\D/g, ''),
+          numCnpj: data.numCnpj.replace(/\D/g, ''),
+          numCelular: data.numCelular.replace(/\D/g, ''),
           cep: data.cep.replace(/\D/g, ''),
         };
 
@@ -221,9 +233,10 @@ const RegisterEstablishmentForm: React.FC = () => {
       email: 'E-mail',
       password: 'Senha',
       confirmSenha: 'Confirmar Senha',
-      nomeEstab: 'Nome do Estabelecimento',
-      cnpj: 'CNPJ',
-      telefone: 'Telefone',
+      nomeEstab: 'Nome Fantasia',
+      razaoSocial: 'Razão Social',
+      numCnpj: 'CNPJ',
+      numCelular: 'Número de Celular Comercial',
       endereco: 'Endereço',
       numero: 'Número',
       complemento: 'Complemento',
@@ -238,7 +251,7 @@ const RegisterEstablishmentForm: React.FC = () => {
   const getFieldType = (field: string) => {
     if (field === 'email') return 'email';
     if (field === 'password' || field === 'confirmSenha') return 'password';
-    if (field === 'telefone') return 'tel';
+    if (field === 'numCelular') return 'tel';
     return 'text';
   };
 
@@ -272,9 +285,9 @@ const RegisterEstablishmentForm: React.FC = () => {
           {currentStepData.fields.map((field) => (
             <div key={field} className='grid gap-2'>
               <Label htmlFor={field}>{getFieldLabel(field)}</Label>
-              {field === 'cnpj' ? (
+              {field === 'numCnpj' ? (
                 <MaskedInput
-                  maskType='cnpj'
+                  maskType='numCnpj'
                   {...register(field as keyof RegisterEstablishmentFormData, {
                     required: 'Este campo é obrigatório',
                     validate: (value) => {
@@ -285,11 +298,11 @@ const RegisterEstablishmentForm: React.FC = () => {
                     },
                   })}
                   error={!!errors[field as keyof RegisterEstablishmentFormData]}
-                  value={watch('cnpj') || ''}
+                  value={watch('numCnpj') || ''}
                 />
-              ) : field === 'telefone' ? (
+              ) : field === 'numCelular' ? (
                 <MaskedInput
-                  maskType='telefone'
+                  maskType='numCelular'
                   {...register(field as keyof RegisterEstablishmentFormData, {
                     required: 'Este campo é obrigatório',
                     validate: (value) => {
@@ -297,12 +310,12 @@ const RegisterEstablishmentForm: React.FC = () => {
                       return (
                         numbers.length === 10 ||
                         numbers.length === 11 ||
-                        'Telefone inválido'
+                        'Número de celular inválido'
                       );
                     },
                   })}
                   error={!!errors[field as keyof RegisterEstablishmentFormData]}
-                  value={watch('telefone') || ''}
+                  value={watch('numCelular') || ''}
                 />
               ) : field === 'cep' ? (
                 <MaskedInput

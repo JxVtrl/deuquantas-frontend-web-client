@@ -1,6 +1,6 @@
-export function validateCPF(cpf: string): boolean {
+export function validateCPF(numCpf: string): boolean {
   // Remove caracteres não numéricos
-  const numbers = cpf.replace(/\D/g, '');
+  const numbers = numCpf.replace(/\D/g, '');
 
   // Verifica se tem 11 dígitos
   if (numbers.length !== 11) return false;
@@ -29,37 +29,37 @@ export function validateCPF(cpf: string): boolean {
   return true;
 }
 
-export function validateCNPJ(cnpj: string): boolean {
+export function validateCNPJ(numCnpj: string): boolean {
   // Remove caracteres não numéricos
-  cnpj = cnpj.replace(/\D/g, '');
+  numCnpj = numCnpj.replace(/\D/g, '');
 
   // Verifica se tem 14 dígitos
-  if (cnpj.length !== 14) return false;
+  if (numCnpj.length !== 14) return false;
 
   // Elimina CNPJs inválidos conhecidos
-  if (/^(\d)\1+$/.test(cnpj)) return false;
+  if (/^(\d)\1+$/.test(numCnpj)) return false;
 
   // Validação do primeiro dígito verificador
   let soma = 0;
   let peso = 5;
   for (let i = 0; i < 12; i++) {
-    soma += parseInt(cnpj.charAt(i)) * peso;
+    soma += parseInt(numCnpj.charAt(i)) * peso;
     peso = peso === 2 ? 9 : peso - 1;
   }
   let digito = 11 - (soma % 11);
   if (digito > 9) digito = 0;
-  if (parseInt(cnpj.charAt(12)) !== digito) return false;
+  if (parseInt(numCnpj.charAt(12)) !== digito) return false;
 
   // Validação do segundo dígito verificador
   soma = 0;
   peso = 6;
   for (let i = 0; i < 13; i++) {
-    soma += parseInt(cnpj.charAt(i)) * peso;
+    soma += parseInt(numCnpj.charAt(i)) * peso;
     peso = peso === 2 ? 9 : peso - 1;
   }
   digito = 11 - (soma % 11);
   if (digito > 9) digito = 0;
-  if (parseInt(cnpj.charAt(13)) !== digito) return false;
+  if (parseInt(numCnpj.charAt(13)) !== digito) return false;
 
   return true;
 }
