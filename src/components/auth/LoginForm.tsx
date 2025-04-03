@@ -62,11 +62,6 @@ export function LoginForm() {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      {error && !errors.email && (
-        <div className='bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4'>
-          {error}
-        </div>
-      )}
       <div className='flex flex-col gap-[12px] mb-[32px]'>
         {list_of_inputs.map((input) => (
           <div key={input.id}>

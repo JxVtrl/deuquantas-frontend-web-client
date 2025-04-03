@@ -103,7 +103,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       setUser(response.user);
     } catch (error) {
       console.error('Erro ao fazer login:', error);
-      throw error;
+      if (axios.isAxiosError(error)) {
+        if (error.response?.status === 401) {
+          throw new Error('E-mail ou senha incorretos');
+        }
+      }
+      throw new Error('Erro ao fazer login');
     }
   };
 

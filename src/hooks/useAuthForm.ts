@@ -1,6 +1,7 @@
 import { RegisterData, LoginData } from '@/services/auth.service';
 import Cookies from 'js-cookie';
 import { useState } from 'react';
+import axios from 'axios';
 
 interface LoginFormData {
   email: string;
@@ -45,8 +46,18 @@ export function useAuthForm({ login, register, onSuccess }: UseAuthFormProps) {
         await register(data);
       }
       onSuccess();
-    } catch {
-      setError('Erro ao processar a requisição');
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        if (err.response?.status === 401) {
+          setError('E-mail ou senha incorretos. Verifique suas credenciais.');
+        } else {
+          setError(
+            err.response?.data?.message || 'Erro ao processar a requisição',
+          );
+        }
+      } else {
+        setError('Erro ao processar a requisição');
+      }
     } finally {
       setLoading(false);
     }
