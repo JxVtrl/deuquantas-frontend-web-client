@@ -7,16 +7,13 @@ import React, {
   useCallback,
 } from 'react';
 import { useRouter } from 'next/router';
-import {
-  AuthService,
-  LoginCredentials,
-  RegisterData,
-} from '@/services/auth.service';
+import { RegisterData, authService, LoginData } from '@/services/auth.service';
 import { jwtDecode } from 'jwt-decode';
-import { PermissionLevel, User } from '../../services/api/types';
 import { setDefaultHeaderToken } from '../../services/api';
 import { saveUserPreferences, viewUserPreferences } from '../../services/user';
 import axios from 'axios';
+import Cookies from 'js-cookie';
+import { PermissionLevel, User } from '../../services/api/types';
 
 export type AvailableLanguages = 'pt' | 'en';
 export type AvailableThemes = 'dark' | 'light' | 'system';
@@ -24,8 +21,8 @@ export type AvailableThemes = 'dark' | 'light' | 'system';
 interface AuthContextData {
   user: User | null;
   loading: boolean;
-  login: (credentials: LoginCredentials) => Promise<void>;
-  register: (userData: RegisterData) => Promise<void>;
+  login: (data: LoginData) => Promise<void>;
+  register: (data: RegisterData) => Promise<{ token: string }>;
   logout: () => void;
   isAuthenticated: boolean;
   isAdmin: boolean;
@@ -54,12 +51,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     try {
       const decodedToken = jwtDecode<User>(token);
       setUser(decodedToken);
-      AuthService.setAuthToken(token);
+      Cookies.set('auth_token', token);
       setDefaultHeaderToken(token);
       return true;
     } catch (error) {
       console.error('Erro ao processar token:', error);
-      AuthService.removeAuthToken();
+      Cookies.remove('auth_token');
       setUser(null);
       return false;
     }
@@ -70,7 +67,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
     const initializeAuth = async () => {
       try {
-        const token = AuthService.getAuthToken();
+        const token = Cookies.get('auth_token');
         console.log('Token recuperado:', token);
 
         if (token && mounted) {
@@ -100,50 +97,29 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
   const isAdmin = user?.permission_level === PermissionLevel.Admin;
 
-  const login = async (credentials: LoginCredentials) => {
+  const login = async (data: LoginData) => {
     try {
-      setLoading(true);
-      const response = await AuthService.login(credentials);
-      const access_token = response?.access_token;
-
-      if (!access_token || typeof access_token !== 'string') {
-        throw new Error('Token inválido ou não fornecido pela API.');
-      }
-
-      AuthService.setAuthToken(access_token);
-      const decodedToken = jwtDecode<User>(access_token);
-
-      console.log('Token decodificado:', decodedToken);
-
-      setUser(decodedToken);
-
-      router.push('/customer/home');
+      const response = await authService.login(data);
+      setUser(response.user);
     } catch (error) {
       console.error('Erro ao fazer login:', error);
       throw error;
-    } finally {
-      setLoading(false);
     }
   };
 
-  const register = async (userData: RegisterData) => {
+  const register = async (data: RegisterData) => {
     try {
-      setLoading(true);
-      // Registrando o usuário no backend real
-      await AuthService.register(userData);
-
-      // Após o registro bem-sucedido, redirecionar para a página de login
-      router.push('/login');
+      const response = await authService.register(data);
+      setUser(response.user);
+      return { token: response.token };
     } catch (error) {
       console.error('Erro ao registrar:', error);
       throw error;
-    } finally {
-      setLoading(false);
     }
   };
 
   const logout = () => {
-    AuthService.removeAuthToken();
+    Cookies.remove('auth_token');
     setUser(null);
     router.push('/login');
   };
@@ -200,40 +176,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
               return;
             }
 
-            // Definir uma interface para o token decodificado
-            interface DecodedToken {
-              sub: string;
-              nome?: string;
-              email?: string;
-              isAdmin?: boolean;
-              permission_level?: number;
-              exp: number;
-              iat: number;
-            }
-
-            const decodedToken = jwtDecode<DecodedToken>(token);
+            const decodedToken = jwtDecode<User>(token);
             console.log('Token decodificado:', decodedToken);
 
-            // Mapear os campos do token para a interface User
-            const user: User = {
-              id: Number(decodedToken.sub),
-              nome: decodedToken.nome || '',
-              email: decodedToken.email || '',
-              isAdmin: decodedToken.isAdmin || false,
-              sub: decodedToken.sub || '',
-              permission_level:
-                decodedToken.permission_level ||
-                (decodedToken.isAdmin
-                  ? PermissionLevel.Admin
-                  : PermissionLevel.Customer),
-            };
-
-            console.log('Usuário mapeado:', user);
-
             setDefaultHeaderToken(token);
-            setUser(user);
-            // Usar apenas o token auth_token
-            AuthService.setAuthToken(token);
+            setUser(decodedToken);
+            Cookies.set('auth_token', token);
 
             await getUserPreferences();
 

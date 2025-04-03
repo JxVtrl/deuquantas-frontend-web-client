@@ -9,7 +9,7 @@ import axios from 'axios';
 import { StatusBar } from '@/components/StatusBar';
 import { CodeInput } from '@/components/CodeInput';
 import Image from 'next/image';
-
+import Cookies from 'js-cookie';
 const CustomerQrCode: React.FC = () => {
   const router = useRouter();
   const { setActiveHomeTab } = useCustomerContext();
@@ -68,7 +68,7 @@ const CustomerQrCode: React.FC = () => {
         return;
       }
 
-      const token = localStorage.getItem('token') || '';
+      const token = Cookies.get('auth_token') || '';
 
       if (!user) {
         setError('Usuário não autenticado. Faça login novamente.');

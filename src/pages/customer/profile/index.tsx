@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import axios from 'axios';
+import Cookies from 'js-cookie';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
@@ -27,7 +28,7 @@ const ProfilePage: React.FC = () => {
     setLoading(true);
 
     try {
-      const token = localStorage.getItem('auth_token');
+      const token = Cookies.get('auth_token');
       await axios.put(
         `${API_URL}/usuarios/${user?.id}`,
         { name: nome, phone: telefone },

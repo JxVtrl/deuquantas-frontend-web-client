@@ -1,24 +1,22 @@
-import axios from 'axios';
+import { api } from '@/lib/axios';
 import Cookies from 'js-cookie';
+import { User } from '../../services/api/types';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-
-// Removendo as configurações de CORS que não funcionam no cliente
-
-export interface LoginCredentials {
+export interface LoginData {
   email: string;
   password: string;
 }
 
 export interface RegisterData {
-  email: string;
   nome: string;
+  email: string;
   password: string;
-  telefone?: string;
+  telefone: string;
 }
 
 export interface AuthResponse {
-  access_token: string;
+  user: User;
+  token: string;
 }
 
 export interface UserResponse {
@@ -32,70 +30,49 @@ export interface UserResponse {
   dataAtualizacao: string;
 }
 
-export class AuthService {
-  static async login(credentials: LoginCredentials): Promise<AuthResponse> {
-    try {
-      // Adaptando os dados para o formato esperado pelo backend
-      const loginData = {
-        email: credentials.email,
-        password: credentials.password,
-      };
+class AuthService {
+  async login(data: LoginData): Promise<AuthResponse> {
+    const response = await api.post<AuthResponse>('/auth/login', data);
+    const { token } = response.data;
 
-      const response = await axios.post(`${API_URL}/auth/login`, loginData);
+    // Salva o token nos cookies
+    Cookies.set('auth_token', token, { expires: 7 }); // Expira em 7 dias
+
+    // Configura o token para as próximas requisições
+    api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
+    return response.data;
+  }
+
+  async register(data: RegisterData): Promise<AuthResponse> {
+    try {
+      const response = await api.post<AuthResponse>('/auth/register', data);
+      const { token } = response.data;
+
+      // Salva o token nos cookies
+      Cookies.set('auth_token', token, { expires: 7 }); // Expira em 7 dias
+
+      // Configura o token para as próximas requisições
+      api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
       return response.data;
     } catch (error) {
-      console.error('Erro ao fazer login:', error);
+      console.error('Erro no registro:', error);
       throw error;
     }
   }
 
-  static async register(userData: RegisterData): Promise<UserResponse> {
-    try {
-      // Enviar os dados para o endpoint de registro real
-      const registerData = {
-        email: userData.email,
-        nome: userData.nome,
-        password: userData.password,
-        telefone: userData.telefone || undefined,
-      };
+  logout(): void {
+    // Remove o token dos cookies
+    Cookies.remove('auth_token');
 
-      const response = await axios.post(
-        `${API_URL}/auth/register`,
-        registerData,
-      );
-      return response.data;
-    } catch (error) {
-      console.error('Erro ao registrar:', error);
-      throw error;
-    }
+    // Remove o token do header das requisições
+    delete api.defaults.headers.common['Authorization'];
   }
 
-  static setAuthToken(token: string): void {
-    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-    if (typeof window !== 'undefined') {
-      Cookies.set('auth_token', token, {
-        expires: 1, // expira em 1 dia
-        path: '/',
-        sameSite: 'strict',
-      });
-    }
-  }
-
-  static getAuthToken(): string | null {
-    if (typeof window !== 'undefined') {
-      return Cookies.get('auth_token') || null;
-    }
-    return null;
-  }
-
-  static removeAuthToken(): void {
-    delete axios.defaults.headers.common['Authorization'];
-    if (typeof window !== 'undefined') {
-      Cookies.remove('auth_token', { path: '/' });
-    }
-  }
-
-  static isAuthenticated(): boolean {
-    return !!this.getAuthToken();
+  isAuthenticated(): boolean {
+    return !!Cookies.get('auth_token');
   }
 }
+
+export const authService = new AuthService();

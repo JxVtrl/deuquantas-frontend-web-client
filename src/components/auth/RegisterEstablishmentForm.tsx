@@ -3,6 +3,8 @@ import { useForm } from 'react-hook-form';
 import { useFormSteps } from '@/hooks/useFormSteps';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
+import { api } from '@/lib/axios';
+import Cookies from 'js-cookie';
 
 export interface RegisterEstablishmentFormData {
   // Dados do usuário
@@ -23,27 +25,6 @@ export interface RegisterEstablishmentFormData {
   cidade: string;
   estado: string;
   cep: string;
-}
-
-export interface RegisterEstablishmentData {
-  usuario: {
-    nome: string;
-    email: string;
-    senha: string;
-  };
-  estabelecimento: {
-    nomeFantasia: string;
-    razaoSocial: string;
-    cnpj: string;
-    telefone: string;
-    endereco: string;
-    numero: string;
-    complemento?: string;
-    bairro: string;
-    cidade: string;
-    estado: string;
-    cep: string;
-  };
 }
 
 const steps = [
@@ -100,8 +81,39 @@ const RegisterEstablishmentForm: React.FC = () => {
         nextStep();
       }
     } else {
-      console.log(data);
-      // Aqui você implementará a lógica de envio do formulário
+      try {
+        // Registra o estabelecimento com todos os dados
+        const response = await api.post('/estabelecimentos', {
+          // Dados do usuário
+          nome: data.nome,
+          email: data.email,
+          senha: data.senha,
+          telefone: data.telefone,
+
+          // Dados do estabelecimento
+          numCnpj: data.cnpj,
+          nomeEstab: data.nomeFantasia,
+          razaoSocial: data.razaoSocial,
+          nomeContato: data.nome,
+          numCelular: data.telefone,
+          endereco: data.endereco,
+          numero: data.numero,
+          complemento: data.complemento,
+          bairro: data.bairro,
+          cidade: data.cidade,
+          estado: data.estado,
+          cep: data.cep,
+        });
+
+        // Salva o token nos cookies
+        Cookies.set('auth_token', response.data.token, { expires: 7 });
+
+        // Configura o token para as próximas requisições
+        api.defaults.headers.common['Authorization'] =
+          `Bearer ${response.data.token}`;
+      } catch (error) {
+        console.error('Erro ao registrar:', error);
+      }
     }
   };
 
@@ -213,13 +225,6 @@ const RegisterEstablishmentForm: React.FC = () => {
       </AnimatePresence>
 
       <div className='flex flex-col gap-[12px]'>
-        <Button disabled={isSubmitting} type='submit' className='w-full'>
-          {isSubmitting
-            ? 'Processando...'
-            : isLastStep
-              ? 'Registrar'
-              : 'Próximo'}
-        </Button>
         {!isFirstStep && (
           <Button
             type='button'
@@ -230,6 +235,13 @@ const RegisterEstablishmentForm: React.FC = () => {
             Voltar
           </Button>
         )}
+        <Button disabled={isSubmitting} type='submit' className='w-full'>
+          {isSubmitting
+            ? 'Processando...'
+            : isLastStep
+              ? 'Registrar'
+              : 'Próximo'}
+        </Button>
       </div>
     </form>
   );

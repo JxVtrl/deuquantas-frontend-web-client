@@ -9,6 +9,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import axios from 'axios';
 import { ScanQrCodeIcon } from '@/components/Icons';
 import InputQrCode from '@/components/InputQrCode';
+import Cookies from 'js-cookie';
 /**
  * Componente para escaneamento de QR Code
  */
@@ -64,7 +65,7 @@ const CustomerQrCode: React.FC = () => {
       }
 
       // Obter token de autenticação do localStorage ou de onde estiver armazenado
-      const token = localStorage.getItem('token') || '';
+      const token = Cookies.get('auth_token') || '';
 
       // Verificar se o usuário está autenticado
       if (!user) {

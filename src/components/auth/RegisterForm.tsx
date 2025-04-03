@@ -3,6 +3,8 @@ import { useForm } from 'react-hook-form';
 import { useFormSteps } from '@/hooks/useFormSteps';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
+import { api } from '@/lib/axios';
+import Cookies from 'js-cookie';
 
 export interface RegisterFormData {
   // Dados do usuário
@@ -78,8 +80,36 @@ const RegisterForm: React.FC = () => {
         nextStep();
       }
     } else {
-      console.log(data);
-      // Aqui você implementará a lógica de envio do formulário
+      try {
+        // Registra o cliente com todos os dados
+        const response = await api.post('/clientes', {
+          // Dados do usuário
+          nome: data.nome,
+          email: data.email,
+          senha: data.senha,
+          telefone: data.telefone,
+
+          // Dados do cliente
+          cpf: data.cpf,
+          dataNascimento: data.dataNascimento,
+          endereco: data.endereco,
+          numero: data.numero,
+          complemento: data.complemento,
+          bairro: data.bairro,
+          cidade: data.cidade,
+          estado: data.estado,
+          cep: data.cep,
+        });
+
+        // Salva o token nos cookies
+        Cookies.set('auth_token', response.data.token, { expires: 7 });
+
+        // Configura o token para as próximas requisições
+        api.defaults.headers.common['Authorization'] =
+          `Bearer ${response.data.token}`;
+      } catch (error) {
+        console.error('Erro ao registrar:', error);
+      }
     }
   };
 
