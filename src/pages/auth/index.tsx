@@ -1,7 +1,5 @@
 import React, { useEffect } from 'react';
 import { AnimatePresence } from 'framer-motion';
-import { LoginForm } from '@/components/auth/LoginForm';
-import { RegisterForm } from '@/components/auth/RegisterForm';
 import Image from 'next/image';
 import AuthModal from '@/components/auth/AuthModal';
 import { useAuthForm } from '@/hooks/useAuthForm';
@@ -45,9 +43,7 @@ export default function AuthPage() {
                   ? 'login'
                   : 'register'
             }
-          >
-            {isLogin ? <LoginForm /> : <RegisterForm />}
-          </AuthModal>
+          />
         </AnimatePresence>
       </div>
     </div>

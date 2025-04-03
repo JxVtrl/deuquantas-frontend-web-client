@@ -107,6 +107,7 @@ export function useAuthForm({ login, register, onSuccess }: UseAuthFormProps) {
 
   const toggleRegisterAsEstablishment = () => {
     setIsRegisterAsEstablishment((prev) => !prev);
+    setIsLogin(false);
     setError('');
   };
 
