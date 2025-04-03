@@ -21,8 +21,7 @@ export interface RegisterEstablishmentFormData {
   confirmSenha: string;
 
   // Dados do estabelecimento
-  nomeFantasia: string;
-  razaoSocial: string;
+  nomeEstab: string;
   cnpj: string;
   telefone: string;
   endereco: string;
@@ -43,7 +42,7 @@ const steps = [
   {
     id: 'estabelecimento',
     title: 'Dados do Estabelecimento',
-    fields: ['nomeFantasia', 'razaoSocial', 'cnpj', 'telefone'],
+    fields: ['nomeEstab', 'cnpj', 'telefone'],
   },
   {
     id: 'endereco',
@@ -100,7 +99,7 @@ const RegisterEstablishmentForm: React.FC = () => {
         setValue('cidade', address.cidade);
         setValue('estado', address.estado);
         setValue('cep', address.cep);
-      } catch (error) {
+      } catch {
         toast({
           title: 'Erro!',
           description: 'CEP não encontrado ou inválido.',
@@ -222,8 +221,7 @@ const RegisterEstablishmentForm: React.FC = () => {
       email: 'E-mail',
       senha: 'Senha',
       confirmSenha: 'Confirmar Senha',
-      nomeFantasia: 'Nome Fantasia',
-      razaoSocial: 'Razão Social',
+      nomeEstab: 'Nome do Estabelecimento',
       cnpj: 'CNPJ',
       telefone: 'Telefone',
       endereco: 'Endereço',
@@ -317,8 +315,15 @@ const RegisterEstablishmentForm: React.FC = () => {
                     },
                   })}
                   error={!!errors[field as keyof RegisterEstablishmentFormData]}
-                  value={watch('cep') || ''}
-                  onChange={handleCepChange}
+                  value={
+                    watch(field as keyof RegisterEstablishmentFormData) || ''
+                  }
+                  onChange={(e) => {
+                    register(
+                      field as keyof RegisterEstablishmentFormData,
+                    ).onChange(e);
+                    handleCepChange(e);
+                  }}
                   disabled={searchingCep}
                 />
               ) : field === 'endereco' ||
@@ -331,10 +336,10 @@ const RegisterEstablishmentForm: React.FC = () => {
                   })}
                   type='text'
                   id={field}
-                  disabled={!watch('cep')}
+                  readOnly
                   className={`flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background
                     ${errors[field as keyof RegisterEstablishmentFormData] ? 'border-red-500' : 'border-gray-300'}
-                    ${!watch('cep') ? 'bg-gray-100 cursor-not-allowed' : ''}
+                    bg-gray-100 cursor-not-allowed
                   `}
                 />
               ) : (

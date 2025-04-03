@@ -38,16 +38,20 @@ export const MaskedInput = React.forwardRef<HTMLInputElement, MaskedInputProps>(
       // Permite apenas números e teclas de controle
       if (
         !/^\d$/.test(e.key) &&
-        !['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(
-          e.key,
-        )
+        ![
+          'Backspace',
+          'Delete',
+          'ArrowLeft',
+          'ArrowRight',
+          'Tab',
+          '-',
+        ].includes(e.key)
       ) {
         e.preventDefault();
       }
     };
 
     const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
-      e.preventDefault();
       const pastedData = e.clipboardData.getData('text');
       const maskedValue = applyMask(pastedData);
       if (onChange) {
