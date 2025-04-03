@@ -229,6 +229,10 @@ export const ScanQrCodeIcon = (props: SVGProps<SVGSVGElement>) => (
     width='100vw'
     height='100vw'
     id='scan-qr-code-icon'
+    style={{
+      maxWidth: '500px',
+      maxHeight: '500px',
+    }}
     {...props}
   >
     <path

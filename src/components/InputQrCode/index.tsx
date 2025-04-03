@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
 
-// import { Container } from './styles';
-
 const InputQrCode: React.FC = () => {
   const [qrCode, setQrCode] = useState('');
 
