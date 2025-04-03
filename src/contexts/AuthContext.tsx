@@ -4,6 +4,7 @@ import React, {
   useContext,
   useState,
   useEffect,
+  useCallback,
 } from 'react';
 import { useRouter } from 'next/router';
 import {
@@ -49,37 +50,53 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   const [language, setLanguage] = useState<AvailableLanguages>('pt');
   const router = useRouter();
 
+  const processToken = useCallback(async (token: string) => {
+    try {
+      const decodedToken = jwtDecode<User>(token);
+      setUser(decodedToken);
+      AuthService.setAuthToken(token);
+      setDefaultHeaderToken(token);
+      return true;
+    } catch (error) {
+      console.error('Erro ao processar token:', error);
+      AuthService.removeAuthToken();
+      setUser(null);
+      return false;
+    }
+  }, []);
+
   useEffect(() => {
+    let mounted = true;
+
     const initializeAuth = async () => {
       try {
         const token = AuthService.getAuthToken();
         console.log('Token recuperado:', token);
 
-        if (token) {
-          const decodedToken = jwtDecode<User>(token);
-          setUser(decodedToken);
-          AuthService.setAuthToken(token);
-          setDefaultHeaderToken(token);
+        if (token && mounted) {
+          const success = await processToken(token);
 
           // Se estiver na página de auth e tiver token válido, redireciona para home
-          if (router.pathname === '/auth') {
+          if (success && router.pathname === '/auth') {
             console.log(
               'Token válido encontrado, redirecionando para /customer/home',
             );
             await router.replace('/customer/home');
           }
         }
-      } catch (error) {
-        console.error('Erro ao processar token:', error);
-        AuthService.removeAuthToken();
-        setUser(null);
       } finally {
-        setLoading(false);
+        if (mounted) {
+          setLoading(false);
+        }
       }
     };
 
     initializeAuth();
-  }, [router.pathname]);
+
+    return () => {
+      mounted = false;
+    };
+  }, [router.pathname, processToken]);
 
   const isAdmin = user?.permission_level === PermissionLevel.Admin;
 

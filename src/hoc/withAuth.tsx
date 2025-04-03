@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router';
-import { useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 
 export function withAuthAdmin(Component: React.FC) {
@@ -19,41 +19,60 @@ export function withAuth(Component: React.FC, requiredRole?: string) {
     props: React.ComponentProps<typeof Component>,
   ) {
     const router = useRouter();
-    const { user, isAuthenticated } = useAuth();
+    const { user, isAuthenticated, loading } = useAuth();
 
-    useEffect(() => {
-      const checkAuth = async () => {
-        console.log('Verificando autenticação...');
-        console.log('Usuário:', user);
-        console.log('Está autenticado:', isAuthenticated);
+    const checkAuth = useCallback(async () => {
+      // Se ainda está carregando, não faz nada
+      if (loading) {
+        console.log('Carregando autenticação...');
+        return;
+      }
 
-        if (!isAuthenticated || !user) {
-          console.log('Usuário não autenticado, redirecionando para /auth');
+      console.log('Verificando autenticação...');
+      console.log('Usuário:', user);
+      console.log('Está autenticado:', isAuthenticated);
+
+      if (!isAuthenticated || !user) {
+        console.log('Usuário não autenticado, redirecionando para /auth');
+        await router.replace('/auth');
+        return;
+      }
+
+      if (requiredRole) {
+        const requiredLevel = getPermissionLevel(requiredRole);
+        const userLevel = user.permission_level || 3; // Default para customer
+
+        console.log('Nível de permissão requerido:', requiredLevel);
+        console.log('Nível de permissão do usuário:', userLevel);
+
+        if (userLevel !== requiredLevel) {
+          console.log(
+            `Permissão insuficiente. Usuário tem nível ${userLevel}, mas precisa de ${requiredLevel}`,
+          );
           await router.replace('/auth');
           return;
         }
+      }
 
-        if (requiredRole) {
-          const requiredLevel = getPermissionLevel(requiredRole);
-          const userLevel = user.permission_level || 3; // Default para customer
+      console.log('Autenticação verificada com sucesso!');
+    }, [user, isAuthenticated, loading, router, requiredRole]);
 
-          console.log('Nível de permissão requerido:', requiredLevel);
-          console.log('Nível de permissão do usuário:', userLevel);
+    useEffect(() => {
+      let mounted = true;
 
-          if (userLevel !== requiredLevel) {
-            console.log(
-              `Permissão insuficiente. Usuário tem nível ${userLevel}, mas precisa de ${requiredLevel}`,
-            );
-            await router.replace('/auth');
-            return;
-          }
-        }
+      if (mounted) {
+        checkAuth();
+      }
 
-        console.log('Autenticação verificada com sucesso!');
+      return () => {
+        mounted = false;
       };
+    }, [checkAuth]);
 
-      checkAuth();
-    }, [user, isAuthenticated, router]);
+    // Se ainda está carregando, mostra nada
+    if (loading) {
+      return null;
+    }
 
     // Renderiza o componente apenas se o usuário estiver autenticado e tiver as permissões necessárias
     if (
