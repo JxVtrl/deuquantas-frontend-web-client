@@ -86,7 +86,7 @@ class AuthService {
 
   async checkCPFExists(cpf: string): Promise<boolean> {
     try {
-      const response = await api.get(`/usuarios/check-document/${cpf}`);
+      const response = await api.get(`/clientes/check-document/${cpf}`);
       return response.data.exists;
     } catch (error) {
       console.error('Erro ao verificar CPF:', error);
@@ -96,7 +96,7 @@ class AuthService {
 
   async checkPhoneExists(telefone: string): Promise<boolean> {
     try {
-      const response = await api.get(`/usuarios/check-phone/${telefone}`);
+      const response = await api.get(`/clientes/check-phone/${telefone}`);
       return response.data.exists;
     } catch (error) {
       console.error('Erro ao verificar telefone:', error);
