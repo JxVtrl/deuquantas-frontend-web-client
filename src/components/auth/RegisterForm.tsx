@@ -202,7 +202,7 @@ const RegisterForm: React.FC = () => {
           bairro: data.bairro,
           cidade: data.cidade,
           estado: data.estado,
-          dataNascimento: data.dataNascimento,
+          dataNascimento: new Date(data.dataNascimento).toISOString(),
         };
 
         // Registra o cliente usando o authService
@@ -260,9 +260,12 @@ const RegisterForm: React.FC = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className='space-y-4 w-full'>
-      <div className='mb-6'>
-        <h2 className='text-[#272727] text-[16px] font-[700] mb-2'>
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className='space-y-4 w-full max-h-[calc(100vh-200px)] overflow-y-auto'
+    >
+      <div className='mb-6 sticky top-0 pb-4 z-10 border-b border-gray-200 rounded-lg p-4 bg-black/70 shadow-sm'>
+        <h2 className='text-[#fff] text-[16px] font-[700] mb-2'>
           {currentStepData.title}
         </h2>
         <div className='flex items-center gap-2'>
@@ -396,7 +399,7 @@ const RegisterForm: React.FC = () => {
         </motion.div>
       </AnimatePresence>
 
-      <div className='flex flex-col gap-[12px]'>
+      <div className='flex flex-col gap-[12px] sticky bottom-0 pt-4'>
         {!isFirstStep && (
           <Button
             type='button'

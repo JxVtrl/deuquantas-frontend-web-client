@@ -81,6 +81,7 @@ export class AuthService {
 
   async register(data: RegisterData): Promise<void> {
     try {
+      console.log('DATA :)', data);
       await api.post('/auth/register', {
         ...data,
         email: data.email.toLowerCase(),
