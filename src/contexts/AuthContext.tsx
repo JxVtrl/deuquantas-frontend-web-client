@@ -11,7 +11,6 @@ import { RegisterData, authService, LoginData } from '@/services/auth.service';
 import { jwtDecode } from 'jwt-decode';
 import { setDefaultHeaderToken } from '../../services/api';
 import { saveUserPreferences, viewUserPreferences } from '../../services/user';
-import axios from 'axios';
 import Cookies from 'js-cookie';
 import { PermissionLevel, User } from '../../services/api/types';
 
@@ -43,8 +42,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [theme, setTheme] = useState<AvailableThemes>('dark');
-  const [language, setLanguage] = useState<AvailableLanguages>('pt');
   const router = useRouter();
 
   const processToken = useCallback(async (token: string) => {
@@ -68,17 +65,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     const initializeAuth = async () => {
       try {
         const token = Cookies.get('auth_token');
-        console.log('Token recuperado:', token);
 
         if (token && mounted) {
           const success = await processToken(token);
 
           // Se estiver na página de auth e tiver token válido, redireciona para home
           if (success && router.pathname === '/auth') {
-            console.log(
-              'Token válido encontrado, redirecionando para /customer/home',
-            );
-            await router.replace('/customer/home');
+            router.replace('/customer/home');
           }
         }
       } finally {
@@ -96,29 +89,26 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   }, [router.pathname, processToken]);
 
   const isAdmin = user?.permission_level === PermissionLevel.Admin;
+  const isAuthenticated = !!user;
 
   const login = async (data: LoginData) => {
     try {
       const response = await authService.login(data);
-      setUser(response.user);
+      await processToken(response.token);
+      router.replace('/customer/home');
     } catch (error) {
-      console.error('Erro ao fazer login:', error);
-      if (axios.isAxiosError(error)) {
-        if (error.response?.status === 401) {
-          throw new Error('E-mail ou senha incorretos');
-        }
-      }
-      throw new Error('Erro ao fazer login');
+      console.error('Erro no login:', error);
+      throw error;
     }
   };
 
   const register = async (data: RegisterData) => {
     try {
       const response = await authService.register(data);
-      setUser(response.user);
-      return { token: response.token };
+      await processToken(response.token);
+      return response;
     } catch (error) {
-      console.error('Erro ao registrar:', error);
+      console.error('Erro no registro:', error);
       throw error;
     }
   };
@@ -126,37 +116,33 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   const logout = () => {
     Cookies.remove('auth_token');
     setUser(null);
-    router.push('/login');
+    setDefaultHeaderToken('');
+    router.replace('/auth');
   };
 
-  const storeUserPreferences = (
+  const storeUserPreferences = async (
     theme: AvailableThemes,
     language: AvailableLanguages,
   ) => {
-    setTheme(theme);
-    setLanguage(language);
+    await saveUserPreferences(theme, language);
   };
 
   const getUserPreferences = async () => {
     try {
-      const userPreferences = await viewUserPreferences();
-      storeUserPreferences(userPreferences.theme, userPreferences.language);
-    } catch (err: unknown) {
-      console.warn('Error getting user preferences.');
-      if (axios.isAxiosError(err) && err.response?.status === 404) {
-        try {
-          const userPreferences = await saveUserPreferences(theme, language);
-          storeUserPreferences(userPreferences.theme, userPreferences.language);
-        } catch {
-          console.warn('Error saving user preferences.');
-        }
-      }
+      await viewUserPreferences();
+    } catch (error) {
+      console.error('Erro ao carregar preferências:', error);
     }
   };
 
   const clearSession = () => {
+    Cookies.remove('auth_token');
     setUser(null);
-    router.push('/login');
+    setDefaultHeaderToken('');
+  };
+
+  const processLogin = async (token: string) => {
+    await processToken(token);
   };
 
   return (
@@ -167,43 +153,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         login,
         register,
         logout,
-        isAuthenticated: !!user,
+        isAuthenticated,
         isAdmin,
-        processLogin: async (token: string) => {
-          if (typeof window === 'undefined') {
-            // Evita que o código execute no lado do servidor
-            return;
-          }
-
-          try {
-            if (!token || typeof token !== 'string') {
-              console.error('Token inválido recebido:', token);
-              return;
-            }
-
-            const decodedToken = jwtDecode<User>(token);
-            console.log('Token decodificado:', decodedToken);
-
-            setDefaultHeaderToken(token);
-            setUser(decodedToken);
-            Cookies.set('auth_token', token);
-
-            await getUserPreferences();
-
-            const pageBeforeLogin = router.query.state;
-            if (pageBeforeLogin) {
-              router.back();
-            } else {
-              router.replace('/customer/home');
-            }
-          } catch (error) {
-            console.error('Erro durante o processamento do login:', error);
-            setUser(null);
-          }
-        },
+        processLogin,
         storeUserPreferences,
-        getUserPreferences,
         clearSession,
+        getUserPreferences,
       }}
     >
       {children}

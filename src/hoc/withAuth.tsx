@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router';
-import { useEffect, useCallback } from 'react';
+import { useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 
 export function withAuthAdmin(Component: React.FC) {
@@ -21,53 +21,29 @@ export function withAuth(Component: React.FC, requiredRole?: string) {
     const router = useRouter();
     const { user, isAuthenticated, loading } = useAuth();
 
-    const checkAuth = useCallback(async () => {
+    useEffect(() => {
       // Se ainda está carregando, não faz nada
       if (loading) {
-        console.log('Carregando autenticação...');
         return;
       }
 
-      console.log('Verificando autenticação...');
-      console.log('Usuário:', user);
-      console.log('Está autenticado:', isAuthenticated);
-
+      // Se não estiver autenticado, redireciona para /auth
       if (!isAuthenticated || !user) {
-        console.log('Usuário não autenticado, redirecionando para /auth');
-        await router.replace('/auth');
+        router.replace('/auth');
         return;
       }
 
+      // Se tiver uma role específica, verifica a permissão
       if (requiredRole) {
         const requiredLevel = getPermissionLevel(requiredRole);
         const userLevel = user.permission_level || 3; // Default para customer
 
-        console.log('Nível de permissão requerido:', requiredLevel);
-        console.log('Nível de permissão do usuário:', userLevel);
-
         if (userLevel !== requiredLevel) {
-          console.log(
-            `Permissão insuficiente. Usuário tem nível ${userLevel}, mas precisa de ${requiredLevel}`,
-          );
-          await router.replace('/auth');
+          router.replace('/auth');
           return;
         }
       }
-
-      console.log('Autenticação verificada com sucesso!');
     }, [user, isAuthenticated, loading, router, requiredRole]);
-
-    useEffect(() => {
-      let mounted = true;
-
-      if (mounted) {
-        checkAuth();
-      }
-
-      return () => {
-        mounted = false;
-      };
-    }, [checkAuth]);
 
     // Se ainda está carregando, mostra nada
     if (loading) {
