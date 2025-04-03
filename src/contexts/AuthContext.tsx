@@ -50,22 +50,36 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   const router = useRouter();
 
   useEffect(() => {
-    // Verificar se o usuário está autenticado ao carregar a página
-    const token = AuthService.getAuthToken();
-    console.log('Token recuperado:', token);
-    if (token) {
+    const initializeAuth = async () => {
       try {
-        const decodedToken = jwtDecode<User>(token);
-        setUser(decodedToken);
-        AuthService.setAuthToken(token);
-        // router.push('/customer/home');
+        const token = AuthService.getAuthToken();
+        console.log('Token recuperado:', token);
+
+        if (token) {
+          const decodedToken = jwtDecode<User>(token);
+          setUser(decodedToken);
+          AuthService.setAuthToken(token);
+          setDefaultHeaderToken(token);
+
+          // Se estiver na página de auth e tiver token válido, redireciona para home
+          if (router.pathname === '/auth') {
+            console.log(
+              'Token válido encontrado, redirecionando para /customer/home',
+            );
+            await router.replace('/customer/home');
+          }
+        }
       } catch (error) {
-        console.error('Token inválido:', error);
+        console.error('Erro ao processar token:', error);
         AuthService.removeAuthToken();
+        setUser(null);
+      } finally {
+        setLoading(false);
       }
-    }
-    setLoading(false);
-  }, []);
+    };
+
+    initializeAuth();
+  }, [router.pathname]);
 
   const isAdmin = user?.permission_level === PermissionLevel.Admin;
 

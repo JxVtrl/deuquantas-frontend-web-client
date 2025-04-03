@@ -3,10 +3,10 @@ import { MaxWidthLayout } from '@/layout';
 import { useAuth } from '@/contexts/AuthContext';
 import Image from 'next/image';
 import { capitalize } from '@/utils/formatters';
+import HeaderMenu from '../HeaderMenu';
 export const Header: React.FC = () => {
   const { user } = useAuth();
   const firstName = user?.nome || 'Usuário';
-  const firstLetter = firstName.charAt(0).toUpperCase();
 
   return (
     <MaxWidthLayout backgroundColor='#FFCC00'>
@@ -34,9 +34,8 @@ export const Header: React.FC = () => {
             </p>
           </div>
         </div>
-        <button className='w-8 h-8 rounded-full bg-white flex items-center justify-center'>
-          {firstLetter}
-        </button>
+
+        <HeaderMenu />
       </header>
     </MaxWidthLayout>
   );

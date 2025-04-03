@@ -142,13 +142,8 @@ button {
   border: none;
   border-radius: 0.25rem;
   color: black;
-  background-color: #0070f3;
   cursor: pointer;
   transition: background-color 0.2s ease;
-}
-
-button:hover {
-  background-color: #0056c7;
 }
 
 button:disabled {

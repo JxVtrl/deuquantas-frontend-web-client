@@ -10,6 +10,7 @@ export interface User {
   email: string;
   isAdmin: boolean;
   sub: string;
+  avatar?: string;
   permission_level: PermissionLevel;
 }
 
