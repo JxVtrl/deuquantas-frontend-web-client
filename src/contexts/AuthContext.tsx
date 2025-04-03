@@ -107,9 +107,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       await processToken(response.token);
 
       // Redireciona com base no tipo de usuário
-      if (response.user.estabelecimento) {
+      if (isEstabelecimento) {
         router.replace('/estabelecimento/dashboard');
-      } else if (response.user.cliente) {
+      } else if (isCliente) {
         router.replace('/customer/home');
       } else {
         router.replace('/auth');
