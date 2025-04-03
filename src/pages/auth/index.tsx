@@ -9,7 +9,12 @@ import { useRouter } from 'next/router';
 export default function AuthPage() {
   const router = useRouter();
   const { login, register } = useAuth();
-  const { toggleForm, isLogin, isRegisterAsEstablishment } = useAuthForm({
+  const {
+    toggleForm,
+    isLogin,
+    isRegisterAsEstablishment,
+    toggleRegisterAsEstablishment,
+  } = useAuthForm({
     login,
     register,
     onSuccess: () => router.push('/customer/home'),
@@ -23,14 +28,14 @@ export default function AuthPage() {
     }
   }, [isRegistered, toggleForm]);
 
-  const backgroundColor = isRegisterAsEstablishment ? '#000' : '#FFCC00';
+  const backgroundColor = isRegisterAsEstablishment ? 'black' : '[#FFCC00]';
   const logoSrc = isRegisterAsEstablishment
     ? '/brand/logo.svg'
     : '/brand/logo-dark.svg';
 
   return (
     <div
-      className={`min-h-screen flex items-center justify-center bg-[${backgroundColor}] p-4`}
+      className={`min-h-screen flex items-center justify-center bg-${backgroundColor} p-4 transition-all duration-300`}
     >
       <div className='w-[75vw] max-w-[314px] flex flex-col items-end'>
         <Image
@@ -38,7 +43,7 @@ export default function AuthPage() {
           alt='Logo'
           width={202}
           height={86}
-          className='mb-[42px]'
+          className='mb-[42px] transition-all duration-300'
         />
 
         <AnimatePresence mode='wait'>
@@ -50,6 +55,10 @@ export default function AuthPage() {
                   ? 'login'
                   : 'register'
             }
+            isLogin={isLogin}
+            isRegisterAsEstablishment={isRegisterAsEstablishment}
+            toggleForm={toggleForm}
+            toggleRegisterAsEstablishment={toggleRegisterAsEstablishment}
           />
         </AnimatePresence>
       </div>

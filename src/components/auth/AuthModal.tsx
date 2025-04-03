@@ -1,25 +1,22 @@
-import { useAuth } from '@/contexts/AuthContext';
 import { motion } from 'framer-motion';
-import { useRouter } from 'next/router';
 import React from 'react';
-import { useAuthForm } from '@/hooks/useAuthForm';
 import RegisterEstablishmentForm from './RegisterEstablishmentForm';
 import { LoginForm } from './LoginForm';
 import RegisterForm from './RegisterForm';
-const AuthModal: React.FC = () => {
-  const router = useRouter();
-  const { login, register } = useAuth();
-  const {
-    toggleForm,
-    isLogin,
-    isRegisterAsEstablishment,
-    toggleRegisterAsEstablishment,
-  } = useAuthForm({
-    login,
-    register,
-    onSuccess: () => router.push('/customer/home'),
-  });
 
+interface AuthModalProps {
+  isLogin: boolean;
+  isRegisterAsEstablishment: boolean;
+  toggleForm: () => void;
+  toggleRegisterAsEstablishment: () => void;
+}
+
+const AuthModal: React.FC<AuthModalProps> = ({
+  isLogin,
+  isRegisterAsEstablishment,
+  toggleForm,
+  toggleRegisterAsEstablishment,
+}) => {
   const handleToggleClick = () => {
     toggleForm();
   };
