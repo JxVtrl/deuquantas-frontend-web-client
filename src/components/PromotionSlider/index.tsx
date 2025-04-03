@@ -23,11 +23,11 @@ export const PromotionSlider: React.FC = () => {
           {Array.from({ length: 5 }).map((_, index) => (
             <CarouselItem
               key={index}
-              className='md:basis-1/2 lg:basis-1/3 h-[136px]'
+              className='md:basis-1/2 lg:basis-1/3 aspect-[2.28676]'
             >
               {/*  */}
               <Card
-                className='h-[136px] w-full relative rounded-[16px] overflow-hidden'
+                className='h-full w-full relative rounded-[16px] overflow-hidden'
                 style={{
                   background:
                     'linear-gradient(360deg, #000000 -13.17%, rgba(0, 0, 0, 0) 51.88%)',

@@ -82,17 +82,17 @@ export const useNavigation = () => {
     {
       icon: HomeIcon,
       label: 'Início',
-      href: '/',
+      href: '/customer/home',
     },
     {
       icon: WalletIcon,
       label: 'Conta',
-      href: '/conta',
+      href: '/customer/account',
     },
     {
       icon: FavoriteIcon,
       label: 'Favoritos',
-      href: '/favoritos',
+      href: '/customer/favorites',
     },
   ];
 

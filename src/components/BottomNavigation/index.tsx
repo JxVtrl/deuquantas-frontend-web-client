@@ -3,15 +3,11 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { PlusIcon } from '@/components/Icons';
 import { MaxWidthLayout } from '@/layout';
+import { useNavigation } from '@/hooks/useNavigation';
 export interface NavigationItem {
   icon: React.FC;
   label: string;
   href: string;
-}
-
-interface BottomNavigationProps {
-  items: NavigationItem[];
-  onAddClick?: () => void;
 }
 
 const NavigationItem: React.FC<NavigationItem & { isActive: boolean }> = ({
@@ -33,19 +29,18 @@ const NavigationItem: React.FC<NavigationItem & { isActive: boolean }> = ({
   );
 };
 
-export const BottomNavigation: React.FC<BottomNavigationProps> = ({
-  items,
-  onAddClick,
-}) => {
+export const BottomNavigation: React.FC = ({}) => {
+  const { bottomNavItems, handleAddClick } = useNavigation();
+
   const router = useRouter();
 
   return (
     <MaxWidthLayout
-      backgroundColor='#000'
+      backgroundColor='#272727'
       className='fixed bottom-0 left-0 right-0'
     >
       <div className='flex justify-around py-4'>
-        {items.map((item) => (
+        {bottomNavItems.map((item) => (
           <NavigationItem
             key={item.href}
             {...item}
@@ -53,7 +48,7 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = ({
           />
         ))}
         <button
-          onClick={onAddClick}
+          onClick={handleAddClick}
           className='w-14 h-14 bg-[#FFCC00] rounded-full border-4 border-white outline outline-2 outline-black flex items-center justify-center -mt-10'
         >
           <div className='text-black w-6 h-6'>
