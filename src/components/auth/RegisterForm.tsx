@@ -11,6 +11,7 @@ import { MaskedInput } from '@/components/ui/masked-input';
 import { useToast } from '@/components/ui/use-toast';
 import { validateCPF } from '@/utils/validators';
 import { authService } from '@/services/auth.service';
+import { useRouter } from 'next/router';
 
 export interface RegisterFormData {
   // Dados do usuário
@@ -82,6 +83,7 @@ const RegisterForm: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [checkingEmail, setCheckingEmail] = useState(false);
   const [checkingDocument, setCheckingDocument] = useState(false);
+  const router = useRouter();
 
   const onSubmit = async (data: RegisterFormData) => {
     if (!isLastStep) {
@@ -163,7 +165,7 @@ const RegisterForm: React.FC = () => {
         // Remove máscaras antes de enviar
         const cleanedData = {
           ...data,
-          cpf: data.cpf.replace(/\D/g, ''),
+          numCpf: data.cpf.replace(/\D/g, ''),
           telefone: data.telefone.replace(/\D/g, ''),
           cep: data.cep.replace(/\D/g, ''),
         };
@@ -182,6 +184,11 @@ const RegisterForm: React.FC = () => {
           title: 'Sucesso!',
           description: 'Cadastro realizado com sucesso.',
         });
+
+        // Redireciona para a página de login após 2 segundos
+        setTimeout(() => {
+          router.push('/login');
+        }, 2000);
       } catch (error) {
         console.error('Erro ao cadastrar:', error);
         toast({

@@ -76,7 +76,7 @@ class AuthService {
 
   async checkEmailExists(email: string): Promise<boolean> {
     try {
-      const response = await api.get(`/usuarios/check-email/${email}`);
+      const response = await api.get(`/clientes/check-email/${email}`);
       return response.data.exists;
     } catch (error) {
       console.error('Erro ao verificar email:', error);
