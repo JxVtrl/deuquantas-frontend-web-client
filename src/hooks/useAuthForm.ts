@@ -10,7 +10,7 @@ interface LoginFormData {
 
 interface UseAuthFormProps {
   login: (credentials: LoginData) => Promise<void>;
-  register: (credentials: RegisterData) => Promise<{ token: string }>;
+  register: (credentials: RegisterData) => Promise<void>;
   onSuccess: () => void;
 }
 

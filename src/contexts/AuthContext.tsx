@@ -21,7 +21,7 @@ interface AuthContextData {
   user: User | null;
   loading: boolean;
   login: (data: LoginData) => Promise<void>;
-  register: (data: RegisterData) => Promise<{ token: string }>;
+  register: (data: RegisterData) => Promise<void>;
   logout: () => void;
   isAuthenticated: boolean;
   isAdmin: boolean;
@@ -110,9 +110,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
   const register = async (data: RegisterData) => {
     try {
-      const response = await authService.register(data);
-      await processToken(response.token);
-      return response;
+      await authService.register(data);
+      router.push('/login');
     } catch (error) {
       console.error('Erro no registro:', error);
       throw error;

@@ -210,12 +210,13 @@ const RegisterForm: React.FC = () => {
 
         toast({
           title: 'Sucesso!',
-          description: 'Cadastro realizado com sucesso.',
+          description:
+            'Cadastro realizado com sucesso. Você será redirecionado para o login.',
         });
 
         // Redireciona para a página de login após 2 segundos
         setTimeout(() => {
-          router.push('/auth');
+          router.push('/login'); // ESTÁ CERTO, TEM UMA ROTA /LOGIN QUE REDIRECIONA PRA /AUTH COM O MODAL DE LOGIN
         }, 2000);
       } catch (err) {
         console.error('Erro ao cadastrar:', err);
