@@ -103,6 +103,21 @@ export class AuthService {
     }
   }
 
+  async getUserData(): Promise<AuthResponse> {
+    try {
+      console.log('=== BUSCANDO DADOS DO USUÁRIO ===');
+      const response = await api.get<AuthApiResponse>('/auth/me');
+      console.log('Dados do usuário obtidos:', response.data);
+      return {
+        user: response.data.user,
+        token: Cookies.get('auth_token') || '',
+      };
+    } catch (error) {
+      console.error('=== ERRO AO BUSCAR DADOS DO USUÁRIO ===', error);
+      throw error;
+    }
+  }
+
   async register(data: RegisterData): Promise<void> {
     try {
       console.log('=== INÍCIO DO PROCESSO DE REGISTRO ===');

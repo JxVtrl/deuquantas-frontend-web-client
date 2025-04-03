@@ -56,7 +56,19 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         formattedToken.replace('Bearer ', ''),
       );
       console.log('Token decodificado:', decodedToken);
-      setUser(decodedToken);
+
+      // Busca os dados completos do usuário
+      const response = await authService.getUserData();
+      console.log('Dados completos do usuário:', response);
+
+      // Combina os dados do token com os dados completos do usuário
+      const userData = {
+        ...decodedToken,
+        ...response.user,
+      };
+      console.log('Dados combinados do usuário:', userData);
+
+      setUser(userData);
       Cookies.set('auth_token', formattedToken.replace('Bearer ', ''));
       setDefaultHeaderToken(formattedToken);
       return true;
