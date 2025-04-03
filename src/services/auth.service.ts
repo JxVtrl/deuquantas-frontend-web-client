@@ -36,7 +36,7 @@ export interface UserResponse {
   dataAtualizacao: string;
 }
 
-class AuthService {
+export class AuthService {
   async login(data: LoginData): Promise<AuthResponse> {
     try {
       const response = await api.post<AuthApiResponse>('/auth/login', {
@@ -131,6 +131,18 @@ class AuthService {
       return response.data.exists;
     } catch (error) {
       console.error('Erro ao verificar telefone:', error);
+      throw error;
+    }
+  }
+
+  async checkCNPJExists(cnpj: string): Promise<boolean> {
+    try {
+      const response = await api.get(`/auth/check-cnpj/${cnpj}`);
+      return response.data.exists;
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response?.status === 404) {
+        return false;
+      }
       throw error;
     }
   }

@@ -85,6 +85,7 @@ const RegisterEstablishmentForm: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [checkingEmail, setCheckingEmail] = useState(false);
   const [searchingCep, setSearchingCep] = useState(false);
+  const [checkingCNPJ, setCheckingCNPJ] = useState(false);
 
   const handleCepChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const cep = e.target.value.replace(/\D/g, '');
@@ -143,6 +144,36 @@ const RegisterEstablishmentForm: React.FC = () => {
             setCheckingEmail(false);
           }
         }
+
+        // Se estiver na segunda etapa, verifica CNPJ
+        if (currentStep === 1) {
+          try {
+            setCheckingCNPJ(true);
+            const cnpjExists = await authService.checkCNPJExists(
+              data.cnpj.replace(/\D/g, ''),
+            );
+
+            if (cnpjExists) {
+              setError('cnpj', {
+                type: 'manual',
+                message: 'Este CNPJ já está cadastrado',
+              });
+              return;
+            }
+          } catch (error) {
+            console.error('Erro ao verificar CNPJ:', error);
+            toast({
+              title: 'Erro!',
+              description:
+                'Não foi possível verificar o CNPJ. Tente novamente.',
+              variant: 'destructive',
+            });
+            return;
+          } finally {
+            setCheckingCNPJ(false);
+          }
+        }
+
         nextStep();
       }
     } else {
@@ -363,7 +394,7 @@ const RegisterEstablishmentForm: React.FC = () => {
           </Button>
         )}
         <Button
-          disabled={loading || checkingEmail}
+          disabled={loading || checkingEmail || checkingCNPJ}
           type='submit'
           className='w-full'
         >
@@ -371,9 +402,11 @@ const RegisterEstablishmentForm: React.FC = () => {
             ? 'Cadastrando...'
             : checkingEmail
               ? 'Verificando...'
-              : isLastStep
-                ? 'Registrar'
-                : 'Próximo'}
+              : checkingCNPJ
+                ? 'Verificando...'
+                : isLastStep
+                  ? 'Registrar'
+                  : 'Próximo'}
         </Button>
       </div>
     </form>
