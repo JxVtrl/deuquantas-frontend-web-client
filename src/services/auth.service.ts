@@ -73,6 +73,36 @@ class AuthService {
   isAuthenticated(): boolean {
     return !!Cookies.get('auth_token');
   }
+
+  async checkEmailExists(email: string): Promise<boolean> {
+    try {
+      const response = await api.get(`/usuarios/check-email/${email}`);
+      return response.data.exists;
+    } catch (error) {
+      console.error('Erro ao verificar email:', error);
+      throw error;
+    }
+  }
+
+  async checkCPFExists(cpf: string): Promise<boolean> {
+    try {
+      const response = await api.get(`/usuarios/check-document/${cpf}`);
+      return response.data.exists;
+    } catch (error) {
+      console.error('Erro ao verificar CPF:', error);
+      throw error;
+    }
+  }
+
+  async checkPhoneExists(telefone: string): Promise<boolean> {
+    try {
+      const response = await api.get(`/usuarios/check-phone/${telefone}`);
+      return response.data.exists;
+    } catch (error) {
+      console.error('Erro ao verificar telefone:', error);
+      throw error;
+    }
+  }
 }
 
 export const authService = new AuthService();

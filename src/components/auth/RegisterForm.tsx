@@ -9,6 +9,8 @@ import { Label } from '@radix-ui/react-label';
 import { Input } from '@/components/ui/input';
 import { MaskedInput } from '@/components/ui/masked-input';
 import { useToast } from '@/components/ui/use-toast';
+import { validateCPF } from '@/utils/validators';
+import { authService } from '@/services/auth.service';
 
 export interface RegisterFormData {
   // Dados do usuário
@@ -63,6 +65,7 @@ const RegisterForm: React.FC = () => {
     formState: { errors },
     watch,
     trigger,
+    setError,
   } = useForm<RegisterFormData>();
 
   const {
@@ -77,13 +80,80 @@ const RegisterForm: React.FC = () => {
 
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [checkingEmail, setCheckingEmail] = useState(false);
+  const [checkingDocument, setCheckingDocument] = useState(false);
 
   const onSubmit = async (data: RegisterFormData) => {
     if (!isLastStep) {
       const isValid = await trigger(
         currentStepData.fields as Array<keyof RegisterFormData>,
       );
+
       if (isValid) {
+        // Se estiver na primeira etapa, verifica o email
+        if (currentStep === 0) {
+          try {
+            setCheckingEmail(true);
+            const emailExists = await authService.checkEmailExists(data.email);
+            if (emailExists) {
+              setError('email', {
+                type: 'manual',
+                message: 'Este email já está cadastrado',
+              });
+              return;
+            }
+          } catch (error) {
+            toast({
+              title: 'Erro!',
+              description:
+                'Não foi possível verificar o email. Tente novamente.',
+              variant: 'destructive',
+            });
+            return;
+          } finally {
+            setCheckingEmail(false);
+          }
+        }
+
+        // Se estiver na segunda etapa, verifica CPF e telefone
+        if (currentStep === 1) {
+          try {
+            setCheckingDocument(true);
+            const cpfExists = await authService.checkCPFExists(
+              data.cpf.replace(/\D/g, ''),
+            );
+            const phoneExists = await authService.checkPhoneExists(
+              data.telefone.replace(/\D/g, ''),
+            );
+
+            if (cpfExists) {
+              setError('cpf', {
+                type: 'manual',
+                message: 'Este CPF já está cadastrado',
+              });
+              return;
+            }
+
+            if (phoneExists) {
+              setError('telefone', {
+                type: 'manual',
+                message: 'Este telefone já está cadastrado',
+              });
+              return;
+            }
+          } catch (error) {
+            toast({
+              title: 'Erro!',
+              description:
+                'Não foi possível verificar os dados. Tente novamente.',
+              variant: 'destructive',
+            });
+            return;
+          } finally {
+            setCheckingDocument(false);
+          }
+        }
+
         nextStep();
       }
     } else {
@@ -186,21 +256,44 @@ const RegisterForm: React.FC = () => {
               {field === 'cpf' ? (
                 <MaskedInput
                   maskType='cpf'
-                  {...register(field as keyof RegisterFormData)}
+                  {...register(field as keyof RegisterFormData, {
+                    required: 'Este campo é obrigatório',
+                    validate: (value) => {
+                      const numbers = value?.replace(/\D/g, '') || '';
+                      if (numbers.length !== 11) return 'CPF inválido';
+                      return validateCPF(numbers) || 'CPF inválido';
+                    },
+                  })}
                   error={!!errors[field as keyof RegisterFormData]}
                   value={watch(field as keyof RegisterFormData) || ''}
                 />
               ) : field === 'telefone' ? (
                 <MaskedInput
                   maskType='telefone'
-                  {...register(field as keyof RegisterFormData)}
+                  {...register(field as keyof RegisterFormData, {
+                    required: 'Este campo é obrigatório',
+                    validate: (value) => {
+                      const numbers = value?.replace(/\D/g, '') || '';
+                      return (
+                        numbers.length === 10 ||
+                        numbers.length === 11 ||
+                        'Telefone inválido'
+                      );
+                    },
+                  })}
                   error={!!errors[field as keyof RegisterFormData]}
                   value={watch(field as keyof RegisterFormData) || ''}
                 />
               ) : field === 'cep' ? (
                 <MaskedInput
                   maskType='cep'
-                  {...register(field as keyof RegisterFormData)}
+                  {...register(field as keyof RegisterFormData, {
+                    required: 'Este campo é obrigatório',
+                    validate: (value) => {
+                      const numbers = value?.replace(/\D/g, '') || '';
+                      return numbers.length === 8 || 'CEP inválido';
+                    },
+                  })}
                   error={!!errors[field as keyof RegisterFormData]}
                   value={watch(field as keyof RegisterFormData) || ''}
                 />
@@ -257,8 +350,20 @@ const RegisterForm: React.FC = () => {
             Voltar
           </Button>
         )}
-        <Button disabled={loading} type='submit' className='w-full'>
-          {loading ? 'Cadastrando...' : isLastStep ? 'Registrar' : 'Próximo'}
+        <Button
+          disabled={loading || checkingEmail || checkingDocument}
+          type='submit'
+          className='w-full'
+        >
+          {loading
+            ? 'Cadastrando...'
+            : checkingEmail
+              ? 'Verificando...'
+              : checkingDocument
+                ? 'Verificando...'
+                : isLastStep
+                  ? 'Registrar'
+                  : 'Próximo'}
         </Button>
       </div>
     </form>

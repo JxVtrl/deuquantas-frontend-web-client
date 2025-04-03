@@ -9,6 +9,8 @@ import { Input } from '@/components/ui/input';
 import { MaskedInput } from '@/components/ui/masked-input';
 import { useToast } from '@/components/ui/use-toast';
 import { Label } from '@radix-ui/react-label';
+import { authService } from '@/services/auth.service';
+import { validateCNPJ } from '@/utils/validators';
 
 export interface RegisterEstablishmentFormData {
   // Dados do usuário
@@ -64,6 +66,7 @@ const RegisterEstablishmentForm: React.FC = () => {
     formState: { errors },
     watch,
     trigger,
+    setError,
   } = useForm<RegisterEstablishmentFormData>();
 
   const {
@@ -78,13 +81,40 @@ const RegisterEstablishmentForm: React.FC = () => {
 
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [checkingEmail, setCheckingEmail] = useState(false);
 
   const onSubmit = async (data: RegisterEstablishmentFormData) => {
     if (!isLastStep) {
       const isValid = await trigger(
         currentStepData.fields as Array<keyof RegisterEstablishmentFormData>,
       );
+
       if (isValid) {
+        // Se estiver na primeira etapa, verifica o email
+        if (currentStep === 0) {
+          try {
+            setCheckingEmail(true);
+            const emailExists = await authService.checkEmailExists(data.email);
+            if (emailExists) {
+              setError('email', {
+                type: 'manual',
+                message: 'Este email já está cadastrado',
+              });
+              return;
+            }
+          } catch (error) {
+            console.error('Erro ao verificar email:', error);
+            toast({
+              title: 'Erro!',
+              description:
+                'Não foi possível verificar o email. Tente novamente.',
+              variant: 'destructive',
+            });
+            return;
+          } finally {
+            setCheckingEmail(false);
+          }
+        }
         nextStep();
       }
     } else {
@@ -188,21 +218,45 @@ const RegisterEstablishmentForm: React.FC = () => {
               {field === 'cnpj' ? (
                 <MaskedInput
                   maskType='cnpj'
-                  {...register(field as keyof RegisterEstablishmentFormData)}
+                  {...register(field as keyof RegisterEstablishmentFormData, {
+                    required: 'Este campo é obrigatório',
+                    validate: (value) => {
+                      const numbers = value?.replace(/\D/g, '') || '';
+                      if (numbers.length !== 14) return 'CNPJ inválido';
+                      if (!validateCNPJ(numbers)) return 'CNPJ inválido';
+                      return true;
+                    },
+                  })}
                   error={!!errors[field as keyof RegisterEstablishmentFormData]}
                   value={watch('cnpj') || ''}
                 />
               ) : field === 'telefone' ? (
                 <MaskedInput
                   maskType='telefone'
-                  {...register(field as keyof RegisterEstablishmentFormData)}
+                  {...register(field as keyof RegisterEstablishmentFormData, {
+                    required: 'Este campo é obrigatório',
+                    validate: (value) => {
+                      const numbers = value?.replace(/\D/g, '') || '';
+                      return (
+                        numbers.length === 10 ||
+                        numbers.length === 11 ||
+                        'Telefone inválido'
+                      );
+                    },
+                  })}
                   error={!!errors[field as keyof RegisterEstablishmentFormData]}
                   value={watch('telefone') || ''}
                 />
               ) : field === 'cep' ? (
                 <MaskedInput
                   maskType='cep'
-                  {...register(field as keyof RegisterEstablishmentFormData)}
+                  {...register(field as keyof RegisterEstablishmentFormData, {
+                    required: 'Este campo é obrigatório',
+                    validate: (value) => {
+                      const numbers = value?.replace(/\D/g, '') || '';
+                      return numbers.length === 8 || 'CEP inválido';
+                    },
+                  })}
                   error={!!errors[field as keyof RegisterEstablishmentFormData]}
                   value={watch('cep') || ''}
                 />
@@ -262,8 +316,18 @@ const RegisterEstablishmentForm: React.FC = () => {
             Voltar
           </Button>
         )}
-        <Button disabled={loading} type='submit' className='w-full'>
-          {loading ? 'Cadastrando...' : isLastStep ? 'Registrar' : 'Próximo'}
+        <Button
+          disabled={loading || checkingEmail}
+          type='submit'
+          className='w-full'
+        >
+          {loading
+            ? 'Cadastrando...'
+            : checkingEmail
+              ? 'Verificando...'
+              : isLastStep
+                ? 'Registrar'
+                : 'Próximo'}
         </Button>
       </div>
     </form>
