@@ -1,6 +1,7 @@
 import { api } from '@/lib/axios';
 import Cookies from 'js-cookie';
 import { User } from '../../services/api/types';
+import axios from 'axios';
 
 export interface LoginData {
   email: string;
@@ -19,6 +20,11 @@ export interface AuthResponse {
   token: string;
 }
 
+interface AuthApiResponse {
+  access_token: string;
+  user: User;
+}
+
 export interface UserResponse {
   id: string;
   email: string;
@@ -32,32 +38,57 @@ export interface UserResponse {
 
 class AuthService {
   async login(data: LoginData): Promise<AuthResponse> {
-    const response = await api.post<AuthResponse>('/auth/login', data);
-    const { token } = response.data;
+    try {
+      const response = await api.post<AuthApiResponse>('/auth/login', {
+        email: data.email.toLowerCase(),
+        password: data.password,
+      });
+      const { access_token, user } = response.data;
 
-    // Salva o token nos cookies
-    Cookies.set('auth_token', token, { expires: 7 }); // Expira em 7 dias
+      // Salva o token nos cookies
+      Cookies.set('auth_token', access_token, { expires: 7 }); // Expira em 7 dias
 
-    // Configura o token para as próximas requisições
-    api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      // Configura o token para as próximas requisições
+      api.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
 
-    return response.data;
+      return {
+        user,
+        token: access_token,
+      };
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        if (error.response?.status === 401) {
+          throw new Error('Email ou senha incorretos');
+        }
+      }
+      throw error;
+    }
   }
 
   async register(data: RegisterData): Promise<AuthResponse> {
     try {
-      const response = await api.post<AuthResponse>('/auth/register', data);
-      const { token } = response.data;
+      const response = await api.post<AuthApiResponse>('/auth/register', {
+        ...data,
+        email: data.email.toLowerCase(),
+      });
+      const { access_token, user } = response.data;
 
       // Salva o token nos cookies
-      Cookies.set('auth_token', token, { expires: 7 }); // Expira em 7 dias
+      Cookies.set('auth_token', access_token, { expires: 7 }); // Expira em 7 dias
 
       // Configura o token para as próximas requisições
-      api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      api.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
 
-      return response.data;
+      return {
+        user,
+        token: access_token,
+      };
     } catch (error) {
-      console.error('Erro no registro:', error);
+      if (axios.isAxiosError(error)) {
+        if (error.response?.status === 409) {
+          throw new Error('Email já cadastrado');
+        }
+      }
       throw error;
     }
   }
