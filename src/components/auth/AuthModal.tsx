@@ -16,6 +16,10 @@ const AuthModal: React.FC<AuthModalProps> = ({
     onToggleForm();
   };
 
+  const handleRegisterAsEstablishment = () => {
+    console.log('Registrar como estabelecimento');
+  };
+
   return (
     <motion.div
       key={isLogin ? 'login' : 'register'}
@@ -27,7 +31,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
       className='bg-[#F0F0F0] w-full rounded-lg shadow-[0px_1px_2px_0px_#0000000D] py-[20px] px-[24px] mx-auto h-fit'
     >
       {children}
-      <div className='mt-[12px] text-end'>
+      <div className='mt-[12px] text-end flex flex-col gap-[12px]'>
         <p className='text-[#272727] text-[12px] leading-[120%] font-[500]'>
           {isLogin ? 'Não tem uma conta?' : 'Já tem uma conta?'}{' '}
           <span
@@ -37,6 +41,15 @@ const AuthModal: React.FC<AuthModalProps> = ({
             {isLogin ? 'Cadastrar' : 'Faça Login'}
           </span>
         </p>
+
+        {!isLogin && (
+          <p
+            className='text-[#272727] text-[12px] leading-[120%] font-[700] underline cursor-pointer'
+            onClick={handleRegisterAsEstablishment}
+          >
+            Registre-se como estabelecimento
+          </p>
+        )}
       </div>
     </motion.div>
   );
