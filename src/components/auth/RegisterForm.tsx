@@ -202,6 +202,7 @@ const RegisterForm: React.FC = () => {
           bairro: data.bairro,
           cidade: data.cidade,
           estado: data.estado,
+          dataNascimento: data.dataNascimento,
         };
 
         // Registra o cliente usando o authService
