@@ -19,12 +19,16 @@ const NavigationItem: React.FC<NavigationItem & { isActive: boolean }> = ({
   return (
     <Link
       href={href}
-      className={`flex flex-col items-center ${
+      className={`flex flex-col items-center justify-center gap-[4px] ${
         isActive ? 'text-[#FFCC00]' : 'text-white'
       }`}
     >
-      <Icon />
-      <div className='text-xs'>{label}</div>
+      <div className='h-[32px] flex items-center justify-center'>
+        <Icon />
+      </div>
+      <div className='text-[12px] leading-[16px] font-[600] tracking-[0.5px]'>
+        {label}
+      </div>
     </Link>
   );
 };
@@ -49,7 +53,7 @@ export const BottomNavigation: React.FC = ({}) => {
         ))}
         <button
           onClick={handleAddClick}
-          className='w-14 h-14 bg-[#FFCC00] rounded-full border-4 border-white outline outline-2 outline-black flex items-center justify-center -mt-10'
+          className='w-14 h-14 bg-[#FFCC00] rounded-full border-4 border-white outline outline-2 outline-black flex items-center justify-center -mt-[64px]'
         >
           <div className='text-black w-6 h-6'>
             <PlusIcon />
