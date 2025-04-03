@@ -11,7 +11,7 @@ interface NavigationPill {
 const Pill: React.FC<NavigationPill> = ({ label, isActive, onClick }) => (
   <button
     onClick={onClick}
-    className={`px-4 py-2 rounded-full text-sm whitespace-nowrap border border-solid hover:bg-[#FFCC00] hover:border-[#FFCC00] hover:font-bold transition-all duration-300 ${
+    className={`h-[24px] px-4 flex items-center justify-center rounded-full text-sm whitespace-nowrap border border-solid hover:bg-[#FFCC00] hover:border-[#FFCC00] hover:font-bold transition-all duration-300 ${
       isActive
         ? 'bg-[#FFCC00] border-[#FFCC00] font-bold'
         : 'bg-[#ffffff] border-[#000000] '
