@@ -11,6 +11,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { Label } from '@radix-ui/react-label';
 import { authService } from '@/services/auth.service';
 import { validateCNPJ } from '@/utils/validators';
+import { cepService } from '@/services/cep.service';
 
 export interface RegisterEstablishmentFormData {
   // Dados do usuário
@@ -48,13 +49,13 @@ const steps = [
     id: 'endereco',
     title: 'Dados do Endereço',
     fields: [
+      'cep',
       'endereco',
       'numero',
       'complemento',
       'bairro',
       'cidade',
       'estado',
-      'cep',
     ],
   },
 ];
@@ -67,6 +68,7 @@ const RegisterEstablishmentForm: React.FC = () => {
     watch,
     trigger,
     setError,
+    setValue,
   } = useForm<RegisterEstablishmentFormData>();
 
   const {
@@ -82,6 +84,32 @@ const RegisterEstablishmentForm: React.FC = () => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [checkingEmail, setCheckingEmail] = useState(false);
+  const [searchingCep, setSearchingCep] = useState(false);
+
+  const handleCepChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const cep = e.target.value.replace(/\D/g, '');
+
+    if (cep.length === 8) {
+      try {
+        setSearchingCep(true);
+        const address = await cepService.getAddressByCep(cep);
+
+        setValue('endereco', address.endereco);
+        setValue('bairro', address.bairro);
+        setValue('cidade', address.cidade);
+        setValue('estado', address.estado);
+        setValue('cep', address.cep);
+      } catch (error) {
+        toast({
+          title: 'Erro!',
+          description: 'CEP não encontrado ou inválido.',
+          variant: 'destructive',
+        });
+      } finally {
+        setSearchingCep(false);
+      }
+    }
+  };
 
   const onSubmit = async (data: RegisterEstablishmentFormData) => {
     if (!isLastStep) {
@@ -259,6 +287,24 @@ const RegisterEstablishmentForm: React.FC = () => {
                   })}
                   error={!!errors[field as keyof RegisterEstablishmentFormData]}
                   value={watch('cep') || ''}
+                  onChange={handleCepChange}
+                  disabled={searchingCep}
+                />
+              ) : field === 'endereco' ||
+                field === 'bairro' ||
+                field === 'cidade' ||
+                field === 'estado' ? (
+                <Input
+                  {...register(field as keyof RegisterEstablishmentFormData, {
+                    required: 'Este campo é obrigatório',
+                  })}
+                  type='text'
+                  id={field}
+                  disabled={!watch('cep')}
+                  className={`flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background
+                    ${errors[field as keyof RegisterEstablishmentFormData] ? 'border-red-500' : 'border-gray-300'}
+                    ${!watch('cep') ? 'bg-gray-100 cursor-not-allowed' : ''}
+                  `}
                 />
               ) : (
                 <Input
@@ -293,12 +339,12 @@ const RegisterEstablishmentForm: React.FC = () => {
               )}
               {errors[field as keyof RegisterEstablishmentFormData]
                 ?.message && (
-                <span className='text-red-500 text-xs mt-1'>
+                <p className='text-red-500 text-sm'>
                   {
                     errors[field as keyof RegisterEstablishmentFormData]
                       ?.message
                   }
-                </span>
+                </p>
               )}
             </div>
           ))}

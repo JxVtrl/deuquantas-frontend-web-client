@@ -8,10 +8,9 @@ interface MaskedInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 
 export const MaskedInput = React.forwardRef<HTMLInputElement, MaskedInputProps>(
   ({ maskType, error, className, onChange, value, ...props }, ref) => {
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const input = e.target;
+    const applyMask = (inputValue: string) => {
       const mask = masks[maskType];
-      const numbers = input.value.replace(/\D/g, '');
+      const numbers = inputValue.replace(/\D/g, '');
       let maskedValue = '';
       let numberIndex = 0;
 
@@ -24,6 +23,11 @@ export const MaskedInput = React.forwardRef<HTMLInputElement, MaskedInputProps>(
         }
       }
 
+      return maskedValue;
+    };
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const maskedValue = applyMask(e.target.value);
       if (onChange) {
         e.target.value = maskedValue;
         onChange(e);
@@ -42,6 +46,16 @@ export const MaskedInput = React.forwardRef<HTMLInputElement, MaskedInputProps>(
       }
     };
 
+    const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+      e.preventDefault();
+      const pastedData = e.clipboardData.getData('text');
+      const maskedValue = applyMask(pastedData);
+      if (onChange) {
+        e.currentTarget.value = maskedValue;
+        onChange(e as unknown as React.ChangeEvent<HTMLInputElement>);
+      }
+    };
+
     return (
       <input
         ref={ref}
@@ -49,6 +63,7 @@ export const MaskedInput = React.forwardRef<HTMLInputElement, MaskedInputProps>(
         value={value}
         onChange={handleChange}
         onKeyDown={handleKeyDown}
+        onPaste={handlePaste}
         className={`flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background
           ${error ? 'border-red-500' : 'border-gray-300'}
           ${className || ''}

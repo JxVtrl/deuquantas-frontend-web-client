@@ -12,6 +12,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { validateCPF } from '@/utils/validators';
 import { authService } from '@/services/auth.service';
 import { useRouter } from 'next/router';
+import { cepService } from '@/services/cep.service';
 
 export interface RegisterFormData {
   // Dados do usuário
@@ -48,13 +49,13 @@ const steps = [
     id: 'endereco',
     title: 'Dados do Endereço',
     fields: [
+      'cep',
       'endereco',
       'numero',
       'complemento',
       'bairro',
       'cidade',
       'estado',
-      'cep',
     ],
   },
 ];
@@ -67,6 +68,7 @@ const RegisterForm: React.FC = () => {
     watch,
     trigger,
     setError,
+    setValue,
   } = useForm<RegisterFormData>();
 
   const {
@@ -83,7 +85,36 @@ const RegisterForm: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [checkingEmail, setCheckingEmail] = useState(false);
   const [checkingDocument, setCheckingDocument] = useState(false);
+  const [searchingCep, setSearchingCep] = useState(false);
+  const [cepValido, setCepValido] = useState(false);
   const router = useRouter();
+
+  const handleCepChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const cep = e.target.value.replace(/\D/g, '');
+    setCepValido(false);
+
+    if (cep.length === 8) {
+      try {
+        setSearchingCep(true);
+        const address = await cepService.getAddressByCep(cep);
+
+        setValue('endereco', address.endereco);
+        setValue('bairro', address.bairro);
+        setValue('cidade', address.cidade);
+        setValue('estado', address.estado);
+        setValue('cep', address.cep);
+        setCepValido(true);
+      } catch (error) {
+        toast({
+          title: 'Erro!',
+          description: 'CEP não encontrado ou inválido.',
+          variant: 'destructive',
+        });
+      } finally {
+        setSearchingCep(false);
+      }
+    }
+  };
 
   const onSubmit = async (data: RegisterFormData) => {
     if (!isLastStep) {
@@ -303,6 +334,27 @@ const RegisterForm: React.FC = () => {
                   })}
                   error={!!errors[field as keyof RegisterFormData]}
                   value={watch(field as keyof RegisterFormData) || ''}
+                  onChange={(e) => {
+                    register(field as keyof RegisterFormData).onChange(e);
+                    handleCepChange(e);
+                  }}
+                  disabled={searchingCep}
+                />
+              ) : field === 'endereco' ||
+                field === 'bairro' ||
+                field === 'cidade' ||
+                field === 'estado' ? (
+                <Input
+                  {...register(field as keyof RegisterFormData, {
+                    required: 'Este campo é obrigatório',
+                  })}
+                  type='text'
+                  id={field}
+                  readOnly
+                  className={`flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background
+                    ${errors[field as keyof RegisterFormData] ? 'border-red-500' : 'border-gray-300'}
+                    bg-gray-100 cursor-not-allowed
+                  `}
                 />
               ) : (
                 <Input
@@ -330,8 +382,7 @@ const RegisterForm: React.FC = () => {
                   })}
                   type={getFieldType(field)}
                   id={field}
-                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500
-                    placeholder:text-[#A1A1AA] placeholder:text-[14px] placeholder:leading-[140%] placeholder:font-[400]
+                  className={`flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background
                     ${errors[field as keyof RegisterFormData] ? 'border-red-500' : 'border-gray-300'}
                   `}
                 />
