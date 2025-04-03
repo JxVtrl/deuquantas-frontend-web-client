@@ -1,5 +1,4 @@
 import React from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { PlusIcon } from '@/components/Icons';
 import { MaxWidthLayout } from '@/layout';
@@ -16,10 +15,12 @@ const NavigationItem: React.FC<NavigationItem & { isActive: boolean }> = ({
   href,
   isActive,
 }) => {
+  const router = useRouter();
+
   return (
-    <Link
-      href={href}
-      className={`flex flex-col items-center justify-center gap-[4px] ${
+    <div
+      onClick={() => router.push(href)}
+      className={`flex flex-col items-center justify-center gap-[4px] cursor-pointer hover:opacity-80 ${
         isActive ? 'text-[#FFCC00]' : 'text-white'
       }`}
     >
@@ -29,7 +30,7 @@ const NavigationItem: React.FC<NavigationItem & { isActive: boolean }> = ({
       <div className='text-[12px] leading-[16px] font-[600] tracking-[0.5px]'>
         {label}
       </div>
-    </Link>
+    </div>
   );
 };
 

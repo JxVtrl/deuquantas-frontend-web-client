@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { SVGProps } from 'react';
 
 export const ScanIcon = () => (
   <svg
@@ -219,5 +219,24 @@ export const DrinksIcon = () => (
       d='M18.14 6.54L17.18 6.22C16.77 6.08 16.5 5.7 16.5 5.27V1C16.5 0.45 16.05 0 15.5 0H12.5C11.95 0 11.5 0.45 11.5 1V5.28C11.5 5.71 11.23 6.09 10.82 6.23L9.86 6.55C9.05 6.83 8.5 7.59 8.5 8.45V18C8.5 19.1 9.4 20 10.5 20H17.5C18.6 20 19.5 19.1 19.5 18V8.44C19.5 7.58 18.95 6.82 18.14 6.54ZM13.5 2H14.5V3H13.5V2ZM17.5 18H10.5V16H17.5V18ZM17.5 14H10.5V12H17.5V14ZM17.5 10H10.5V8.44L11.45 8.12C12.68 7.72 13.5 6.57 13.5 5.28V5H14.5V5.28C14.5 6.57 15.32 7.72 16.55 8.13L17.5 8.44V10Z'
       fill='black'
     />
+  </svg>
+);
+
+export const ScanQrCodeIcon = (props: SVGProps<SVGSVGElement>) => (
+  <svg
+    xmlns='http://www.w3.org/2000/svg'
+    viewBox='0 0 24 24'
+    width='100vw'
+    height='100vw'
+    id='scan-qr-code-icon'
+    {...props}
+  >
+    <path
+      fill='none'
+      stroke='rgba(255, 204, 0, 0.65)'
+      strokeLinecap='round'
+      strokeLinejoin='round'
+      d='M18.5 15v3.5H15m-6 0H5.5V15M15 5.5h3.496V9M9 5.5H5.5V9'
+    ></path>
   </svg>
 );

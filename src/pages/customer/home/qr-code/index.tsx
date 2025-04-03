@@ -1,5 +1,5 @@
 import { withAuthCustomer } from '@/hoc/withAuth';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { CustomerLayout } from '@/layout';
 import { Scanner } from '@yudiel/react-qr-scanner';
 import { useRouter } from 'next/router';
@@ -7,7 +7,8 @@ import { useCustomerContext } from '@/contexts/CustomerContext';
 import { ComandaService, CreateComandaDto } from '@/services/comanda.service';
 import { useAuth } from '@/contexts/AuthContext';
 import axios from 'axios';
-
+import { ScanQrCodeIcon } from '@/components/Icons';
+import InputQrCode from '@/components/InputQrCode';
 /**
  * Componente para escaneamento de QR Code
  */
@@ -18,23 +19,8 @@ const CustomerQrCode: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   // Estado para indicar se estamos em modo offline
-  const [isOfflineMode, setIsOfflineMode] = useState(false);
   // Estado para mostrar mensagem de sucesso
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
-
-  // Verificar status do backend ao carregar o componente
-  useEffect(() => {
-    const checkBackendStatus = async () => {
-      const isAvailable = await ComandaService.isBackendAvailable();
-      setIsOfflineMode(!isAvailable);
-
-      if (!isAvailable) {
-        console.log('Aplicação iniciada em modo offline');
-      }
-    };
-
-    checkBackendStatus();
-  }, []);
 
   // Função para navegar para a página da comanda com tratamento de erro
   const navegarParaComanda = (mesaId: string, clienteId: string) => {
@@ -69,7 +55,6 @@ const CustomerQrCode: React.FC = () => {
 
       // Verificar se o backend está disponível
       const backendAvailable = await ComandaService.isBackendAvailable();
-      setIsOfflineMode(!backendAvailable);
 
       if (!backendAvailable) {
         console.warn('Backend não está disponível.');
@@ -162,71 +147,92 @@ const CustomerQrCode: React.FC = () => {
 
   return (
     <CustomerLayout>
-      {/* Indicador de modo offline */}
-      {isOfflineMode && (
-        <div className='fixed top-2 right-2 bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs'>
-          Modo Offline
-        </div>
-      )}
+      <style jsx global>{`
+        .qr-scanner svg {
+          display: none !important;
+        }
+        #scan-qr-code-icon {
+          display: block !important;
+        }
+      `}</style>
+      <div>
+        {error && (
+          <div className='fixed top-2 left-2 right-2 z-50 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded'>
+            <span className='block sm:inline'>{error}</span>
+          </div>
+        )}
 
-      {error && (
-        <div className='bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4'>
-          <span className='block sm:inline'>{error}</span>
-        </div>
-      )}
+        {successMessage && (
+          <div className='fixed top-2 left-2 right-2 z-50 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded'>
+            <span className='block sm:inline'>{successMessage}</span>
+          </div>
+        )}
 
-      {successMessage && (
-        <div className='bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4'>
-          <span className='block sm:inline'>{successMessage}</span>
-        </div>
-      )}
+        {isLoading ? (
+          <div className='fixed inset-0 z-50 flex justify-center items-center bg-black bg-opacity-50'>
+            <div className='animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#FFCC00]'></div>
+            <p className='ml-2 text-white'>Processando QR Code...</p>
+          </div>
+        ) : (
+          <>
+            <div className='qr-scanner'>
+              <Scanner
+                constraints={{}}
+                styles={{
+                  container: {
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    padding: 0,
+                    margin: 0,
+                    zIndex: -1,
+                  },
+                  video: {
+                    width: '100vw',
+                    height: '100vh',
+                    objectFit: 'cover',
+                  },
+                }}
+                onError={(err) => {
+                  console.log('Erro ao escanear QR Code', err);
+                  setError('Erro ao escanear QR Code. Tente novamente.');
+                }}
+                onScan={(result) => {
+                  try {
+                    // Extrair informações do QR code
+                    // Formato esperado: "estabelecimento:CNPJ:mesa:ID"
+                    const qrData = result[0].rawValue;
+                    const dataParts = qrData.split(':');
 
-      {isLoading ? (
-        <div className='flex justify-center items-center h-[50vh]'>
-          <div className='animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#FFCC00]'></div>
-          <p className='ml-2'>Processando QR Code...</p>
-        </div>
-      ) : (
-        <Scanner
-          styles={{
-            finderBorder: 2,
-            container: {
-              width: '100%',
-              height: '100%',
-            },
-            video: {
-              width: '100%',
-              height: '100%',
-            },
-          }}
-          onError={(err) => {
-            console.log('Erro ao escanear QR Code', err);
-            setError('Erro ao escanear QR Code. Tente novamente.');
-          }}
-          onScan={(result) => {
-            try {
-              // Extrair informações do QR code
-              // Formato esperado: "estabelecimento:CNPJ:mesa:ID"
-              const qrData = result[0].rawValue;
-              const dataParts = qrData.split(':');
+                    if (
+                      dataParts.length < 4 ||
+                      dataParts[0] !== 'estabelecimento'
+                    ) {
+                      setError('QR Code inválido. Tente novamente.');
+                      return;
+                    }
 
-              if (dataParts.length < 4 || dataParts[0] !== 'estabelecimento') {
-                setError('QR Code inválido. Tente novamente.');
-                return;
-              }
+                    const estabelecimentoId = dataParts[1];
+                    const mesaId = dataParts[3];
 
-              const estabelecimentoId = dataParts[1];
-              const mesaId = dataParts[3];
-
-              // Criar comanda e redirecionar
-              criarComanda(mesaId, estabelecimentoId);
-            } catch (err) {
-              console.error('Erro ao processar QR Code:', err);
-              setError('Erro ao processar QR Code. Formato inválido.');
-            }
-          }}
-        />
-      )}
+                    // Criar comanda e redirecionar
+                    criarComanda(mesaId, estabelecimentoId);
+                  } catch (err) {
+                    console.error('Erro ao processar QR Code:', err);
+                    setError('Erro ao processar QR Code. Formato inválido.');
+                  }
+                }}
+              />
+              <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[9999999]'>
+                <ScanQrCodeIcon />
+                <InputQrCode />
+              </div>
+            </div>
+          </>
+        )}
+      </div>
     </CustomerLayout>
   );
 };
