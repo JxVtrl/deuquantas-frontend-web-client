@@ -7,7 +7,6 @@ import AuthModal from '@/components/auth/AuthModal';
 import { useAuthForm } from '@/hooks/useAuthForm';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/router';
-import RegisterEstablishmentForm from '@/components/auth/RegisterEstablishmentForm';
 
 export default function AuthPage() {
   const router = useRouter();
@@ -47,13 +46,7 @@ export default function AuthPage() {
                   : 'register'
             }
           >
-            {isRegisterAsEstablishment ? (
-              <RegisterEstablishmentForm />
-            ) : isLogin ? (
-              <LoginForm />
-            ) : (
-              <RegisterForm />
-            )}
+            {isLogin ? <LoginForm /> : <RegisterForm />}
           </AuthModal>
         </AnimatePresence>
       </div>

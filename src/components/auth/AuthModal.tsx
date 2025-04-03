@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { useRouter } from 'next/router';
 import React from 'react';
 import { useAuthForm } from '@/hooks/useAuthForm';
+import RegisterEstablishmentForm from './RegisterEstablishmentForm';
 
 interface AuthModalProps {
   children: React.ReactNode;
@@ -46,7 +47,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ children }) => {
       style={{ transformStyle: 'preserve-3d' }}
       className='bg-[#F0F0F0] w-full rounded-lg shadow-[0px_1px_2px_0px_#0000000D] py-[20px] px-[24px] mx-auto h-fit'
     >
-      {children}
+      {isRegisterAsEstablishment ? <RegisterEstablishmentForm /> : children}
       <div className='mt-[12px] text-end flex flex-col gap-[12px]'>
         <p className='text-[#272727] text-[12px] leading-[120%] font-[500]'>
           {isLogin ? 'Não tem uma conta?' : 'Já tem uma conta?'}{' '}
