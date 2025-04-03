@@ -39,7 +39,7 @@ export const BottomNavigation: React.FC = ({}) => {
       backgroundColor='#272727'
       className='fixed bottom-0 left-0 right-0'
     >
-      <div className='flex justify-around py-4'>
+      <div className='flex justify-around items-center h-[66px]'>
         {bottomNavItems.map((item) => (
           <NavigationItem
             key={item.href}

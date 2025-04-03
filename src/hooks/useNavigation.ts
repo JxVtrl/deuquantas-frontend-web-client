@@ -7,7 +7,7 @@ import {
   OrdersIcon,
   LocationIcon,
   HomeIcon,
-  WalletIcon,
+  MoneyIcon,
 } from '@/components/Icons';
 
 export interface NavigationPill {
@@ -85,7 +85,7 @@ export const useNavigation = () => {
       href: '/customer/home',
     },
     {
-      icon: WalletIcon,
+      icon: MoneyIcon,
       label: 'Conta',
       href: '/customer/account',
     },
