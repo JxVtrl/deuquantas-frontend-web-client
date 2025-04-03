@@ -1,19 +1,27 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import Button from '../Button';
-
+import { useAuthForm } from '@/hooks/useAuthForm';
+import { useAuth } from '@/contexts/AuthContext';
+import { useRouter } from 'next/router';
 interface LoginFormData {
   email: string;
   senha: string;
 }
 
-interface LoginFormProps {
-  loading: boolean;
-  error?: string;
-  onSubmit: (data: LoginFormData) => void;
-}
+export function LoginForm() {
+  const { login, register: regFunc } = useAuth();
+  const router = useRouter();
+  const {
+    loading,
+    error,
+    handleSubmit: onSubmit,
+  } = useAuthForm({
+    login,
+    register: regFunc,
+    onSuccess: () => router.push('/customer/home'),
+  });
 
-export function LoginForm({ loading, error, onSubmit }: LoginFormProps) {
   const {
     register,
     handleSubmit,

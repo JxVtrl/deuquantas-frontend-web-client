@@ -1,28 +1,44 @@
+import { useAuth } from '@/contexts/AuthContext';
 import { motion } from 'framer-motion';
+import { useRouter } from 'next/router';
 import React from 'react';
+import { useAuthForm } from '@/hooks/useAuthForm';
 
 interface AuthModalProps {
   children: React.ReactNode;
-  isLogin: boolean;
-  onToggleForm: () => void;
 }
 
-const AuthModal: React.FC<AuthModalProps> = ({
-  children,
-  isLogin,
-  onToggleForm,
-}) => {
+const AuthModal: React.FC<AuthModalProps> = ({ children }) => {
+  const router = useRouter();
+  const { login, register } = useAuth();
+  const {
+    toggleForm,
+    isLogin,
+    isRegisterAsEstablishment,
+    setIsRegisterAsEstablishment,
+  } = useAuthForm({
+    login,
+    register,
+    onSuccess: () => router.push('/customer/home'),
+  });
+
   const handleToggleClick = () => {
-    onToggleForm();
+    toggleForm();
   };
 
   const handleRegisterAsEstablishment = () => {
-    console.log('Registrar como estabelecimento');
+    setIsRegisterAsEstablishment((prev) => !prev);
   };
 
   return (
     <motion.div
-      key={isLogin ? 'login' : 'register'}
+      key={
+        isRegisterAsEstablishment
+          ? 'register-establishment'
+          : isLogin
+            ? 'login'
+            : 'register'
+      }
       initial={{ opacity: 0, rotateY: 90 }}
       animate={{ opacity: 1, rotateY: 0 }}
       exit={{ opacity: 0, rotateY: -90 }}
@@ -47,7 +63,9 @@ const AuthModal: React.FC<AuthModalProps> = ({
             className='text-[#272727] text-[12px] leading-[120%] font-[700] underline cursor-pointer'
             onClick={handleRegisterAsEstablishment}
           >
-            Registre-se como estabelecimento
+            {isRegisterAsEstablishment
+              ? 'Registrar como cliente'
+              : 'Registrar como estabelecimento'}
           </p>
         )}
       </div>

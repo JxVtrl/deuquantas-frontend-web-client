@@ -1,6 +1,9 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import Button from '../Button';
+import { useAuth } from '@/contexts/AuthContext';
+import { useRouter } from 'next/router';
+import { useAuthForm } from '@/hooks/useAuthForm';
 
 interface RegisterFormData {
   nome: string;
@@ -10,13 +13,19 @@ interface RegisterFormData {
   confirmSenha: string;
 }
 
-interface RegisterFormProps {
-  loading: boolean;
-  error?: string;
-  onSubmit: (data: RegisterFormData) => void;
-}
+export function RegisterForm() {
+  const { login, register: regFunc } = useAuth();
+  const router = useRouter();
+  const {
+    loading,
+    error,
+    handleSubmit: onSubmit,
+  } = useAuthForm({
+    login,
+    register: regFunc,
+    onSuccess: () => router.push('/customer/home'),
+  });
 
-export function RegisterForm({ loading, error, onSubmit }: RegisterFormProps) {
   const {
     register,
     handleSubmit,

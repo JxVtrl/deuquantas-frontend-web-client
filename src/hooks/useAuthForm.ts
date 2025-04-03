@@ -34,6 +34,8 @@ interface UseAuthFormProps {
 
 export function useAuthForm({ login, register, onSuccess }: UseAuthFormProps) {
   const [isLogin, setIsLogin] = useState(true);
+  const [isRegisterAsEstablishment, setIsRegisterAsEstablishment] =
+    useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -97,6 +99,14 @@ export function useAuthForm({ login, register, onSuccess }: UseAuthFormProps) {
 
   const toggleForm = () => {
     setIsLogin((prev) => !prev);
+
+    setIsRegisterAsEstablishment(false);
+
+    setError('');
+  };
+
+  const toggleRegisterAsEstablishment = () => {
+    setIsRegisterAsEstablishment((prev) => !prev);
     setError('');
   };
 
@@ -106,5 +116,8 @@ export function useAuthForm({ login, register, onSuccess }: UseAuthFormProps) {
     error,
     handleSubmit,
     toggleForm,
+    isRegisterAsEstablishment,
+    setIsRegisterAsEstablishment,
+    toggleRegisterAsEstablishment,
   };
 }
