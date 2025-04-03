@@ -6,7 +6,7 @@ import { capitalize } from '@/utils/formatters';
 import HeaderMenu from '../HeaderMenu';
 export const Header: React.FC = () => {
   const { user } = useAuth();
-  const firstName = user?.nome || 'Usuário';
+  const firstName = user?.name || 'Usuário';
 
   return (
     <MaxWidthLayout backgroundColor='#FFCC00'>

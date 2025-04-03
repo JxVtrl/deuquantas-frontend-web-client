@@ -55,6 +55,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       const decodedToken = jwtDecode<User>(
         formattedToken.replace('Bearer ', ''),
       );
+      console.log('Token decodificado:', decodedToken);
       setUser(decodedToken);
       Cookies.set('auth_token', formattedToken.replace('Bearer ', ''));
       setDefaultHeaderToken(formattedToken);
@@ -103,7 +104,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
   const login = async (data: LoginData) => {
     try {
+      console.log('Dados de login recebidos:', data);
       const response = await authService.login(data);
+      console.log('Resposta do login:', response);
       await processToken(response.token);
 
       // Redireciona com base no tipo de usuário

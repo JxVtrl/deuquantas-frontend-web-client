@@ -41,7 +41,7 @@ export interface Estabelecimento {
 
 export interface User {
   id: string;
-  nome: string;
+  name: string;
   email: string;
   isAdmin: boolean;
   isAtivo: boolean;

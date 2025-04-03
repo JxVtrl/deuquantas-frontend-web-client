@@ -9,7 +9,7 @@ export interface LoginData {
 }
 
 export interface RegisterData {
-  nome: string;
+  name: string;
   email: string;
   password: string;
   numCelular: string;
@@ -36,7 +36,7 @@ interface AuthApiResponse {
 export interface UserResponse {
   id: string;
   email: string;
-  nome: string;
+  name: string;
   isAdmin: boolean;
   isAtivo: boolean;
   dataCriacao: string;

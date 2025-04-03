@@ -14,7 +14,7 @@ import { cepService } from '@/services/cep.service';
 
 export interface RegisterFormData {
   // Dados do usuário
-  nome: string;
+  name: string;
   email: string;
   password: string;
   confirmSenha: string;
@@ -36,7 +36,7 @@ const steps = [
   {
     id: 'usuario',
     title: 'Registro de Cliente',
-    fields: ['nome', 'email', 'password', 'confirmSenha'],
+    fields: ['name', 'email', 'password', 'confirmSenha'],
   },
   {
     id: 'pessoal',
@@ -190,7 +190,7 @@ const RegisterForm: React.FC = () => {
 
         // Remove máscaras antes de enviar
         const cleanedData = {
-          nome: data.nome,
+          name: data.name,
           email: data.email,
           password: data.password,
           numCelular: data.numCelular.replace(/\D/g, ''),
@@ -233,7 +233,7 @@ const RegisterForm: React.FC = () => {
 
   const getFieldLabel = (field: string) => {
     const labels: Record<string, string> = {
-      nome: 'Nome Completo',
+      name: 'Nome Completo',
       email: 'E-mail',
       password: 'Senha',
       confirmSenha: 'Confirmar Senha',

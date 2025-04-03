@@ -18,7 +18,7 @@ const CustomerQrCode: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isOfflineMode, setIsOfflineMode] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const firstName = user?.nome || 'Usuário';
+  const firstName = user?.name || 'Usuário';
 
   useEffect(() => {
     const checkBackendStatus = async () => {

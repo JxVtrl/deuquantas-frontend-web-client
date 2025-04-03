@@ -42,7 +42,7 @@ export function useAuthForm({ login, register, onSuccess }: UseAuthFormProps) {
     try {
       if ('password' in data) {
         await login({ email: data.email, password: data.password });
-      } else if ('nome' in data) {
+      } else if ('name' in data) {
         await register(data);
       }
       onSuccess();

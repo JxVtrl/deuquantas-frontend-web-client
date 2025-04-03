@@ -8,7 +8,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
 const ProfilePage: React.FC = () => {
   const { user, logout } = useAuth();
-  const [nome, setNome] = useState('');
+  const [name, setName] = useState('');
   const [numCelular, setNumCelular] = useState('');
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
@@ -16,7 +16,7 @@ const ProfilePage: React.FC = () => {
 
   useEffect(() => {
     if (user) {
-      setNome(user.nome || '');
+      setName(user.name || '');
       setNumCelular('');
     }
   }, [user]);
@@ -31,7 +31,7 @@ const ProfilePage: React.FC = () => {
       const token = Cookies.get('auth_token');
       await axios.put(
         `${API_URL}/usuarios/${user?.id}`,
-        { nome, numCelular },
+        { name, numCelular },
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -90,16 +90,16 @@ const ProfilePage: React.FC = () => {
 
               <div className='mb-4'>
                 <label
-                  htmlFor='nome'
+                  htmlFor='name'
                   className='block text-gray-700 font-bold mb-2'
                 >
                   Nome
                 </label>
                 <input
                   type='text'
-                  id='nome'
-                  value={nome}
-                  onChange={(e) => setNome(e.target.value)}
+                  id='name'
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
                   className='w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500'
                   required
                 />

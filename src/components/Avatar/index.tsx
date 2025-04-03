@@ -9,7 +9,7 @@ import { useAuth } from '@/contexts/AuthContext';
 
 const Avatar: React.FC<AvatarProps> = (props) => {
   const { user } = useAuth();
-  const firstLetter = user?.nome.charAt(0).toUpperCase() || 'DQ';
+  const firstLetter = user?.name?.charAt(0).toUpperCase() || 'DQ';
   // const avatarUrl = user?.avatar || '';
 
   return (

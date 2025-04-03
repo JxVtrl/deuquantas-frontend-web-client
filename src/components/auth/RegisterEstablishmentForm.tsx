@@ -15,7 +15,7 @@ import { cepService } from '@/services/cep.service';
 
 export interface RegisterEstablishmentFormData {
   // Dados do usuário
-  nome: string;
+  name: string;
   email: string;
   password: string;
   confirmSenha: string;
@@ -38,7 +38,7 @@ const steps = [
   {
     id: 'usuario',
     title: 'Registro de Estabelecimento',
-    fields: ['nome', 'email', 'password', 'confirmSenha'],
+    fields: ['name', 'email', 'password', 'confirmSenha'],
   },
   {
     id: 'estabelecimento',
@@ -229,7 +229,7 @@ const RegisterEstablishmentForm: React.FC = () => {
 
   const getFieldLabel = (field: string) => {
     const labels: Record<string, string> = {
-      nome: 'Nome Completo',
+      name: 'Nome Completo',
       email: 'E-mail',
       password: 'Senha',
       confirmSenha: 'Confirmar Senha',
