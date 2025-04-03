@@ -17,7 +17,7 @@ export interface RegisterEstablishmentFormData {
   // Dados do usuário
   nome: string;
   email: string;
-  senha: string;
+  password: string;
   confirmSenha: string;
 
   // Dados do estabelecimento
@@ -37,7 +37,7 @@ const steps = [
   {
     id: 'usuario',
     title: 'Registro de Estabelecimento',
-    fields: ['nome', 'email', 'senha', 'confirmSenha'],
+    fields: ['nome', 'email', 'password', 'confirmSenha'],
   },
   {
     id: 'estabelecimento',
@@ -219,7 +219,7 @@ const RegisterEstablishmentForm: React.FC = () => {
     const labels: Record<string, string> = {
       nome: 'Nome Completo',
       email: 'E-mail',
-      senha: 'Senha',
+      password: 'Senha',
       confirmSenha: 'Confirmar Senha',
       nomeEstab: 'Nome do Estabelecimento',
       cnpj: 'CNPJ',
@@ -237,7 +237,7 @@ const RegisterEstablishmentForm: React.FC = () => {
 
   const getFieldType = (field: string) => {
     if (field === 'email') return 'email';
-    if (field === 'senha' || field === 'confirmSenha') return 'password';
+    if (field === 'password' || field === 'confirmSenha') return 'password';
     if (field === 'telefone') return 'tel';
     return 'text';
   };
@@ -357,9 +357,10 @@ const RegisterEstablishmentForm: React.FC = () => {
                     }),
                     ...(field === 'confirmSenha' && {
                       validate: (value) =>
-                        value === watch('senha') || 'As senhas não coincidem',
+                        value === watch('password') ||
+                        'As senhas não coincidem',
                     }),
-                    ...(field === 'senha' && {
+                    ...(field === 'password' && {
                       minLength: {
                         value: 6,
                         message: 'A senha deve ter no mínimo 6 caracteres',

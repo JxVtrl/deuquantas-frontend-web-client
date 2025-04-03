@@ -46,10 +46,16 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
   const processToken = useCallback(async (token: string) => {
     try {
-      const decodedToken = jwtDecode<User>(token);
+      // Garante que o token começa com "Bearer "
+      const formattedToken = token.startsWith('Bearer ')
+        ? token
+        : `Bearer ${token}`;
+      const decodedToken = jwtDecode<User>(
+        formattedToken.replace('Bearer ', ''),
+      );
       setUser(decodedToken);
-      Cookies.set('auth_token', token);
-      setDefaultHeaderToken(token);
+      Cookies.set('auth_token', formattedToken.replace('Bearer ', ''));
+      setDefaultHeaderToken(formattedToken);
       return true;
     } catch (error) {
       console.error('Erro ao processar token:', error);

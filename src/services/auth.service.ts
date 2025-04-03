@@ -13,6 +13,14 @@ export interface RegisterData {
   email: string;
   password: string;
   telefone: string;
+  numCpf: string;
+  cep: string;
+  endereco: string;
+  numero: string;
+  complemento?: string;
+  bairro: string;
+  cidade: string;
+  estado: string;
 }
 
 export interface AuthResponse {
@@ -45,15 +53,21 @@ export class AuthService {
       });
       const { access_token, user } = response.data;
 
+      // Formata o token corretamente
+      const formattedToken = access_token.startsWith('Bearer ')
+        ? access_token
+        : `Bearer ${access_token}`;
+      const tokenWithoutBearer = formattedToken.replace('Bearer ', '');
+
       // Salva o token nos cookies
-      Cookies.set('auth_token', access_token, { expires: 7 }); // Expira em 7 dias
+      Cookies.set('auth_token', tokenWithoutBearer, { expires: 7 }); // Expira em 7 dias
 
       // Configura o token para as próximas requisições
-      api.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
+      api.defaults.headers.common['Authorization'] = formattedToken;
 
       return {
         user,
-        token: access_token,
+        token: tokenWithoutBearer,
       };
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -73,15 +87,21 @@ export class AuthService {
       });
       const { access_token, user } = response.data;
 
+      // Formata o token corretamente
+      const formattedToken = access_token.startsWith('Bearer ')
+        ? access_token
+        : `Bearer ${access_token}`;
+      const tokenWithoutBearer = formattedToken.replace('Bearer ', '');
+
       // Salva o token nos cookies
-      Cookies.set('auth_token', access_token, { expires: 7 }); // Expira em 7 dias
+      Cookies.set('auth_token', tokenWithoutBearer, { expires: 7 }); // Expira em 7 dias
 
       // Configura o token para as próximas requisições
-      api.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
+      api.defaults.headers.common['Authorization'] = formattedToken;
 
       return {
         user,
-        token: access_token,
+        token: tokenWithoutBearer,
       };
     } catch (error) {
       if (axios.isAxiosError(error)) {

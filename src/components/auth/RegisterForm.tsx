@@ -3,8 +3,6 @@ import { useForm } from 'react-hook-form';
 import { useFormSteps } from '@/hooks/useFormSteps';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { api } from '@/lib/axios';
-import Cookies from 'js-cookie';
 import { Label } from '@radix-ui/react-label';
 import { Input } from '@/components/ui/input';
 import { MaskedInput } from '@/components/ui/masked-input';
@@ -18,7 +16,7 @@ export interface RegisterFormData {
   // Dados do usuário
   nome: string;
   email: string;
-  senha: string;
+  password: string;
   confirmSenha: string;
 
   // Dados pessoais
@@ -38,7 +36,7 @@ const steps = [
   {
     id: 'usuario',
     title: 'Registro de Cliente',
-    fields: ['nome', 'email', 'senha', 'confirmSenha'],
+    fields: ['nome', 'email', 'password', 'confirmSenha'],
   },
   {
     id: 'pessoal',
@@ -86,12 +84,10 @@ const RegisterForm: React.FC = () => {
   const [checkingEmail, setCheckingEmail] = useState(false);
   const [checkingDocument, setCheckingDocument] = useState(false);
   const [searchingCep, setSearchingCep] = useState(false);
-  const [cepValido, setCepValido] = useState(false);
   const router = useRouter();
 
   const handleCepChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const cep = e.target.value.replace(/\D/g, '');
-    setCepValido(false);
 
     if (cep.length === 8) {
       try {
@@ -103,8 +99,7 @@ const RegisterForm: React.FC = () => {
         setValue('cidade', address.cidade);
         setValue('estado', address.estado);
         setValue('cep', address.cep);
-        setCepValido(true);
-      } catch (error) {
+      } catch {
         toast({
           title: 'Erro!',
           description: 'CEP não encontrado ou inválido.',
@@ -135,7 +130,7 @@ const RegisterForm: React.FC = () => {
               });
               return;
             }
-          } catch (error) {
+          } catch {
             toast({
               title: 'Erro!',
               description:
@@ -174,7 +169,7 @@ const RegisterForm: React.FC = () => {
               });
               return;
             }
-          } catch (error) {
+          } catch {
             toast({
               title: 'Erro!',
               description:
@@ -195,21 +190,22 @@ const RegisterForm: React.FC = () => {
 
         // Remove máscaras antes de enviar
         const cleanedData = {
-          ...data,
-          numCpf: data.cpf.replace(/\D/g, ''),
+          nome: data.nome,
+          email: data.email,
+          password: data.password,
           telefone: data.telefone.replace(/\D/g, ''),
+          numCpf: data.cpf.replace(/\D/g, ''),
           cep: data.cep.replace(/\D/g, ''),
+          endereco: data.endereco,
+          numero: data.numero,
+          complemento: data.complemento,
+          bairro: data.bairro,
+          cidade: data.cidade,
+          estado: data.estado,
         };
 
-        // Registra o cliente com todos os dados
-        const response = await api.post('/clientes', cleanedData);
-
-        // Salva o token nos cookies
-        Cookies.set('auth_token', response.data.token, { expires: 7 });
-
-        // Configura o token para as próximas requisições
-        api.defaults.headers.common['Authorization'] =
-          `Bearer ${response.data.token}`;
+        // Registra o cliente usando o authService
+        await authService.register(cleanedData);
 
         toast({
           title: 'Sucesso!',
@@ -218,10 +214,10 @@ const RegisterForm: React.FC = () => {
 
         // Redireciona para a página de login após 2 segundos
         setTimeout(() => {
-          router.push('/login');
+          router.push('/auth');
         }, 2000);
-      } catch (error) {
-        console.error('Erro ao cadastrar:', error);
+      } catch (err) {
+        console.error('Erro ao cadastrar:', err);
         toast({
           title: 'Erro!',
           description: 'Ocorreu um erro ao realizar o cadastro.',
@@ -237,7 +233,7 @@ const RegisterForm: React.FC = () => {
     const labels: Record<string, string> = {
       nome: 'Nome Completo',
       email: 'E-mail',
-      senha: 'Senha',
+      password: 'Senha',
       confirmSenha: 'Confirmar Senha',
       cpf: 'CPF',
       telefone: 'Telefone',
@@ -255,7 +251,7 @@ const RegisterForm: React.FC = () => {
 
   const getFieldType = (field: string) => {
     if (field === 'email') return 'email';
-    if (field === 'senha' || field === 'confirmSenha') return 'password';
+    if (field === 'password' || field === 'confirmSenha') return 'password';
     if (field === 'telefone') return 'tel';
     if (field === 'dataNascimento') return 'date';
     return 'text';
@@ -371,9 +367,10 @@ const RegisterForm: React.FC = () => {
                     }),
                     ...(field === 'confirmSenha' && {
                       validate: (value) =>
-                        value === watch('senha') || 'As senhas não coincidem',
+                        value === watch('password') ||
+                        'As senhas não coincidem',
                     }),
-                    ...(field === 'senha' && {
+                    ...(field === 'password' && {
                       minLength: {
                         value: 6,
                         message: 'A senha deve ter no mínimo 6 caracteres',

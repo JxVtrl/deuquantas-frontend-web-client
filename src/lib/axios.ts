@@ -12,7 +12,10 @@ export const api = axios.create({
 api.interceptors.request.use((config) => {
   const token = Cookies.get('auth_token');
   if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+    const formattedToken = token.startsWith('Bearer ')
+      ? token
+      : `Bearer ${token}`;
+    config.headers.Authorization = formattedToken;
   }
   return config;
 });

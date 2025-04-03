@@ -5,7 +5,7 @@ import axios from 'axios';
 
 interface LoginFormData {
   email: string;
-  senha: string;
+  password: string;
 }
 
 interface UseAuthFormProps {
@@ -40,8 +40,8 @@ export function useAuthForm({ login, register, onSuccess }: UseAuthFormProps) {
     Cookies.remove('auth_token');
 
     try {
-      if ('senha' in data) {
-        await login({ email: data.email, password: data.senha });
+      if ('password' in data) {
+        await login({ email: data.email, password: data.password });
       } else if ('nome' in data) {
         await register(data);
       }

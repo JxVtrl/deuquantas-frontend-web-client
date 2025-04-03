@@ -6,7 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/router';
 interface LoginFormData {
   email: string;
-  senha: string;
+  password: string;
 }
 
 export function LoginForm() {
@@ -43,7 +43,7 @@ export function LoginForm() {
       placeholder: 'your-email@email.com',
     },
     {
-      id: 'senha',
+      id: 'password',
       type: 'password',
       label: 'Senha',
       placeholder: '••••••••••',
