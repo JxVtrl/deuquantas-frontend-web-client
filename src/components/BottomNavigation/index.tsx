@@ -48,7 +48,7 @@ export const BottomNavigation: React.FC = ({}) => {
           <NavigationItem
             key={item.href}
             {...item}
-            isActive={router.pathname === item.href}
+            isActive={router.pathname.includes(item.href)}
           />
         ))}
         <button
