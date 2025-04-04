@@ -9,9 +9,14 @@ interface Step {
 export const register_steps: Record<AccountType, Step[]> = {
   cliente: [
     {
-      id: 'usuario',
-      title: 'Registro de Cliente',
+      id: 'email',
+      title: 'Qual é o seu e-mail?',
       fields: ['email'],
+    },
+    {
+      id: 'senha',
+      title: 'Crie sua senha',
+      fields: ['password', 'confirmSenha'],
     },
     {
       id: 'pessoal',
@@ -20,7 +25,7 @@ export const register_steps: Record<AccountType, Step[]> = {
     },
     {
       id: 'endereco',
-      title: 'Dados do Endereço',
+      title: 'Onde você mora?',
       fields: [
         'cep',
         'endereco',

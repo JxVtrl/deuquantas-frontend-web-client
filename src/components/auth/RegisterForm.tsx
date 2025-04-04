@@ -7,7 +7,7 @@ import { Label } from '@radix-ui/react-label';
 import { Input } from '@/components/ui/input';
 import { MaskedInput } from '@/components/ui/masked-input';
 import { useToast } from '@/components/ui/use-toast';
-import { validateCPF, validateCNPJ } from '@/utils/validators';
+import { validateCPF } from '@/utils/validators';
 import { authService } from '@/services/auth.service';
 import { useRouter } from 'next/navigation';
 import { cepService } from '@/services/cep.service';
@@ -120,107 +120,109 @@ const RegisterForm: React.FC = () => {
 
   const onSubmit = async (data: RegisterFormData) => {
     if (!isLastStep) {
+      // Primeiro passo - Verificação de email
+      if (currentStep === 0) {
+        try {
+          setCheckingEmail(true);
+          const accountInfo = await authService.checkAccountType(data.email);
+
+          if (accountInfo.hasClienteAccount) {
+            toast({
+              title: 'Atenção!',
+              description:
+                'Este email já está cadastrado como cliente. Por favor, faça login.',
+            });
+            router.push('/login');
+            return;
+          }
+
+          // Se chegou aqui, o email está disponível
+          nextStep();
+        } catch (error) {
+          console.error('Erro ao verificar email:', error);
+          toast({
+            title: 'Erro!',
+            description: 'Não foi possível verificar o email. Tente novamente.',
+            variant: 'destructive',
+          });
+        } finally {
+          setCheckingEmail(false);
+        }
+        return;
+      }
+
+      // Para os outros passos, valida os campos antes de prosseguir
       const isValid = await trigger(
         currentStepData.fields as Array<keyof RegisterFormData>,
       );
 
       if (isValid) {
-        // Se estiver na primeira etapa, verifica o email
-        if (
-          currentStep === 0 &&
-          !register_steps[accountType][0].fields.includes('password')
-        ) {
-          try {
-            setCheckingEmail(true);
-            const accountInfo = await authService.checkAccountType(data.email);
+        // Segundo passo - Validação de senha
+        if (currentStep === 1) {
+          const password = data.password;
+          const confirmPassword = data.confirmSenha;
 
-            if (
-              accountInfo.hasClienteAccount ||
-              accountInfo.hasEstabelecimentoAccount
-            ) {
-              toast({
-                title: 'Atenção!',
-                description:
-                  'Este email já está cadastrado. Por favor, faça login.',
+          if (password !== confirmPassword) {
+            setError('confirmSenha', {
+              type: 'manual',
+              message: 'As senhas não coincidem',
+            });
+            return;
+          }
+
+          // Validar força da senha
+          const hasUpperCase = /[A-Z]/.test(password);
+          const hasLowerCase = /[a-z]/.test(password);
+          const hasNumbers = /\d/.test(password);
+          const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+          const isLongEnough = password.length >= 8;
+
+          let passwordStrength = 0;
+          if (hasUpperCase) passwordStrength++;
+          if (hasLowerCase) passwordStrength++;
+          if (hasNumbers) passwordStrength++;
+          if (hasSpecialChar) passwordStrength++;
+          if (isLongEnough) passwordStrength++;
+
+          if (passwordStrength < 3) {
+            setError('password', {
+              type: 'manual',
+              message:
+                'A senha deve ser mais forte. Inclua letras maiúsculas, minúsculas, números e caracteres especiais.',
+            });
+            return;
+          }
+
+          nextStep();
+          return;
+        }
+
+        // Terceiro passo - Validação de CPF e Celular
+        if (currentStep === 2) {
+          try {
+            setCheckingDocument(true);
+            const [cpfExists, phoneExists] = await Promise.all([
+              authService.checkCPFExists(data.numCpf.replace(/\D/g, '')),
+              authService.checkPhoneExists(data.numCelular.replace(/\D/g, '')),
+            ]);
+
+            if (cpfExists) {
+              setError('numCpf', {
+                type: 'manual',
+                message: 'Este CPF já está cadastrado',
               });
-              router.push('/auth');
               return;
             }
 
-            // Se não tem nenhuma conta, mostra campos de senha e confirmação
-            if (!register_steps[accountType][0].fields.includes('password')) {
-              register_steps[accountType][0].fields.push(
-                'password',
-                'confirmSenha',
-              );
+            if (phoneExists) {
+              setError('numCelular', {
+                type: 'manual',
+                message: 'Este número de celular já está cadastrado',
+              });
+              return;
             }
-            return;
-          } catch (error) {
-            console.error('Erro ao verificar email:', error);
-            toast({
-              title: 'Erro!',
-              description:
-                'Não foi possível verificar o email. Tente novamente.',
-              variant: 'destructive',
-            });
-            return;
-          } finally {
-            setCheckingEmail(false);
-          }
-        }
 
-        // Se estiver na segunda etapa, verifica documentos
-        if (currentStep === 1) {
-          try {
-            setCheckingDocument(true);
-            if (accountType === 'cliente') {
-              const [cpfExists, phoneExists] = await Promise.all([
-                authService.checkCPFExists(data.numCpf.replace(/\D/g, '')),
-                authService.checkPhoneExists(
-                  data.numCelular.replace(/\D/g, ''),
-                ),
-              ]);
-
-              if (cpfExists) {
-                setError('numCpf', {
-                  type: 'manual',
-                  message: 'Este CPF já está cadastrado',
-                });
-                return;
-              }
-
-              if (phoneExists) {
-                setError('numCelular', {
-                  type: 'manual',
-                  message: 'Este número de celular já está cadastrado',
-                });
-                return;
-              }
-            } else {
-              const [cnpjExists, phoneExists] = await Promise.all([
-                authService.checkCNPJExists(data.numCnpj.replace(/\D/g, '')),
-                authService.checkEstablishmentPhoneExists(
-                  data.numCelularComercial.replace(/\D/g, ''),
-                ),
-              ]);
-
-              if (cnpjExists) {
-                setError('numCnpj', {
-                  type: 'manual',
-                  message: 'Este CNPJ já está cadastrado',
-                });
-                return;
-              }
-
-              if (phoneExists) {
-                setError('numCelularComercial', {
-                  type: 'manual',
-                  message:
-                    'Este número de celular já está cadastrado para outro estabelecimento',
-                });
-                return;
-              }
-            }
+            nextStep();
           } catch (error) {
             console.error('Erro ao verificar documentos:', error);
             toast({
@@ -229,10 +231,10 @@ const RegisterForm: React.FC = () => {
                 'Não foi possível verificar os dados. Tente novamente.',
               variant: 'destructive',
             });
-            return;
           } finally {
             setCheckingDocument(false);
           }
+          return;
         }
 
         nextStep();
@@ -247,8 +249,6 @@ const RegisterForm: React.FC = () => {
           email: data.email.toLowerCase(),
           numCpf: data.numCpf?.replace(/\D/g, ''),
           numCelular: data.numCelular?.replace(/\D/g, ''),
-          numCnpj: data.numCnpj?.replace(/\D/g, ''),
-          numCelularComercial: data.numCelularComercial?.replace(/\D/g, ''),
           cep: data.cep.replace(/\D/g, ''),
         };
 
@@ -263,7 +263,7 @@ const RegisterForm: React.FC = () => {
 
         // Redireciona para a página de login após 2 segundos
         setTimeout(() => {
-          router.push('/login');
+          router.push('/auth');
         }, 2000);
       } catch (err) {
         console.error('Erro ao cadastrar:', err);
@@ -276,6 +276,52 @@ const RegisterForm: React.FC = () => {
         setLoading(false);
       }
     }
+  };
+
+  // Componente para mostrar a força da senha
+  const PasswordStrengthIndicator = ({ password }: { password: string }) => {
+    if (!password) return null;
+
+    const hasUpperCase = /[A-Z]/.test(password);
+    const hasLowerCase = /[a-z]/.test(password);
+    const hasNumbers = /\d/.test(password);
+    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+    const isLongEnough = password.length >= 8;
+
+    let strength = 0;
+    if (hasUpperCase) strength++;
+    if (hasLowerCase) strength++;
+    if (hasNumbers) strength++;
+    if (hasSpecialChar) strength++;
+    if (isLongEnough) strength++;
+
+    const getStrengthText = () => {
+      if (strength <= 2) return 'Fraca';
+      if (strength <= 3) return 'Média';
+      if (strength <= 4) return 'Forte';
+      return 'Muito forte';
+    };
+
+    const getStrengthColor = () => {
+      if (strength <= 2) return 'bg-red-500';
+      if (strength <= 3) return 'bg-yellow-500';
+      if (strength <= 4) return 'bg-green-500';
+      return 'bg-green-700';
+    };
+
+    return (
+      <div className='mt-2'>
+        <div className='h-1 w-full bg-gray-200 rounded-full'>
+          <div
+            className={`h-1 rounded-full transition-all duration-300 ${getStrengthColor()}`}
+            style={{ width: `${(strength / 5) * 100}%` }}
+          />
+        </div>
+        <p className='text-xs mt-1 text-gray-600'>
+          Força da senha: {getStrengthText()}
+        </p>
+      </div>
+    );
   };
 
   return (
@@ -342,29 +388,30 @@ const RegisterForm: React.FC = () => {
                     })}
                     type='email'
                     id={field}
-                    disabled={register_steps[accountType][0].fields.includes(
-                      'password',
-                    )}
+                    disabled={checkingEmail}
                     className={`flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background
                       ${errors[field as keyof RegisterFormData] ? 'border-red-500' : 'border-gray-300'}
-                      ${register_steps[accountType][0].fields.includes('password') ? 'bg-gray-100 cursor-not-allowed' : ''}
+                      ${checkingEmail ? 'bg-gray-100 cursor-not-allowed' : ''}
                     `}
                   />
                 ) : field === 'password' ? (
-                  <Input
-                    {...register(field as keyof RegisterFormData, {
-                      required: 'Este campo é obrigatório',
-                      minLength: {
-                        value: 6,
-                        message: 'A senha deve ter no mínimo 6 caracteres',
-                      },
-                    })}
-                    type='password'
-                    id={field}
-                    className={`flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background
-                      ${errors[field as keyof RegisterFormData] ? 'border-red-500' : 'border-gray-300'}
-                    `}
-                  />
+                  <div>
+                    <Input
+                      {...register(field as keyof RegisterFormData, {
+                        required: 'Este campo é obrigatório',
+                        minLength: {
+                          value: 8,
+                          message: 'A senha deve ter no mínimo 8 caracteres',
+                        },
+                      })}
+                      type='password'
+                      id={field}
+                      className={`flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background
+                        ${errors[field as keyof RegisterFormData] ? 'border-red-500' : 'border-gray-300'}
+                      `}
+                    />
+                    <PasswordStrengthIndicator password={watch('password')} />
+                  </div>
                 ) : field === 'confirmSenha' ? (
                   <Input
                     {...register(field as keyof RegisterFormData, {
@@ -392,23 +439,24 @@ const RegisterForm: React.FC = () => {
                     })}
                     error={!!errors[field as keyof RegisterFormData]}
                     value={watch(field as keyof RegisterFormData) || ''}
+                    onBlur={async (e) => {
+                      const cpf = e.target.value.replace(/\D/g, '');
+                      if (cpf.length === 11 && validateCPF(cpf)) {
+                        try {
+                          const exists = await authService.checkCPFExists(cpf);
+                          if (exists) {
+                            setError('numCpf', {
+                              type: 'manual',
+                              message: 'Este CPF já está cadastrado',
+                            });
+                          }
+                        } catch (error) {
+                          console.error('Erro ao verificar CPF:', error);
+                        }
+                      }
+                    }}
                   />
-                ) : field === 'numCnpj' ? (
-                  <MaskedInput
-                    maskType='numCnpj'
-                    {...register(field as keyof RegisterFormData, {
-                      required: 'Este campo é obrigatório',
-                      validate: (value) => {
-                        const numbers = value?.replace(/\D/g, '') || '';
-                        if (numbers.length !== 14) return 'CNPJ inválido';
-                        return validateCNPJ(numbers) || 'CNPJ inválido';
-                      },
-                    })}
-                    error={!!errors[field as keyof RegisterFormData]}
-                    value={watch(field as keyof RegisterFormData) || ''}
-                  />
-                ) : field === 'numCelular' ||
-                  field === 'numCelularComercial' ? (
+                ) : field === 'numCelular' ? (
                   <MaskedInput
                     maskType='numCelular'
                     {...register(field as keyof RegisterFormData, {
@@ -416,14 +464,30 @@ const RegisterForm: React.FC = () => {
                       validate: (value) => {
                         const numbers = value?.replace(/\D/g, '') || '';
                         return (
-                          numbers.length === 10 ||
-                          numbers.length === 11 ||
-                          'Número de celular inválido'
+                          numbers.length === 11 || 'Número de celular inválido'
                         );
                       },
                     })}
                     error={!!errors[field as keyof RegisterFormData]}
                     value={watch(field as keyof RegisterFormData) || ''}
+                    onBlur={async (e) => {
+                      const phone = e.target.value.replace(/\D/g, '');
+                      if (phone.length === 11) {
+                        try {
+                          const exists =
+                            await authService.checkPhoneExists(phone);
+                          if (exists) {
+                            setError('numCelular', {
+                              type: 'manual',
+                              message:
+                                'Este número de celular já está cadastrado',
+                            });
+                          }
+                        } catch (error) {
+                          console.error('Erro ao verificar celular:', error);
+                        }
+                      }
+                    }}
                   />
                 ) : field === 'cep' ? (
                   <MaskedInput
@@ -503,9 +567,9 @@ const RegisterForm: React.FC = () => {
             {loading
               ? 'Cadastrando...'
               : checkingEmail
-                ? 'Verificando...'
+                ? 'Verificando email...'
                 : checkingDocument
-                  ? 'Verificando...'
+                  ? 'Verificando documentos...'
                   : isLastStep
                     ? 'Registrar'
                     : 'Próximo'}
