@@ -44,6 +44,11 @@ export const register_steps: Record<AccountType, Step[]> = {
       fields: ['email'],
     },
     {
+      id: 'senha',
+      title: 'Crie sua senha',
+      fields: ['password', 'confirmSenha'],
+    },
+    {
       id: 'estabelecimento',
       title: 'Dados do Estabelecimento',
       fields: [

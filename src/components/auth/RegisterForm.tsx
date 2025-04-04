@@ -8,13 +8,14 @@ import { Input } from '@/components/ui/input';
 import { MaskedInput } from '@/components/ui/masked-input';
 import { useToast } from '@/components/ui/use-toast';
 import { validateCPF } from '@/utils/validators';
-import { authService } from '@/services/auth.service';
+import { authService, RegisterData } from '@/services/auth.service';
 import { useRouter } from 'next/navigation';
 import { cepService } from '@/services/cep.service';
 import { useAuthFormContext } from '@/contexts/AuthFormContext';
 import { register_steps } from '@/data/register_steps';
 import { RegisterFormData } from '@/interfaces/register';
 import { getFieldLabel, getFieldType } from '@/utils/registerFieldsFuncs';
+import { PasswordStrengthIndicator } from '@/components/PasswordStrengthIndicator';
 
 const RegisterForm: React.FC = () => {
   const {
@@ -241,6 +242,7 @@ const RegisterForm: React.FC = () => {
       }
     } else {
       try {
+        console.log('Iniciando processo de registro...');
         setLoading(true);
 
         // Remove máscaras antes de enviar
@@ -252,21 +254,79 @@ const RegisterForm: React.FC = () => {
           cep: data.cep.replace(/\D/g, ''),
         };
 
+        // Filtra os campos baseado no tipo de conta
+        const dataToSend = isRegisterAsEstablishment
+          ? {
+              email: cleanedData.email,
+              password: cleanedData.password,
+              name: cleanedData.name,
+              numCnpj: cleanedData.numCnpj,
+              numCelularComercial: cleanedData.numCelularComercial,
+              nomeEstab: cleanedData.nomeEstab,
+              razaoSocial: cleanedData.razaoSocial,
+              endereco: cleanedData.endereco,
+              numero: cleanedData.numero,
+              complemento: cleanedData.complemento,
+              bairro: cleanedData.bairro,
+              cidade: cleanedData.cidade,
+              estado: cleanedData.estado,
+              cep: cleanedData.cep,
+            }
+          : {
+              email: cleanedData.email,
+              password: cleanedData.password,
+              name: cleanedData.name,
+              numCpf: cleanedData.numCpf,
+              numCelular: cleanedData.numCelular,
+              dataNascimento: cleanedData.dataNascimento,
+              endereco: cleanedData.endereco,
+              numero: cleanedData.numero,
+              complemento: cleanedData.complemento,
+              bairro: cleanedData.bairro,
+              cidade: cleanedData.cidade,
+              estado: cleanedData.estado,
+              cep: cleanedData.cep,
+            };
+
+        console.log('Dados limpos para registro:', dataToSend);
+
         // Registra o usuário
-        await authService.register(cleanedData);
+        console.log('Chamando authService.register...');
+        const registeredUser = await authService.register(
+          dataToSend as RegisterData,
+        );
+        console.log('Registro concluído com sucesso:', registeredUser);
 
-        toast({
-          title: 'Sucesso!',
-          description:
-            'Cadastro realizado com sucesso. Você será redirecionado para o login.',
-        });
+        try {
+          // Faz login automaticamente
+          console.log('Iniciando login automático...');
+          const loginResponse = await authService.login({
+            email: cleanedData.email,
+            password: cleanedData.password,
+          });
+          console.log('Login realizado com sucesso:', loginResponse);
 
-        // Redireciona para a página de login após 2 segundos
-        setTimeout(() => {
+          toast({
+            title: 'Sucesso!',
+            description: 'Cadastro realizado com sucesso. Bem-vindo!',
+          });
+
+          // Aguarda um momento para garantir que o token foi salvo
+          await new Promise((resolve) => setTimeout(resolve, 500));
+
+          console.log('Redirecionando para /customer/home...');
+          window.location.href = '/customer/home';
+        } catch (loginError) {
+          console.error('Erro no login automático:', loginError);
+          // Se falhar o login automático, redireciona para a página de login
+          toast({
+            title: 'Atenção!',
+            description: 'Por favor, faça login com suas credenciais.',
+          });
           router.push('/login');
-        }, 2000);
+        }
       } catch (err) {
-        console.error('Erro ao cadastrar:', err);
+        console.error('Erro no processo de registro:', err);
         toast({
           title: 'Erro!',
           description: 'Ocorreu um erro ao realizar o cadastro.',
@@ -279,50 +339,6 @@ const RegisterForm: React.FC = () => {
   };
 
   // Componente para mostrar a força da senha
-  const PasswordStrengthIndicator = ({ password }: { password: string }) => {
-    if (!password) return null;
-
-    const hasUpperCase = /[A-Z]/.test(password);
-    const hasLowerCase = /[a-z]/.test(password);
-    const hasNumbers = /\d/.test(password);
-    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
-    const isLongEnough = password.length >= 8;
-
-    let strength = 0;
-    if (hasUpperCase) strength++;
-    if (hasLowerCase) strength++;
-    if (hasNumbers) strength++;
-    if (hasSpecialChar) strength++;
-    if (isLongEnough) strength++;
-
-    const getStrengthText = () => {
-      if (strength <= 2) return 'Fraca';
-      if (strength <= 3) return 'Média';
-      if (strength <= 4) return 'Forte';
-      return 'Muito forte';
-    };
-
-    const getStrengthColor = () => {
-      if (strength <= 2) return 'bg-red-500';
-      if (strength <= 3) return 'bg-yellow-500';
-      if (strength <= 4) return 'bg-green-500';
-      return 'bg-green-700';
-    };
-
-    return (
-      <div className='mt-2'>
-        <div className='h-1 w-full bg-gray-200 rounded-full'>
-          <div
-            className={`h-1 rounded-full transition-all duration-300 ${getStrengthColor()}`}
-            style={{ width: `${(strength / 5) * 100}%` }}
-          />
-        </div>
-        <p className='text-xs mt-1 text-gray-600'>
-          Força da senha: {getStrengthText()}
-        </p>
-      </div>
-    );
-  };
 
   return (
     <div className='space-y-4'>
@@ -524,6 +540,70 @@ const RegisterForm: React.FC = () => {
                       ${errors[field as keyof RegisterFormData] ? 'border-red-500' : 'border-gray-300'}
                       bg-gray-100 cursor-not-allowed
                     `}
+                  />
+                ) : field === 'numCnpj' ? (
+                  <MaskedInput
+                    maskType='numCnpj'
+                    {...register(field as keyof RegisterFormData, {
+                      required: 'Este campo é obrigatório',
+                      validate: (value) => {
+                        const numbers = value?.replace(/\D/g, '') || '';
+                        if (numbers.length !== 14) return 'CNPJ inválido';
+                        return true;
+                      },
+                    })}
+                    error={!!errors[field as keyof RegisterFormData]}
+                    value={watch(field as keyof RegisterFormData) || ''}
+                    onBlur={async (e) => {
+                      const cnpj = e.target.value.replace(/\D/g, '');
+                      if (cnpj.length === 14) {
+                        try {
+                          const exists =
+                            await authService.checkCNPJExists(cnpj);
+                          if (exists) {
+                            setError('numCnpj', {
+                              type: 'manual',
+                              message: 'Este CNPJ já está cadastrado',
+                            });
+                          }
+                        } catch (error) {
+                          console.error('Erro ao verificar CNPJ:', error);
+                        }
+                      }
+                    }}
+                  />
+                ) : field === 'numCelularComercial' ? (
+                  <MaskedInput
+                    maskType='numCelular'
+                    {...register(field as keyof RegisterFormData, {
+                      required: 'Este campo é obrigatório',
+                      validate: (value) => {
+                        const numbers = value?.replace(/\D/g, '') || '';
+                        return (
+                          numbers.length === 11 || 'Número de celular inválido'
+                        );
+                      },
+                    })}
+                    error={!!errors[field as keyof RegisterFormData]}
+                    value={watch(field as keyof RegisterFormData) || ''}
+                    onBlur={async (e) => {
+                      const phone = e.target.value.replace(/\D/g, '');
+                      if (phone.length === 11) {
+                        try {
+                          const exists =
+                            await authService.checkPhoneExists(phone);
+                          if (exists) {
+                            setError('numCelularComercial', {
+                              type: 'manual',
+                              message:
+                                'Este número de celular já está cadastrado',
+                            });
+                          }
+                        } catch (error) {
+                          console.error('Erro ao verificar celular:', error);
+                        }
+                      }
+                    }}
                   />
                 ) : (
                   <Input
