@@ -43,6 +43,11 @@ export interface UserResponse {
   dataAtualizacao: string;
 }
 
+export interface CheckAccountResponse {
+  hasClienteAccount: boolean;
+  hasEstabelecimentoAccount: boolean;
+}
+
 export class AuthService {
   async login(data: LoginData): Promise<AuthResponse> {
     try {
@@ -168,7 +173,7 @@ export class AuthService {
 
   async checkEmailExists(email: string): Promise<boolean> {
     try {
-      const response = await api.get(`/clientes/check-email/${email}`);
+      const response = await api.get(`/auth/check-email/${email}`);
       return response.data.exists;
     } catch (error) {
       console.error('Erro ao verificar email:', error);
@@ -220,6 +225,13 @@ export class AuthService {
       }
       throw error;
     }
+  }
+
+  async checkAccountType(email: string): Promise<CheckAccountResponse> {
+    const response = await api.get<CheckAccountResponse>(
+      `/auth/check-account?email=${email}`,
+    );
+    return response.data;
   }
 }
 

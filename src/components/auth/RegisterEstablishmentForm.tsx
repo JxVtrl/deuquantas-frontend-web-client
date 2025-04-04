@@ -39,12 +39,12 @@ const steps = [
   {
     id: 'usuario',
     title: 'Registro de Estabelecimento',
-    fields: ['name', 'email', 'password', 'confirmSenha'],
+    fields: ['email'],
   },
   {
     id: 'estabelecimento',
     title: 'Dados do Estabelecimento',
-    fields: ['nomeEstab', 'razaoSocial', 'numCnpj', 'numCelular'],
+    fields: ['name', 'nomeEstab', 'razaoSocial', 'numCnpj', 'numCelular'],
   },
   {
     id: 'endereco',
@@ -61,7 +61,7 @@ const steps = [
   },
 ];
 
-const RegisterEstablishmentForm: React.FC = () => {
+const RegisterEstablishmentForm = () => {
   const {
     register,
     handleSubmit,
@@ -125,14 +125,31 @@ const RegisterEstablishmentForm: React.FC = () => {
         if (currentStep === 0) {
           try {
             setCheckingEmail(true);
-            const emailExists = await authService.checkEmailExists(data.email);
-            if (emailExists) {
-              setError('email', {
-                type: 'manual',
-                message: 'Este email já está cadastrado',
+            const accountInfo = await authService.checkAccountType(data.email);
+
+            if (accountInfo.hasEstabelecimentoAccount) {
+              toast({
+                title: 'Atenção!',
+                description:
+                  'Você já possui uma conta de estabelecimento. Por favor, faça login.',
               });
+              router.push('/login');
               return;
             }
+
+            if (accountInfo.hasClienteAccount) {
+              // Se tem conta de cliente, mostra campo de senha para login
+              if (!steps[0].fields.includes('password')) {
+                steps[0].fields.push('password');
+              }
+              return;
+            }
+
+            // Se não tem nenhuma conta, mostra campos de senha e confirmação
+            if (!steps[0].fields.includes('password')) {
+              steps[0].fields.push('password', 'confirmSenha');
+            }
+            return;
           } catch (error) {
             console.error('Erro ao verificar email:', error);
             toast({
@@ -259,9 +276,12 @@ const RegisterEstablishmentForm: React.FC = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className='space-y-4 w-full'>
-      <div className='mb-6'>
-        <h2 className='text-[#272727] text-[16px] font-[700] mb-2'>
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className='space-y-4 w-full max-h-[calc(100vh-200px)] overflow-y-auto'
+    >
+      <div className='mb-6 sticky top-0 pb-4 z-10 border-b '>
+        <h2 className='text-[#333333] text-[16px] font-[700] mb-2'>
           {currentStepData.title}
         </h2>
         <div className='flex items-center gap-2'>
@@ -288,7 +308,50 @@ const RegisterEstablishmentForm: React.FC = () => {
           {currentStepData.fields.map((field) => (
             <div key={field} className='grid gap-2'>
               <Label htmlFor={field}>{getFieldLabel(field)}</Label>
-              {field === 'numCnpj' ? (
+              {field === 'email' ? (
+                <Input
+                  {...register(field as keyof RegisterEstablishmentFormData, {
+                    required: 'Este campo é obrigatório',
+                    pattern: {
+                      value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                      message: 'Digite um e-mail válido',
+                    },
+                  })}
+                  type='email'
+                  id={field}
+                  className={`flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background
+                    ${errors[field as keyof RegisterEstablishmentFormData] ? 'border-red-500' : 'border-gray-300'}
+                  `}
+                />
+              ) : field === 'password' ? (
+                <Input
+                  {...register(field as keyof RegisterEstablishmentFormData, {
+                    required: 'Este campo é obrigatório',
+                    minLength: {
+                      value: 6,
+                      message: 'A senha deve ter no mínimo 6 caracteres',
+                    },
+                  })}
+                  type='password'
+                  id={field}
+                  className={`flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background
+                    ${errors[field as keyof RegisterEstablishmentFormData] ? 'border-red-500' : 'border-gray-300'}
+                  `}
+                />
+              ) : field === 'confirmSenha' ? (
+                <Input
+                  {...register(field as keyof RegisterEstablishmentFormData, {
+                    required: 'Este campo é obrigatório',
+                    validate: (value) =>
+                      value === watch('password') || 'As senhas não coincidem',
+                  })}
+                  type='password'
+                  id={field}
+                  className={`flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background
+                    ${errors[field as keyof RegisterEstablishmentFormData] ? 'border-red-500' : 'border-gray-300'}
+                  `}
+                />
+              ) : field === 'numCnpj' ? (
                 <MaskedInput
                   maskType='numCnpj'
                   {...register(field as keyof RegisterEstablishmentFormData, {
@@ -365,23 +428,6 @@ const RegisterEstablishmentForm: React.FC = () => {
                       field !== 'complemento'
                         ? 'Este campo é obrigatório'
                         : false,
-                    ...(field === 'email' && {
-                      pattern: {
-                        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                        message: 'Digite um e-mail válido',
-                      },
-                    }),
-                    ...(field === 'confirmSenha' && {
-                      validate: (value) =>
-                        value === watch('password') ||
-                        'As senhas não coincidem',
-                    }),
-                    ...(field === 'password' && {
-                      minLength: {
-                        value: 6,
-                        message: 'A senha deve ter no mínimo 6 caracteres',
-                      },
-                    }),
                   })}
                   type={getFieldType(field)}
                   id={field}
@@ -404,7 +450,7 @@ const RegisterEstablishmentForm: React.FC = () => {
         </motion.div>
       </AnimatePresence>
 
-      <div className='flex flex-col gap-[12px]'>
+      <div className='flex flex-col gap-[12px] sticky bottom-0 pt-4'>
         {!isFirstStep && (
           <Button
             type='button'

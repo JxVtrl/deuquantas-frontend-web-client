@@ -11,7 +11,7 @@ import { validateCPF } from '@/utils/validators';
 import { authService } from '@/services/auth.service';
 import { useRouter } from 'next/router';
 import { cepService } from '@/services/cep.service';
-
+import { UserResponse } from '@/services/auth.service';
 export interface RegisterFormData {
   // Dados do usuário
   name: string;
@@ -36,12 +36,12 @@ const steps = [
   {
     id: 'usuario',
     title: 'Registro de Cliente',
-    fields: ['name', 'email', 'password', 'confirmSenha'],
+    fields: ['email'],
   },
   {
     id: 'pessoal',
     title: 'Dados Pessoais',
-    fields: ['numCpf', 'numCelular', 'dataNascimento'],
+    fields: ['name', 'numCpf', 'numCelular', 'dataNascimento'],
   },
   {
     id: 'endereco',
@@ -84,6 +84,7 @@ const RegisterForm: React.FC = () => {
   const [checkingEmail, setCheckingEmail] = useState(false);
   const [checkingDocument, setCheckingDocument] = useState(false);
   const [searchingCep, setSearchingCep] = useState(false);
+  const [userData] = useState<UserResponse | null>(null);
   const router = useRouter();
 
   const handleCepChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -119,18 +120,36 @@ const RegisterForm: React.FC = () => {
 
       if (isValid) {
         // Se estiver na primeira etapa, verifica o email
-        if (currentStep === 0) {
+        if (currentStep === 0 && !steps[0].fields.includes('password')) {
           try {
             setCheckingEmail(true);
-            const emailExists = await authService.checkEmailExists(data.email);
-            if (emailExists) {
-              setError('email', {
-                type: 'manual',
-                message: 'Este email já está cadastrado',
+            const accountInfo = await authService.checkAccountType(data.email);
+
+            if (accountInfo.hasClienteAccount) {
+              toast({
+                title: 'Atenção!',
+                description:
+                  'Você já possui uma conta de cliente. Por favor, faça login.',
               });
+              router.push('/login');
               return;
             }
-          } catch {
+
+            if (accountInfo.hasEstabelecimentoAccount) {
+              // Se tem conta de estabelecimento, mostra campo de senha para login
+              if (!steps[0].fields.includes('password')) {
+                steps[0].fields.push('password');
+              }
+              return;
+            }
+
+            // Se não tem nenhuma conta, mostra campos de senha e confirmação
+            if (!steps[0].fields.includes('password')) {
+              steps[0].fields.push('password', 'confirmSenha');
+            }
+            return;
+          } catch (error) {
+            console.error('Erro ao verificar email:', error);
             toast({
               title: 'Erro!',
               description:
@@ -169,7 +188,8 @@ const RegisterForm: React.FC = () => {
               });
               return;
             }
-          } catch {
+          } catch (error) {
+            console.error('Erro ao verificar CPF/Número de celular:', error);
             toast({
               title: 'Erro!',
               description:
@@ -264,8 +284,8 @@ const RegisterForm: React.FC = () => {
       onSubmit={handleSubmit(onSubmit)}
       className='space-y-4 w-full max-h-[calc(100vh-200px)] overflow-y-auto'
     >
-      <div className='mb-6 sticky top-0 pb-4 z-10 border-b border-gray-200 rounded-lg p-4 bg-black/70 shadow-sm'>
-        <h2 className='text-[#fff] text-[16px] font-[700] mb-2'>
+      <div className='mb-6 sticky top-0 pb-4 z-10 border-b '>
+        <h2 className='text-[#333333] text-[16px] font-[700] mb-2'>
           {currentStepData.title}
         </h2>
         <div className='flex items-center gap-2'>
@@ -292,7 +312,50 @@ const RegisterForm: React.FC = () => {
           {currentStepData.fields.map((field) => (
             <div key={field} className='grid gap-2'>
               <Label htmlFor={field}>{getFieldLabel(field)}</Label>
-              {field === 'numCpf' ? (
+              {field === 'email' ? (
+                <Input
+                  {...register(field as keyof RegisterFormData, {
+                    required: 'Este campo é obrigatório',
+                    pattern: {
+                      value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                      message: 'Digite um e-mail válido',
+                    },
+                  })}
+                  type='email'
+                  id={field}
+                  className={`flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background
+                    ${errors[field as keyof RegisterFormData] ? 'border-red-500' : 'border-gray-300'}
+                  `}
+                />
+              ) : field === 'password' ? (
+                <Input
+                  {...register(field as keyof RegisterFormData, {
+                    required: 'Este campo é obrigatório',
+                    minLength: {
+                      value: 6,
+                      message: 'A senha deve ter no mínimo 6 caracteres',
+                    },
+                  })}
+                  type='password'
+                  id={field}
+                  className={`flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background
+                    ${errors[field as keyof RegisterFormData] ? 'border-red-500' : 'border-gray-300'}
+                  `}
+                />
+              ) : field === 'confirmSenha' ? (
+                <Input
+                  {...register(field as keyof RegisterFormData, {
+                    required: 'Este campo é obrigatório',
+                    validate: (value) =>
+                      value === watch('password') || 'As senhas não coincidem',
+                  })}
+                  type='password'
+                  id={field}
+                  className={`flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background
+                    ${errors[field as keyof RegisterFormData] ? 'border-red-500' : 'border-gray-300'}
+                  `}
+                />
+              ) : field === 'numCpf' ? (
                 <MaskedInput
                   maskType='numCpf'
                   {...register(field as keyof RegisterFormData, {
@@ -357,6 +420,15 @@ const RegisterForm: React.FC = () => {
                     bg-gray-100 cursor-not-allowed
                   `}
                 />
+              ) : field === 'name' && userData ? (
+                <Input
+                  {...register(field as keyof RegisterFormData)}
+                  type='text'
+                  id={field}
+                  value={userData.name}
+                  disabled
+                  className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background bg-gray-100 cursor-not-allowed'
+                />
               ) : (
                 <Input
                   {...register(field as keyof RegisterFormData, {
@@ -364,23 +436,6 @@ const RegisterForm: React.FC = () => {
                       field !== 'complemento'
                         ? 'Este campo é obrigatório'
                         : false,
-                    ...(field === 'email' && {
-                      pattern: {
-                        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                        message: 'Digite um e-mail válido',
-                      },
-                    }),
-                    ...(field === 'confirmSenha' && {
-                      validate: (value) =>
-                        value === watch('password') ||
-                        'As senhas não coincidem',
-                    }),
-                    ...(field === 'password' && {
-                      minLength: {
-                        value: 6,
-                        message: 'A senha deve ter no mínimo 6 caracteres',
-                      },
-                    }),
                   })}
                   type={getFieldType(field)}
                   id={field}
