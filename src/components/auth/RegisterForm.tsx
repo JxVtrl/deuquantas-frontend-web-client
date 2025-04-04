@@ -8,7 +8,11 @@ import { Input } from '@/components/ui/input';
 import { MaskedInput } from '@/components/ui/masked-input';
 import { useToast } from '@/components/ui/use-toast';
 import { validateCPF } from '@/utils/validators';
-import { authService, RegisterData } from '@/services/auth.service';
+import {
+  authService,
+  RegisterData,
+  RegisterEstablishmentData,
+} from '@/services/auth.service';
 import { useRouter } from 'next/navigation';
 import { cepService } from '@/services/cep.service';
 import { useAuthFormContext } from '@/contexts/AuthFormContext';
@@ -198,8 +202,8 @@ const RegisterForm: React.FC = () => {
           return;
         }
 
-        // Terceiro passo - Validação de CPF e Celular
-        if (currentStep === 2) {
+        // Terceiro passo - Validação de CPF e Celular para Cliente
+        if (currentStep === 2 && !isRegisterAsEstablishment) {
           try {
             setCheckingDocument(true);
             const [cpfExists, phoneExists] = await Promise.all([
@@ -226,6 +230,51 @@ const RegisterForm: React.FC = () => {
             nextStep();
           } catch (error) {
             console.error('Erro ao verificar documentos:', error);
+            toast({
+              title: 'Erro!',
+              description:
+                'Não foi possível verificar os dados. Tente novamente.',
+              variant: 'destructive',
+            });
+          } finally {
+            setCheckingDocument(false);
+          }
+          return;
+        }
+
+        // Terceiro passo - Validação de CNPJ e Celular Comercial para Estabelecimento
+        if (currentStep === 2 && isRegisterAsEstablishment) {
+          try {
+            setCheckingDocument(true);
+            const [cnpjExists, phoneExists] = await Promise.all([
+              authService.checkCNPJExists(data.numCnpj.replace(/\D/g, '')),
+              authService.checkPhoneExists(
+                data.numCelularComercial.replace(/\D/g, ''),
+              ),
+            ]);
+
+            if (cnpjExists) {
+              setError('numCnpj', {
+                type: 'manual',
+                message: 'Este CNPJ já está cadastrado',
+              });
+              return;
+            }
+
+            if (phoneExists) {
+              setError('numCelularComercial', {
+                type: 'manual',
+                message: 'Este número de celular já está cadastrado',
+              });
+              return;
+            }
+
+            nextStep();
+          } catch (error) {
+            console.error(
+              'Erro ao verificar documentos do estabelecimento:',
+              error,
+            );
             toast({
               title: 'Erro!',
               description:
@@ -292,9 +341,11 @@ const RegisterForm: React.FC = () => {
 
         // Registra o usuário
         console.log('Chamando authService.register...');
-        const registeredUser = await authService.register(
-          dataToSend as RegisterData,
-        );
+        const registeredUser = isRegisterAsEstablishment
+          ? await authService.registerEstablishment(
+              dataToSend as RegisterEstablishmentData,
+            )
+          : await authService.register(dataToSend as RegisterData);
         console.log('Registro concluído com sucesso:', registeredUser);
 
         try {
@@ -600,7 +651,10 @@ const RegisterForm: React.FC = () => {
                             });
                           }
                         } catch (error) {
-                          console.error('Erro ao verificar celular:', error);
+                          console.error(
+                            'Erro ao verificar celular comercial:',
+                            error,
+                          );
                         }
                       }
                     }}
@@ -631,16 +685,6 @@ const RegisterForm: React.FC = () => {
         </AnimatePresence>
 
         <div className='flex flex-col gap-[12px] sticky bottom-0 pt-4'>
-          {!isFirstStep && (
-            <Button
-              type='button'
-              onClick={previousStep}
-              variant='outline'
-              className='w-full'
-            >
-              Voltar
-            </Button>
-          )}
           <Button
             disabled={loading || checkingEmail || checkingDocument}
             type='submit'
@@ -656,6 +700,16 @@ const RegisterForm: React.FC = () => {
                     ? 'Registrar'
                     : 'Próximo'}
           </Button>
+          {!isFirstStep && (
+            <Button
+              type='button'
+              onClick={previousStep}
+              variant='outline'
+              className='w-full'
+            >
+              Voltar
+            </Button>
+          )}
 
           <div className='mt-[12px] text-end flex flex-col gap-[12px]'>
             <p className='text-[#272727] text-[12px] leading-[120%] font-[500]'>

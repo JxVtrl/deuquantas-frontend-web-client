@@ -23,6 +23,24 @@ export interface RegisterData {
   estado: string;
 }
 
+export interface RegisterEstablishmentData {
+  name: string;
+  email: string;
+  password: string;
+  numCnpj: string;
+  numCelularComercial: string;
+  nomeEstab: string;
+  razaoSocial: string;
+  endereco: string;
+  numero: string;
+  complemento?: string;
+  bairro: string;
+  cidade: string;
+  estado: string;
+  cep: string;
+  imgLogo?: string;
+}
+
 export interface AuthResponse {
   user: User;
   token: string;
@@ -169,6 +187,57 @@ export class AuthService {
     }
   }
 
+  async registerEstablishment(
+    data: RegisterEstablishmentData,
+  ): Promise<AuthResponse> {
+    try {
+      console.log('=== INÍCIO DO PROCESSO DE REGISTRO DE ESTABELECIMENTO ===');
+      console.log('Dados enviados para registro:', {
+        ...data,
+        email: data.email.toLowerCase(),
+        password: '[PROTEGIDO]',
+      });
+
+      const response = await api.post('/auth/register-establishment', {
+        ...data,
+        email: data.email.toLowerCase(),
+      });
+
+      const { access_token, user } = response.data;
+
+      // Formata o token corretamente
+      const formattedToken = access_token.startsWith('Bearer ')
+        ? access_token
+        : `Bearer ${access_token}`;
+      const tokenWithoutBearer = formattedToken.replace('Bearer ', '');
+
+      // Salva o token nos cookies
+      Cookies.set('auth_token', tokenWithoutBearer, { expires: 7 });
+
+      // Configura o token para as próximas requisições
+      api.defaults.headers.common['Authorization'] = formattedToken;
+
+      console.log('Registro de estabelecimento concluído com sucesso');
+      console.log('=== FIM DO PROCESSO DE REGISTRO DE ESTABELECIMENTO ===');
+
+      return {
+        user,
+        token: tokenWithoutBearer,
+      };
+    } catch (error) {
+      console.error(
+        '=== ERRO NO PROCESSO DE REGISTRO DE ESTABELECIMENTO ===',
+        error,
+      );
+      if (axios.isAxiosError(error)) {
+        if (error.response?.status === 409) {
+          throw new Error('Email já cadastrado');
+        }
+      }
+      throw error;
+    }
+  }
+
   logout(): void {
     console.log('=== INÍCIO DO PROCESSO DE LOGOUT ===');
     // Remove o token dos cookies
@@ -223,20 +292,6 @@ export class AuthService {
   async checkCNPJExists(numCnpj: string): Promise<boolean> {
     try {
       const response = await api.get(`/auth/check-cnpj/${numCnpj}`);
-      return response.data.exists;
-    } catch (error) {
-      if (axios.isAxiosError(error) && error.response?.status === 404) {
-        return false;
-      }
-      throw error;
-    }
-  }
-
-  async checkEstablishmentPhoneExists(numCelular: string): Promise<boolean> {
-    try {
-      const response = await api.get(
-        `/estabelecimentos/check-phone/${numCelular}`,
-      );
       return response.data.exists;
     } catch (error) {
       if (axios.isAxiosError(error) && error.response?.status === 404) {
