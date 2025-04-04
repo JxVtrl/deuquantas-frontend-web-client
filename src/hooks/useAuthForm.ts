@@ -27,6 +27,12 @@ export function useAuthForm({ login, register, onSuccess }: UseAuthFormProps) {
     setError(null);
   };
 
+  const setRegisterType = (type: 'cliente' | 'estabelecimento') => {
+    setIsRegisterAsEstablishment(type === 'estabelecimento');
+    setIsLogin(type === 'cliente');
+    setError(null);
+  };
+
   const toggleRegisterAsEstablishment = () => {
     setIsRegisterAsEstablishment((prev) => !prev);
     setIsLogin(false);
@@ -71,5 +77,6 @@ export function useAuthForm({ login, register, onSuccess }: UseAuthFormProps) {
     isRegisterAsEstablishment,
     toggleForm,
     toggleRegisterAsEstablishment,
+    setRegisterType,
   };
 }

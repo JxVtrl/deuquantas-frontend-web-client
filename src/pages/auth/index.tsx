@@ -9,12 +9,7 @@ import { useRouter } from 'next/router';
 export default function AuthPage() {
   const router = useRouter();
   const { login, register } = useAuth();
-  const {
-    toggleForm,
-    isLogin,
-    isRegisterAsEstablishment,
-    toggleRegisterAsEstablishment,
-  } = useAuthForm({
+  const { toggleForm, isLogin, isRegisterAsEstablishment } = useAuthForm({
     login,
     register,
     onSuccess: () => router.push('/customer/home'),
@@ -56,9 +51,7 @@ export default function AuthPage() {
                   : 'register'
             }
             isLogin={isLogin}
-            isRegisterAsEstablishment={isRegisterAsEstablishment}
             toggleForm={toggleForm}
-            toggleRegisterAsEstablishment={toggleRegisterAsEstablishment}
           />
         </AnimatePresence>
       </div>
