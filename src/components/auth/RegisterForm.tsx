@@ -11,103 +11,10 @@ import { validateCPF, validateCNPJ } from '@/utils/validators';
 import { authService } from '@/services/auth.service';
 import { useRouter } from 'next/navigation';
 import { cepService } from '@/services/cep.service';
-import { useAuthForm } from '@/hooks/useAuthForm';
-
-export interface RegisterFormData {
-  // Dados do usuário
-  name: string;
-  email: string;
-  password: string;
-  confirmSenha: string;
-  accountType: 'cliente' | 'estabelecimento';
-
-  // Dados pessoais (cliente)
-  numCpf: string;
-  numCelular: string;
-  dataNascimento: string;
-
-  // Dados do estabelecimento
-  nomeEstab: string;
-  razaoSocial: string;
-  numCnpj: string;
-  numCelularComercial: string;
-
-  // Dados de endereço
-  endereco: string;
-  numero: string;
-  complemento?: string;
-  bairro: string;
-  cidade: string;
-  estado: string;
-  cep: string;
-}
-
-type AccountType = 'cliente' | 'estabelecimento';
-
-interface Step {
-  id: string;
-  title: string;
-  fields: string[];
-}
-
-const steps: Record<AccountType, Step[]> = {
-  cliente: [
-    {
-      id: 'usuario',
-      title: 'Registro de Cliente',
-      fields: ['email'],
-    },
-    {
-      id: 'pessoal',
-      title: 'Dados Pessoais',
-      fields: ['name', 'numCpf', 'numCelular', 'dataNascimento'],
-    },
-    {
-      id: 'endereco',
-      title: 'Dados do Endereço',
-      fields: [
-        'cep',
-        'endereco',
-        'numero',
-        'complemento',
-        'bairro',
-        'cidade',
-        'estado',
-      ],
-    },
-  ],
-  estabelecimento: [
-    {
-      id: 'usuario',
-      title: 'Registro de Estabelecimento',
-      fields: ['email'],
-    },
-    {
-      id: 'estabelecimento',
-      title: 'Dados do Estabelecimento',
-      fields: [
-        'name',
-        'nomeEstab',
-        'razaoSocial',
-        'numCnpj',
-        'numCelularComercial',
-      ],
-    },
-    {
-      id: 'endereco',
-      title: 'Dados do Endereço',
-      fields: [
-        'cep',
-        'endereco',
-        'numero',
-        'complemento',
-        'bairro',
-        'cidade',
-        'estado',
-      ],
-    },
-  ],
-};
+import { useAuthFormContext } from '@/contexts/AuthFormContext';
+import { register_steps } from '@/data/register_steps';
+import { RegisterFormData } from '@/interfaces/register';
+import { getFieldLabel, getFieldType } from '@/utils/registerFieldsFuncs';
 
 const RegisterForm: React.FC = () => {
   const {
@@ -124,11 +31,15 @@ const RegisterForm: React.FC = () => {
     },
   });
 
-  const { setRegisterType, isRegisterAsEstablishment } = useAuthForm({
-    login: () => Promise.resolve(),
-    register: () => Promise.resolve(),
-    onSuccess: () => {},
-  });
+  const { setRegisterType, isRegisterAsEstablishment, toggleForm } =
+    useAuthFormContext();
+
+  useEffect(() => {
+    console.log(
+      'isRegisterAsEstablishment mudou para:',
+      isRegisterAsEstablishment,
+    );
+  }, [isRegisterAsEstablishment]);
 
   const accountType = isRegisterAsEstablishment ? 'estabelecimento' : 'cliente';
 
@@ -140,7 +51,7 @@ const RegisterForm: React.FC = () => {
     isFirstStep,
     isLastStep,
     totalSteps,
-  } = useFormSteps(steps[accountType]);
+  } = useFormSteps(register_steps[accountType]);
 
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
@@ -177,8 +88,8 @@ const RegisterForm: React.FC = () => {
     setValue('cep', '');
 
     // Reseta os campos do primeiro passo
-    if (steps[accountType][0].fields.includes('password')) {
-      steps[accountType][0].fields = ['email'];
+    if (register_steps[accountType][0].fields.includes('password')) {
+      register_steps[accountType][0].fields = ['email'];
     }
   }, [accountType]);
 
@@ -217,7 +128,7 @@ const RegisterForm: React.FC = () => {
         // Se estiver na primeira etapa, verifica o email
         if (
           currentStep === 0 &&
-          !steps[accountType][0].fields.includes('password')
+          !register_steps[accountType][0].fields.includes('password')
         ) {
           try {
             setCheckingEmail(true);
@@ -237,8 +148,11 @@ const RegisterForm: React.FC = () => {
             }
 
             // Se não tem nenhuma conta, mostra campos de senha e confirmação
-            if (!steps[accountType][0].fields.includes('password')) {
-              steps[accountType][0].fields.push('password', 'confirmSenha');
+            if (!register_steps[accountType][0].fields.includes('password')) {
+              register_steps[accountType][0].fields.push(
+                'password',
+                'confirmSenha',
+              );
             }
             return;
           } catch (error) {
@@ -364,38 +278,6 @@ const RegisterForm: React.FC = () => {
     }
   };
 
-  const getFieldLabel = (field: string) => {
-    const labels: Record<string, string> = {
-      name: 'Nome Completo',
-      email: 'E-mail',
-      password: 'Senha',
-      confirmSenha: 'Confirmar Senha',
-      numCpf: 'CPF',
-      numCelular: 'Número de Celular',
-      numCelularComercial: 'Número de Celular Comercial',
-      dataNascimento: 'Data de Nascimento',
-      nomeEstab: 'Nome Fantasia',
-      razaoSocial: 'Razão Social',
-      numCnpj: 'CNPJ',
-      endereco: 'Endereço',
-      numero: 'Número',
-      complemento: 'Complemento',
-      bairro: 'Bairro',
-      cidade: 'Cidade',
-      estado: 'Estado',
-      cep: 'CEP',
-    };
-    return labels[field] || field;
-  };
-
-  const getFieldType = (field: string) => {
-    if (field === 'email') return 'email';
-    if (field === 'password' || field === 'confirmSenha') return 'password';
-    if (field === 'numCelular' || field === 'numCelularComercial') return 'tel';
-    if (field === 'dataNascimento') return 'date';
-    return 'text';
-  };
-
   return (
     <div className='space-y-4'>
       <div className='grid grid-cols-2 gap-4 mb-6'>
@@ -460,10 +342,12 @@ const RegisterForm: React.FC = () => {
                     })}
                     type='email'
                     id={field}
-                    disabled={steps[accountType][0].fields.includes('password')}
+                    disabled={register_steps[accountType][0].fields.includes(
+                      'password',
+                    )}
                     className={`flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background
                       ${errors[field as keyof RegisterFormData] ? 'border-red-500' : 'border-gray-300'}
-                      ${steps[accountType][0].fields.includes('password') ? 'bg-gray-100 cursor-not-allowed' : ''}
+                      ${register_steps[accountType][0].fields.includes('password') ? 'bg-gray-100 cursor-not-allowed' : ''}
                     `}
                   />
                 ) : field === 'password' ? (
@@ -626,6 +510,18 @@ const RegisterForm: React.FC = () => {
                     ? 'Registrar'
                     : 'Próximo'}
           </Button>
+
+          <div className='mt-[12px] text-end flex flex-col gap-[12px]'>
+            <p className='text-[#272727] text-[12px] leading-[120%] font-[500]'>
+              Já tem uma conta?{' '}
+              <span
+                className='underline cursor-pointer font-[700]'
+                onClick={toggleForm}
+              >
+                Faça Login
+              </span>
+            </p>
+          </div>
         </div>
       </form>
     </div>

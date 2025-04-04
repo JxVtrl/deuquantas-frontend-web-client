@@ -1,26 +1,20 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import Button from '../Button';
-import { useAuthForm } from '@/hooks/useAuthForm';
-import { useAuth } from '@/contexts/AuthContext';
-import { useRouter } from 'next/router';
+import { useAuthFormContext } from '@/contexts/AuthFormContext';
+
 interface LoginFormData {
   email: string;
   password: string;
 }
 
 export function LoginForm() {
-  const { login, register: regFunc } = useAuth();
-  const router = useRouter();
   const {
     loading,
     error,
     handleSubmit: onSubmit,
-  } = useAuthForm({
-    login,
-    register: regFunc,
-    onSuccess: () => router.push('/customer/home'),
-  });
+    toggleForm,
+  } = useAuthFormContext();
 
   const {
     register,
@@ -111,6 +105,18 @@ export function LoginForm() {
           text={loading || isSubmitting ? 'Entrando...' : 'Entrar com Google'}
           type='button'
         />
+      </div>
+
+      <div className='mt-[12px] text-end flex flex-col gap-[12px]'>
+        <p className='text-[#272727] text-[12px] leading-[120%] font-[500]'>
+          Não tem uma conta?{' '}
+          <span
+            className='underline cursor-pointer font-[700]'
+            onClick={toggleForm}
+          >
+            Cadastrar
+          </span>
+        </p>
       </div>
     </form>
   );

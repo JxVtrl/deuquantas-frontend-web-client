@@ -1,0 +1,66 @@
+type AccountType = 'cliente' | 'estabelecimento';
+
+interface Step {
+  id: string;
+  title: string;
+  fields: string[];
+}
+
+export const register_steps: Record<AccountType, Step[]> = {
+  cliente: [
+    {
+      id: 'usuario',
+      title: 'Registro de Cliente',
+      fields: ['email'],
+    },
+    {
+      id: 'pessoal',
+      title: 'Dados Pessoais',
+      fields: ['name', 'numCpf', 'numCelular', 'dataNascimento'],
+    },
+    {
+      id: 'endereco',
+      title: 'Dados do Endereço',
+      fields: [
+        'cep',
+        'endereco',
+        'numero',
+        'complemento',
+        'bairro',
+        'cidade',
+        'estado',
+      ],
+    },
+  ],
+  estabelecimento: [
+    {
+      id: 'usuario',
+      title: 'Registro de Estabelecimento',
+      fields: ['email'],
+    },
+    {
+      id: 'estabelecimento',
+      title: 'Dados do Estabelecimento',
+      fields: [
+        'name',
+        'nomeEstab',
+        'razaoSocial',
+        'numCnpj',
+        'numCelularComercial',
+      ],
+    },
+    {
+      id: 'endereco',
+      title: 'Dados do Endereço',
+      fields: [
+        'cep',
+        'endereco',
+        'numero',
+        'complemento',
+        'bairro',
+        'cidade',
+        'estado',
+      ],
+    },
+  ],
+};

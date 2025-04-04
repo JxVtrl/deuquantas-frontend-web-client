@@ -9,12 +9,16 @@ interface LoginFormData {
 }
 
 interface UseAuthFormProps {
-  login: (credentials: LoginData) => Promise<void>;
-  register: (credentials: RegisterData) => Promise<void>;
-  onSuccess: () => void;
+  login?: (credentials: LoginData) => Promise<void>;
+  register?: (credentials: RegisterData) => Promise<void>;
+  onSuccess?: () => void;
 }
 
-export function useAuthForm({ login, register, onSuccess }: UseAuthFormProps) {
+export function useAuthForm({
+  login,
+  register,
+  onSuccess,
+}: UseAuthFormProps = {}) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isLogin, setIsLogin] = useState(true);
@@ -28,8 +32,8 @@ export function useAuthForm({ login, register, onSuccess }: UseAuthFormProps) {
   };
 
   const setRegisterType = (type: 'cliente' | 'estabelecimento') => {
+    console.log('setRegisterType chamado com:', type);
     setIsRegisterAsEstablishment(type === 'estabelecimento');
-    setIsLogin(type === 'cliente');
     setError(null);
   };
 
@@ -40,6 +44,8 @@ export function useAuthForm({ login, register, onSuccess }: UseAuthFormProps) {
   };
 
   const handleSubmit = async (data: LoginFormData | RegisterData) => {
+    if (!login || !register || !onSuccess) return;
+
     setLoading(true);
     setError(null);
 
