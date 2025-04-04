@@ -10,9 +10,18 @@ import {
 import Avatar from '../Avatar';
 import Image from 'next/image';
 import { useAuth } from '@/contexts/AuthContext';
+import { useUserPreferences } from '@/contexts/UserPreferencesContext';
+import { IOSSwitch } from '@/components/ui/ios-switch';
 
 const HeaderMenu: React.FC = () => {
   const { logout } = useAuth();
+  const { preferences, toggleLeftHanded } = useUserPreferences();
+  const { isLeftHanded } = preferences;
+
+  const handleToggleLeftHanded = (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log('Toggle left-handed:', e.target.checked);
+    toggleLeftHanded();
+  };
 
   const menu_items = [
     {
@@ -36,9 +45,21 @@ const HeaderMenu: React.FC = () => {
           />
         </div>
       </DropdownMenuTrigger>
-      <DropdownMenuContent>
+      <DropdownMenuContent className='w-56'>
         <DropdownMenuLabel>Menu</DropdownMenuLabel>
         <DropdownMenuSeparator />
+
+        <div className='px-2 py-1.5'>
+          <IOSSwitch
+            checked={isLeftHanded}
+            onChange={handleToggleLeftHanded}
+            label='Modo Canhoto'
+            description='Posiciona o botão de adicionar à esquerda'
+          />
+        </div>
+
+        <DropdownMenuSeparator />
+
         {menu_items.map((item) => (
           <DropdownMenuItem
             key={item.label}
