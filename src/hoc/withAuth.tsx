@@ -27,9 +27,9 @@ export function withAuth(Component: React.FC, requiredRole?: string) {
         return;
       }
 
-      // Se não estiver autenticado, redireciona para /auth
+      // Se não estiver autenticado, redireciona para /login
       if (!isAuthenticated || !user) {
-        router.replace('/auth');
+        router.replace('/login');
         return;
       }
 
@@ -39,7 +39,7 @@ export function withAuth(Component: React.FC, requiredRole?: string) {
         const userLevel = user.permission_level || 3; // Default para customer
 
         if (userLevel !== requiredLevel) {
-          router.replace('/auth');
+          router.replace('/login');
           return;
         }
       }

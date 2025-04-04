@@ -1,10 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useFormSteps } from '@/hooks/useFormSteps';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { api } from '@/lib/axios';
-import Cookies from 'js-cookie';
 import { Input } from '@/components/ui/input';
 import { MaskedInput } from '@/components/ui/masked-input';
 import { useToast } from '@/components/ui/use-toast';
@@ -12,7 +11,7 @@ import { Label } from '@radix-ui/react-label';
 import { authService } from '@/services/auth.service';
 import { validateCNPJ } from '@/utils/validators';
 import { cepService } from '@/services/cep.service';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 
 export interface RegisterEstablishmentFormData {
   // Dados do usuário
@@ -87,7 +86,39 @@ const RegisterEstablishmentForm = () => {
   const [checkingEmail, setCheckingEmail] = useState(false);
   const [searchingCep, setSearchingCep] = useState(false);
   const [checkingCNPJ, setCheckingCNPJ] = useState(false);
+  const [userName, setUserName] = useState<string | null>(null);
   const router = useRouter();
+
+  useEffect(() => {
+    // Reseta todos os estados quando o componente é montado
+    setLoading(false);
+    setCheckingEmail(false);
+    setSearchingCep(false);
+    setCheckingCNPJ(false);
+    setUserName(null);
+
+    // Reseta os campos do formulário
+    setValue('email', '');
+    setValue('password', '');
+    setValue('confirmSenha', '');
+    setValue('name', '');
+    setValue('nomeEstab', '');
+    setValue('razaoSocial', '');
+    setValue('numCnpj', '');
+    setValue('numCelular', '');
+    setValue('endereco', '');
+    setValue('numero', '');
+    setValue('complemento', '');
+    setValue('bairro', '');
+    setValue('cidade', '');
+    setValue('estado', '');
+    setValue('cep', '');
+
+    // Reseta os campos do primeiro passo
+    if (steps[0].fields.includes('password')) {
+      steps[0].fields = ['email'];
+    }
+  }, []); // Executa apenas quando o componente é montado
 
   const handleCepChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const cep = e.target.value.replace(/\D/g, '');
@@ -122,7 +153,7 @@ const RegisterEstablishmentForm = () => {
 
       if (isValid) {
         // Se estiver na primeira etapa, verifica o email
-        if (currentStep === 0) {
+        if (currentStep === 0 && !steps[0].fields.includes('password')) {
           try {
             setCheckingEmail(true);
             const accountInfo = await authService.checkAccountType(data.email);
@@ -138,10 +169,23 @@ const RegisterEstablishmentForm = () => {
             }
 
             if (accountInfo.hasClienteAccount) {
-              // Se tem conta de cliente, mostra campo de senha para login
-              if (!steps[0].fields.includes('password')) {
-                steps[0].fields.push('password');
+              console.log('tem conta de cliente');
+
+              // Se tem conta de cliente, busca os dados do usuário
+              const userData = await authService.getUserDataByEmail(data.email);
+
+              console.log('userData', userData);
+
+              if (userData) {
+                setUserName(userData.name);
+                setValue('name', userData.name);
               }
+
+              // Mostra campos de senha e confirmação para criar nova conta
+              if (!steps[0].fields.includes('password')) {
+                steps[0].fields.push('password', 'confirmSenha');
+              }
+              nextStep();
               return;
             }
 
@@ -220,20 +264,18 @@ const RegisterEstablishmentForm = () => {
         };
 
         // Registra o estabelecimento com todos os dados
-        const response = await api.post('/estabelecimentos', cleanedData);
-
-        // Salva o token nos cookies
-        Cookies.set('auth_token', response.data.token, { expires: 7 });
-
-        // Configura o token para as próximas requisições
-        api.defaults.headers.common['Authorization'] =
-          `Bearer ${response.data.token}`;
+        await api.post('/estabelecimentos', cleanedData);
 
         toast({
           title: 'Sucesso!',
-          description: 'Cadastro realizado com sucesso.',
+          description:
+            'Cadastro realizado com sucesso. Você será redirecionado para o login.',
         });
-        router.push('/login');
+
+        // Redireciona para a página de login após 2 segundos
+        setTimeout(() => {
+          router.push('/login');
+        }, 2000);
       } catch (error) {
         console.error('Erro ao cadastrar:', error);
         toast({
@@ -308,7 +350,16 @@ const RegisterEstablishmentForm = () => {
           {currentStepData.fields.map((field) => (
             <div key={field} className='grid gap-2'>
               <Label htmlFor={field}>{getFieldLabel(field)}</Label>
-              {field === 'email' ? (
+              {field === 'name' && userName ? (
+                <Input
+                  {...register(field as keyof RegisterEstablishmentFormData)}
+                  type='text'
+                  id={field}
+                  value={userName}
+                  disabled
+                  className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background bg-gray-100 cursor-not-allowed'
+                />
+              ) : field === 'email' ? (
                 <Input
                   {...register(field as keyof RegisterEstablishmentFormData, {
                     required: 'Este campo é obrigatório',
@@ -319,8 +370,10 @@ const RegisterEstablishmentForm = () => {
                   })}
                   type='email'
                   id={field}
+                  disabled={steps[0].fields.includes('password')}
                   className={`flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background
                     ${errors[field as keyof RegisterEstablishmentFormData] ? 'border-red-500' : 'border-gray-300'}
+                    ${steps[0].fields.includes('password') ? 'bg-gray-100 cursor-not-allowed' : ''}
                   `}
                 />
               ) : field === 'password' ? (

@@ -123,7 +123,7 @@ export class AuthService {
     }
   }
 
-  async register(data: RegisterData): Promise<void> {
+  async register(data: RegisterData): Promise<AuthResponse> {
     try {
       console.log('=== INÍCIO DO PROCESSO DE REGISTRO ===');
       console.log('Dados enviados para registro:', {
@@ -132,13 +132,32 @@ export class AuthService {
         password: '[PROTEGIDO]',
       });
 
-      await api.post('/auth/register', {
+      const response = await api.post('/auth/register', {
         ...data,
         email: data.email.toLowerCase(),
       });
 
+      const { access_token, user } = response.data;
+
+      // Formata o token corretamente
+      const formattedToken = access_token.startsWith('Bearer ')
+        ? access_token
+        : `Bearer ${access_token}`;
+      const tokenWithoutBearer = formattedToken.replace('Bearer ', '');
+
+      // Salva o token nos cookies
+      Cookies.set('auth_token', tokenWithoutBearer, { expires: 7 });
+
+      // Configura o token para as próximas requisições
+      api.defaults.headers.common['Authorization'] = formattedToken;
+
       console.log('Registro concluído com sucesso');
       console.log('=== FIM DO PROCESSO DE REGISTRO ===');
+
+      return {
+        user,
+        token: tokenWithoutBearer,
+      };
     } catch (error) {
       console.error('=== ERRO NO PROCESSO DE REGISTRO ===', error);
       if (axios.isAxiosError(error)) {
@@ -232,6 +251,20 @@ export class AuthService {
       `/auth/check-account?email=${email}`,
     );
     return response.data;
+  }
+
+  async getUserDataByEmail(email: string): Promise<UserResponse> {
+    try {
+      console.log('=== BUSCANDO DADOS DO USUÁRIO POR EMAIL ===');
+      const response = await api.get<UserResponse>(
+        `/auth/user-by-email/${email}`,
+      );
+      console.log('Dados do usuário obtidos:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('=== ERRO AO BUSCAR DADOS DO USUÁRIO POR EMAIL ===', error);
+      throw error;
+    }
   }
 }
 

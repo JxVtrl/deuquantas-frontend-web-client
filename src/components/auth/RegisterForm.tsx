@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useFormSteps } from '@/hooks/useFormSteps';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -86,6 +86,35 @@ const RegisterForm: React.FC = () => {
   const [searchingCep, setSearchingCep] = useState(false);
   const [userData] = useState<UserResponse | null>(null);
   const router = useRouter();
+
+  useEffect(() => {
+    // Reseta todos os estados quando o componente é montado
+    setLoading(false);
+    setCheckingEmail(false);
+    setCheckingDocument(false);
+    setSearchingCep(false);
+
+    // Reseta os campos do formulário
+    setValue('email', '');
+    setValue('password', '');
+    setValue('confirmSenha', '');
+    setValue('name', '');
+    setValue('numCpf', '');
+    setValue('numCelular', '');
+    setValue('dataNascimento', '');
+    setValue('endereco', '');
+    setValue('numero', '');
+    setValue('complemento', '');
+    setValue('bairro', '');
+    setValue('cidade', '');
+    setValue('estado', '');
+    setValue('cep', '');
+
+    // Reseta os campos do primeiro passo
+    if (steps[0].fields.includes('password')) {
+      steps[0].fields = ['email'];
+    }
+  }, []); // Executa apenas quando o componente é montado
 
   const handleCepChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const cep = e.target.value.replace(/\D/g, '');
@@ -225,7 +254,7 @@ const RegisterForm: React.FC = () => {
           dataNascimento: new Date(data.dataNascimento).toISOString(),
         };
 
-        // Registra o cliente usando o authService
+        // Registra o usuário
         await authService.register(cleanedData);
 
         toast({
@@ -236,7 +265,7 @@ const RegisterForm: React.FC = () => {
 
         // Redireciona para a página de login após 2 segundos
         setTimeout(() => {
-          router.push('/login'); // ESTÁ CERTO, TEM UMA ROTA /LOGIN QUE REDIRECIONA PRA /AUTH COM O MODAL DE LOGIN
+          router.push('/login');
         }, 2000);
       } catch (err) {
         console.error('Erro ao cadastrar:', err);
@@ -323,8 +352,10 @@ const RegisterForm: React.FC = () => {
                   })}
                   type='email'
                   id={field}
+                  disabled={steps[0].fields.includes('password')}
                   className={`flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background
                     ${errors[field as keyof RegisterFormData] ? 'border-red-500' : 'border-gray-300'}
+                    ${steps[0].fields.includes('password') ? 'bg-gray-100 cursor-not-allowed' : ''}
                   `}
                 />
               ) : field === 'password' ? (

@@ -127,7 +127,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       } else if (isCliente) {
         router.replace('/customer/home');
       } else {
-        router.replace('/auth');
+        router.replace('/login');
       }
     } catch (error) {
       console.error('Erro no login:', error);
@@ -138,7 +138,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   const register = async (data: RegisterData) => {
     try {
       await authService.register(data);
-      router.push('/login');
     } catch (error) {
       console.error('Erro no registro:', error);
       throw error;
@@ -149,7 +148,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     Cookies.remove('auth_token');
     setUser(null);
     setDefaultHeaderToken('');
-    router.replace('/auth');
+    router.replace('/login');
   };
 
   const storeUserPreferences = async (
