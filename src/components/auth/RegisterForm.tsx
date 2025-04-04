@@ -8,18 +8,18 @@ import { Input } from '@/components/ui/input';
 import { MaskedInput } from '@/components/ui/masked-input';
 import { useToast } from '@/components/ui/use-toast';
 import { validateCPF } from '@/utils/validators';
-import {
-  authService,
-  RegisterData,
-  RegisterEstablishmentData,
-} from '@/services/auth.service';
+import { authService } from '@/services/auth.service';
 import { useRouter } from 'next/navigation';
-import { cepService } from '@/services/cep.service';
 import { useAuthFormContext } from '@/contexts/AuthFormContext';
 import { register_steps } from '@/data/register_steps';
 import { RegisterFormData } from '@/interfaces/register';
 import { getFieldLabel, getFieldType } from '@/utils/registerFieldsFuncs';
 import { PasswordStrengthIndicator } from '@/components/PasswordStrengthIndicator';
+import { RegisterService } from '@/services/register.service';
+import { DocumentService } from '@/services/document.service';
+import { EmailService } from '@/services/email.service';
+import { PasswordService } from '@/services/password.service';
+import { AddressService } from '@/services/address.service';
 
 const RegisterForm: React.FC = () => {
   const {
@@ -63,7 +63,9 @@ const RegisterForm: React.FC = () => {
   const [checkingEmail, setCheckingEmail] = useState(false);
   const [checkingDocument, setCheckingDocument] = useState(false);
   const [searchingCep, setSearchingCep] = useState(false);
+  const [isStepValid, setIsStepValid] = useState(false);
   const router = useRouter();
+  const [emailMessage, setEmailMessage] = useState('');
 
   useEffect(() => {
     // Reseta todos os estados quando o componente é montado
@@ -98,27 +100,56 @@ const RegisterForm: React.FC = () => {
     }
   }, [accountType]);
 
+  // Efeito para validar os campos do step atual sempre que houver mudança nos valores
+  useEffect(() => {
+    const validateCurrentStep = async () => {
+      const isValid = await RegisterService.handleStepValidation(
+        currentStep,
+        watch(),
+        isRegisterAsEstablishment,
+      );
+      setIsStepValid(isValid);
+    };
+
+    validateCurrentStep();
+  }, [currentStep, watch(), currentStepData.fields, isRegisterAsEstablishment]);
+
   const handleCepChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const cep = e.target.value.replace(/\D/g, '');
+    await AddressService.handleCepChange(cep, setValue, (message) => {
+      toast({
+        title: 'Erro!',
+        description: message,
+        variant: 'destructive',
+      });
+    });
+  };
 
-    if (cep.length === 8) {
+  const handleEmailBlur = async (e: React.FocusEvent<HTMLInputElement>) => {
+    const email = e.target.value;
+    if (email) {
+      setCheckingEmail(true);
       try {
-        setSearchingCep(true);
-        const address = await cepService.getAddressByCep(cep);
-
-        setValue('endereco', address.endereco);
-        setValue('bairro', address.bairro);
-        setValue('cidade', address.cidade);
-        setValue('estado', address.estado);
-        setValue('cep', address.cep);
-      } catch {
-        toast({
-          title: 'Erro!',
-          description: 'CEP não encontrado ou inválido.',
-          variant: 'destructive',
-        });
+        const result = await EmailService.checkEmail(
+          email,
+          router,
+          (message) => {
+            toast({
+              title: 'Erro!',
+              description: message,
+              variant: 'destructive',
+            });
+          },
+          (message) => {
+            toast({
+              title: 'Atenção!',
+              description: message,
+            });
+          },
+        );
+        setEmailMessage(result.message || '');
       } finally {
-        setSearchingCep(false);
+        setCheckingEmail(false);
       }
     }
   };
@@ -127,29 +158,34 @@ const RegisterForm: React.FC = () => {
     if (!isLastStep) {
       // Primeiro passo - Verificação de email
       if (currentStep === 0) {
+        setCheckingEmail(true);
         try {
-          setCheckingEmail(true);
-          const accountInfo = await authService.checkAccountType(data.email);
+          const result = await EmailService.checkEmail(
+            data.email,
+            router,
+            (message) => {
+              toast({
+                title: 'Erro!',
+                description: message,
+                variant: 'destructive',
+              });
+            },
+            (message) => {
+              toast({
+                title: 'Atenção!',
+                description: message,
+              });
+            },
+          );
 
-          if (accountInfo.hasClienteAccount) {
-            toast({
-              title: 'Atenção!',
-              description:
-                'Este email já está cadastrado como cliente. Por favor, faça login.',
-            });
+          if (result.exists) {
             router.push('/login');
             return;
           }
 
-          // Se chegou aqui, o email está disponível
-          nextStep();
-        } catch (error) {
-          console.error('Erro ao verificar email:', error);
-          toast({
-            title: 'Erro!',
-            description: 'Não foi possível verificar o email. Tente novamente.',
-            variant: 'destructive',
-          });
+          if (result.isValid) {
+            nextStep();
+          }
         } finally {
           setCheckingEmail(false);
         }
@@ -164,36 +200,13 @@ const RegisterForm: React.FC = () => {
       if (isValid) {
         // Segundo passo - Validação de senha
         if (currentStep === 1) {
-          const password = data.password;
-          const confirmPassword = data.confirmSenha;
+          const { isValid: passwordValid, strength } =
+            PasswordService.validatePassword(data.password, data.confirmSenha);
 
-          if (password !== confirmPassword) {
-            setError('confirmSenha', {
-              type: 'manual',
-              message: 'As senhas não coincidem',
-            });
-            return;
-          }
-
-          // Validar força da senha
-          const hasUpperCase = /[A-Z]/.test(password);
-          const hasLowerCase = /[a-z]/.test(password);
-          const hasNumbers = /\d/.test(password);
-          const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
-          const isLongEnough = password.length >= 8;
-
-          let passwordStrength = 0;
-          if (hasUpperCase) passwordStrength++;
-          if (hasLowerCase) passwordStrength++;
-          if (hasNumbers) passwordStrength++;
-          if (hasSpecialChar) passwordStrength++;
-          if (isLongEnough) passwordStrength++;
-
-          if (passwordStrength < 3) {
+          if (!passwordValid) {
             setError('password', {
               type: 'manual',
-              message:
-                'A senha deve ser mais forte. Inclua letras maiúsculas, minúsculas, números e caracteres especiais.',
+              message: PasswordService.getPasswordStrengthMessage(strength),
             });
             return;
           }
@@ -202,87 +215,62 @@ const RegisterForm: React.FC = () => {
           return;
         }
 
-        // Terceiro passo - Validação de CPF e Celular para Cliente
-        if (currentStep === 2 && !isRegisterAsEstablishment) {
+        // Terceiro passo - Validação de documentos
+        if (currentStep === 2) {
+          setCheckingDocument(true);
           try {
-            setCheckingDocument(true);
-            const [cpfExists, phoneExists] = await Promise.all([
-              authService.checkCPFExists(data.numCpf.replace(/\D/g, '')),
-              authService.checkPhoneExists(data.numCelular.replace(/\D/g, '')),
-            ]);
-
-            if (cpfExists) {
-              setError('numCpf', {
-                type: 'manual',
-                message: 'Este CPF já está cadastrado',
-              });
-              return;
+            let documentsValid = false;
+            if (isRegisterAsEstablishment) {
+              documentsValid =
+                await DocumentService.checkEstablishmentDocuments(
+                  data.numCnpj,
+                  data.numCelularComercial,
+                  setError,
+                  (message) => {
+                    toast({
+                      title: 'Erro!',
+                      description: message,
+                      variant: 'destructive',
+                    });
+                  },
+                );
+            } else {
+              documentsValid = await DocumentService.checkClientDocuments(
+                data.numCpf,
+                data.numCelular,
+                setError,
+                (message) => {
+                  toast({
+                    title: 'Erro!',
+                    description: message,
+                    variant: 'destructive',
+                  });
+                },
+              );
             }
 
-            if (phoneExists) {
-              setError('numCelular', {
-                type: 'manual',
-                message: 'Este número de celular já está cadastrado',
-              });
-              return;
+            if (documentsValid) {
+              nextStep();
             }
-
-            nextStep();
-          } catch (error) {
-            console.error('Erro ao verificar documentos:', error);
-            toast({
-              title: 'Erro!',
-              description:
-                'Não foi possível verificar os dados. Tente novamente.',
-              variant: 'destructive',
-            });
           } finally {
             setCheckingDocument(false);
           }
           return;
         }
 
-        // Terceiro passo - Validação de CNPJ e Celular Comercial para Estabelecimento
-        if (currentStep === 2 && isRegisterAsEstablishment) {
-          try {
-            setCheckingDocument(true);
-            const [cnpjExists, phoneExists] = await Promise.all([
-              authService.checkCNPJExists(data.numCnpj.replace(/\D/g, '')),
-              authService.checkPhoneExists(
-                data.numCelularComercial.replace(/\D/g, ''),
-              ),
-            ]);
+        // Quarto passo - Validação de endereço
+        if (currentStep === 3) {
+          const addressValid = AddressService.validateAddress({
+            cep: data.cep,
+            endereco: data.endereco,
+            numero: data.numero,
+            bairro: data.bairro,
+            cidade: data.cidade,
+            estado: data.estado,
+          });
 
-            if (cnpjExists) {
-              setError('numCnpj', {
-                type: 'manual',
-                message: 'Este CNPJ já está cadastrado',
-              });
-              return;
-            }
-
-            if (phoneExists) {
-              setError('numCelularComercial', {
-                type: 'manual',
-                message: 'Este número de celular já está cadastrado',
-              });
-              return;
-            }
-
+          if (addressValid) {
             nextStep();
-          } catch (error) {
-            console.error(
-              'Erro ao verificar documentos do estabelecimento:',
-              error,
-            );
-            toast({
-              title: 'Erro!',
-              description:
-                'Não foi possível verificar os dados. Tente novamente.',
-              variant: 'destructive',
-            });
-          } finally {
-            setCheckingDocument(false);
           }
           return;
         }
@@ -291,98 +279,26 @@ const RegisterForm: React.FC = () => {
       }
     } else {
       try {
-        console.log('Iniciando processo de registro...');
         setLoading(true);
-
-        // Remove máscaras antes de enviar
-        const cleanedData = {
-          ...data,
-          email: data.email.toLowerCase(),
-          numCpf: data.numCpf?.replace(/\D/g, ''),
-          numCelular: data.numCelular?.replace(/\D/g, ''),
-          cep: data.cep.replace(/\D/g, ''),
-        };
-
-        // Filtra os campos baseado no tipo de conta
-        const dataToSend = isRegisterAsEstablishment
-          ? {
-              email: cleanedData.email,
-              password: cleanedData.password,
-              name: cleanedData.name,
-              numCnpj: cleanedData.numCnpj,
-              numCelularComercial: cleanedData.numCelularComercial,
-              nomeEstab: cleanedData.nomeEstab,
-              razaoSocial: cleanedData.razaoSocial,
-              endereco: cleanedData.endereco,
-              numero: cleanedData.numero,
-              complemento: cleanedData.complemento,
-              bairro: cleanedData.bairro,
-              cidade: cleanedData.cidade,
-              estado: cleanedData.estado,
-              cep: cleanedData.cep,
-            }
-          : {
-              email: cleanedData.email,
-              password: cleanedData.password,
-              name: cleanedData.name,
-              numCpf: cleanedData.numCpf,
-              numCelular: cleanedData.numCelular,
-              dataNascimento: cleanedData.dataNascimento,
-              endereco: cleanedData.endereco,
-              numero: cleanedData.numero,
-              complemento: cleanedData.complemento,
-              bairro: cleanedData.bairro,
-              cidade: cleanedData.cidade,
-              estado: cleanedData.estado,
-              cep: cleanedData.cep,
-            };
-
-        console.log('Dados limpos para registro:', dataToSend);
-
-        // Registra o usuário
-        console.log('Chamando authService.register...');
-        const registeredUser = isRegisterAsEstablishment
-          ? await authService.registerEstablishment(
-              dataToSend as RegisterEstablishmentData,
-            )
-          : await authService.register(dataToSend as RegisterData);
-        console.log('Registro concluído com sucesso:', registeredUser);
-
-        try {
-          // Faz login automaticamente
-          console.log('Iniciando login automático...');
-          const loginResponse = await authService.login({
-            email: cleanedData.email,
-            password: cleanedData.password,
-          });
-          console.log('Login realizado com sucesso:', loginResponse);
-
-          toast({
-            title: 'Sucesso!',
-            description: 'Cadastro realizado com sucesso. Bem-vindo!',
-          });
-
-          // Aguarda um momento para garantir que o token foi salvo
-          await new Promise((resolve) => setTimeout(resolve, 500));
-
-          console.log('Redirecionando para /customer/home...');
-          window.location.href = '/customer/home';
-        } catch (loginError) {
-          console.error('Erro no login automático:', loginError);
-          // Se falhar o login automático, redireciona para a página de login
-          toast({
-            title: 'Atenção!',
-            description: 'Por favor, faça login com suas credenciais.',
-          });
-          router.push('/login');
-        }
-      } catch (err) {
-        console.error('Erro no processo de registro:', err);
-        toast({
-          title: 'Erro!',
-          description: 'Ocorreu um erro ao realizar o cadastro.',
-          variant: 'destructive',
-        });
+        await RegisterService.handleRegistration(
+          data,
+          isRegisterAsEstablishment,
+          (message) => {
+            toast({
+              title: 'Sucesso!',
+              description: message,
+            });
+          },
+          (message) => {
+            toast({
+              title: 'Erro!',
+              description: message,
+              variant: 'destructive',
+            });
+          },
+        );
+      } catch (error) {
+        console.error('Erro no processo de registro:', error);
       } finally {
         setLoading(false);
       }
@@ -447,22 +363,30 @@ const RegisterForm: React.FC = () => {
               <div key={field} className='grid gap-2'>
                 <Label htmlFor={field}>{getFieldLabel(field)}</Label>
                 {field === 'email' ? (
-                  <Input
-                    {...register(field as keyof RegisterFormData, {
-                      required: 'Este campo é obrigatório',
-                      pattern: {
-                        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                        message: 'Digite um e-mail válido',
-                      },
-                    })}
-                    type='email'
-                    id={field}
-                    disabled={checkingEmail}
-                    className={`flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background
-                      ${errors[field as keyof RegisterFormData] ? 'border-red-500' : 'border-gray-300'}
-                      ${checkingEmail ? 'bg-gray-100 cursor-not-allowed' : ''}
-                    `}
-                  />
+                  <div>
+                    <Input
+                      {...register(field as keyof RegisterFormData, {
+                        required: 'Este campo é obrigatório',
+                        pattern: {
+                          value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                          message: 'Digite um e-mail válido',
+                        },
+                      })}
+                      type='email'
+                      id={field}
+                      disabled={checkingEmail}
+                      onBlur={handleEmailBlur}
+                      className={`flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background
+                        ${errors[field as keyof RegisterFormData] ? 'border-red-500' : 'border-gray-300'}
+                        ${checkingEmail ? 'bg-gray-100 cursor-not-allowed' : ''}
+                      `}
+                    />
+                    {emailMessage && (
+                      <p className='text-red-500 text-sm mt-1'>
+                        {emailMessage}
+                      </p>
+                    )}
+                  </div>
                 ) : field === 'password' ? (
                   <div>
                     <Input
@@ -686,7 +610,9 @@ const RegisterForm: React.FC = () => {
 
         <div className='flex flex-col gap-[12px] sticky bottom-0 pt-4'>
           <Button
-            disabled={loading || checkingEmail || checkingDocument}
+            disabled={
+              loading || checkingEmail || checkingDocument || !isStepValid
+            }
             type='submit'
             className='w-full'
           >

@@ -63,3 +63,84 @@ export function validateCNPJ(numCnpj: string): boolean {
 
   return true;
 }
+
+export const validateEmail = (email: string): boolean => {
+  return !!(email && /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(email));
+};
+
+export const validatePassword = (
+  password: string,
+): { isValid: boolean; strength: number } => {
+  const hasUpperCase = /[A-Z]/.test(password);
+  const hasLowerCase = /[a-z]/.test(password);
+  const hasNumbers = /\d/.test(password);
+  const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+  const isLongEnough = password?.length >= 8;
+
+  let strength = 0;
+  if (hasUpperCase) strength++;
+  if (hasLowerCase) strength++;
+  if (hasNumbers) strength++;
+  if (hasSpecialChar) strength++;
+  if (isLongEnough) strength++;
+
+  return {
+    isValid: !!(password && strength >= 3),
+    strength,
+  };
+};
+
+export const validateEstablishmentData = (data: {
+  name: string;
+  numCnpj: string;
+  numCelularComercial: string;
+  nomeEstab: string;
+  razaoSocial: string;
+}): boolean => {
+  const { name, numCnpj, numCelularComercial, nomeEstab, razaoSocial } = data;
+  return !!(
+    name &&
+    numCnpj?.replace(/\D/g, '').length === 14 &&
+    numCelularComercial?.replace(/\D/g, '').length === 11 &&
+    nomeEstab &&
+    razaoSocial
+  );
+};
+
+export const validateClientData = (
+  data: {
+    name: string;
+    numCpf: string;
+    numCelular: string;
+    dataNascimento: string;
+  },
+  validateCPF: (cpf: string) => boolean,
+): boolean => {
+  const { name, numCpf, numCelular, dataNascimento } = data;
+  return !!(
+    name &&
+    numCpf?.replace(/\D/g, '').length === 11 &&
+    validateCPF(numCpf?.replace(/\D/g, '')) &&
+    numCelular?.replace(/\D/g, '').length === 11 &&
+    dataNascimento
+  );
+};
+
+export const validateAddressData = (data: {
+  cep: string;
+  endereco: string;
+  numero: string;
+  bairro: string;
+  cidade: string;
+  estado: string;
+}): boolean => {
+  const { cep, endereco, numero, bairro, cidade, estado } = data;
+  return !!(
+    cep?.replace(/\D/g, '').length === 8 &&
+    endereco &&
+    numero &&
+    bairro &&
+    cidade &&
+    estado
+  );
+};
