@@ -65,11 +65,7 @@ body {
 }
 
 main {
-  max-width: 768px;
-  height: 100vh;
   width: 100%;
-  margin: 0 auto;
-  overflow-y: hidden;
 }
 
 /* Estilizar links */
@@ -271,20 +267,4 @@ form {
   body {
     @apply bg-background text-foreground;
   }
-}
-
-/* Swiper custom styles */
-.swiper-pagination-bullet {
-  width: 8px !important;
-  height: 8px !important;
-  background: rgba(0, 0, 0, 0.2) !important;
-  opacity: 1 !important;
-}
-
-.swiper-pagination-bullet-active {
-  background: #000 !important;
-}
-
-.swiper-pagination {
-  bottom: 0 !important;
 }
