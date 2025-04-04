@@ -263,7 +263,7 @@ const RegisterForm: React.FC = () => {
 
         // Redireciona para a página de login após 2 segundos
         setTimeout(() => {
-          router.push('/auth');
+          router.push('/login');
         }, 2000);
       } catch (err) {
         console.error('Erro ao cadastrar:', err);
@@ -326,24 +326,26 @@ const RegisterForm: React.FC = () => {
 
   return (
     <div className='space-y-4'>
-      <div className='grid grid-cols-2 gap-4 mb-6'>
-        <Button
-          type='button'
-          variant={accountType === 'cliente' ? 'default' : 'outline'}
-          onClick={() => setRegisterType('cliente')}
-          className='flex-1'
-        >
-          Cliente
-        </Button>
-        <Button
-          type='button'
-          variant={accountType === 'estabelecimento' ? 'default' : 'outline'}
-          onClick={() => setRegisterType('estabelecimento')}
-          className='flex-1'
-        >
-          Estabelecimento
-        </Button>
-      </div>
+      {currentStep === 0 && (
+        <div className='grid grid-cols-2 gap-4 mb-6'>
+          <Button
+            type='button'
+            variant={accountType === 'cliente' ? 'default' : 'outline'}
+            onClick={() => setRegisterType('cliente')}
+            className='flex-1'
+          >
+            Cliente
+          </Button>
+          <Button
+            type='button'
+            variant={accountType === 'estabelecimento' ? 'default' : 'outline'}
+            onClick={() => setRegisterType('estabelecimento')}
+            className='flex-1'
+          >
+            Estabelecimento
+          </Button>
+        </div>
+      )}
 
       <form
         onSubmit={handleSubmit(onSubmit)}
