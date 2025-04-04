@@ -12,6 +12,7 @@ import { Label } from '@radix-ui/react-label';
 import { authService } from '@/services/auth.service';
 import { validateCNPJ } from '@/utils/validators';
 import { cepService } from '@/services/cep.service';
+import { useRouter } from 'next/router';
 
 export interface RegisterEstablishmentFormData {
   // Dados do usuário
@@ -86,6 +87,7 @@ const RegisterEstablishmentForm: React.FC = () => {
   const [checkingEmail, setCheckingEmail] = useState(false);
   const [searchingCep, setSearchingCep] = useState(false);
   const [checkingCNPJ, setCheckingCNPJ] = useState(false);
+  const router = useRouter();
 
   const handleCepChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const cep = e.target.value.replace(/\D/g, '');
@@ -214,6 +216,7 @@ const RegisterEstablishmentForm: React.FC = () => {
           title: 'Sucesso!',
           description: 'Cadastro realizado com sucesso.',
         });
+        router.push('/login');
       } catch (error) {
         console.error('Erro ao cadastrar:', error);
         toast({
