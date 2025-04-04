@@ -41,14 +41,14 @@ export class DocumentService {
 
   static async checkEstablishmentDocuments(
     numCnpj: string,
-    numCelularComercial: string,
+    numCelular: string,
     setError: UseFormSetError<RegisterFormData>,
     showError: (message: string) => void,
   ): Promise<boolean> {
     try {
       const [cnpjExists, phoneExists] = await Promise.all([
         authService.checkCNPJExists(numCnpj.replace(/\D/g, '')),
-        authService.checkPhoneExists(numCelularComercial.replace(/\D/g, '')),
+        authService.checkPhoneExists(numCelular.replace(/\D/g, '')),
       ]);
 
       if (cnpjExists) {
@@ -60,7 +60,7 @@ export class DocumentService {
       }
 
       if (phoneExists) {
-        setError('numCelularComercial', {
+        setError('numCelular', {
           type: 'manual',
           message: 'Este número de celular já está cadastrado',
         });

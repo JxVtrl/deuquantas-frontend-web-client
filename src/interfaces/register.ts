@@ -15,7 +15,6 @@ export interface RegisterFormData {
   nomeEstab: string;
   razaoSocial: string;
   numCnpj: string;
-  numCelularComercial: string;
 
   // Dados de endereço
   endereco: string;

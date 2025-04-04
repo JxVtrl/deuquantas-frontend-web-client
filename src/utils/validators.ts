@@ -93,15 +93,15 @@ export const validatePassword = (
 export const validateEstablishmentData = (data: {
   name: string;
   numCnpj: string;
-  numCelularComercial: string;
+  numCelular: string;
   nomeEstab: string;
   razaoSocial: string;
 }): boolean => {
-  const { name, numCnpj, numCelularComercial, nomeEstab, razaoSocial } = data;
+  const { name, numCnpj, numCelular, nomeEstab, razaoSocial } = data;
   return !!(
     name &&
     numCnpj?.replace(/\D/g, '').length === 14 &&
-    numCelularComercial?.replace(/\D/g, '').length === 11 &&
+    numCelular?.replace(/\D/g, '').length === 11 &&
     nomeEstab &&
     razaoSocial
   );

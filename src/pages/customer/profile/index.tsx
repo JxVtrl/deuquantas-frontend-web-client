@@ -3,7 +3,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import axios from 'axios';
 import Cookies from 'js-cookie';
-
+import { withAuthCustomer } from '@/hoc/withAuth';
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
 const ProfilePage: React.FC = () => {
@@ -146,4 +146,4 @@ const ProfilePage: React.FC = () => {
   );
 };
 
-export default ProfilePage;
+export default withAuthCustomer(ProfilePage);

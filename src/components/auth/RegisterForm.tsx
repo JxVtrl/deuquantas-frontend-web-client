@@ -85,7 +85,7 @@ const RegisterForm: React.FC = () => {
     setValue('nomeEstab', '');
     setValue('razaoSocial', '');
     setValue('numCnpj', '');
-    setValue('numCelularComercial', '');
+    setValue('numCelular', '');
     setValue('endereco', '');
     setValue('numero', '');
     setValue('complemento', '');
@@ -130,23 +130,13 @@ const RegisterForm: React.FC = () => {
     if (email) {
       setCheckingEmail(true);
       try {
-        const result = await EmailService.checkEmail(
-          email,
-          router,
-          (message) => {
-            toast({
-              title: 'Erro!',
-              description: message,
-              variant: 'destructive',
-            });
-          },
-          (message) => {
-            toast({
-              title: 'Atenção!',
-              description: message,
-            });
-          },
-        );
+        const result = await EmailService.checkEmail(email, (message) => {
+          toast({
+            title: 'Erro!',
+            description: message,
+            variant: 'destructive',
+          });
+        });
         setEmailMessage(result.message || '');
       } finally {
         setCheckingEmail(false);
@@ -162,18 +152,11 @@ const RegisterForm: React.FC = () => {
         try {
           const result = await EmailService.checkEmail(
             data.email,
-            router,
             (message) => {
               toast({
                 title: 'Erro!',
                 description: message,
                 variant: 'destructive',
-              });
-            },
-            (message) => {
-              toast({
-                title: 'Atenção!',
-                description: message,
               });
             },
           );
@@ -224,7 +207,7 @@ const RegisterForm: React.FC = () => {
               documentsValid =
                 await DocumentService.checkEstablishmentDocuments(
                   data.numCnpj,
-                  data.numCelularComercial,
+                  data.numCelular,
                   setError,
                   (message) => {
                     toast({
@@ -547,7 +530,7 @@ const RegisterForm: React.FC = () => {
                       }
                     }}
                   />
-                ) : field === 'numCelularComercial' ? (
+                ) : field === 'numCelular' ? (
                   <MaskedInput
                     maskType='numCelular'
                     {...register(field as keyof RegisterFormData, {
@@ -568,7 +551,7 @@ const RegisterForm: React.FC = () => {
                           const exists =
                             await authService.checkPhoneExists(phone);
                           if (exists) {
-                            setError('numCelularComercial', {
+                            setError('numCelular', {
                               type: 'manual',
                               message:
                                 'Este número de celular já está cadastrado',

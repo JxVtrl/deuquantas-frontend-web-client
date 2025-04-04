@@ -43,7 +43,7 @@ export function withAuth(Component: React.FC, requiredRole?: string) {
           return;
         }
       }
-    }, [user, isAuthenticated, loading, router, requiredRole]);
+    }, [user, isAuthenticated, loading, router]);
 
     // Se ainda está carregando, mostra nada
     if (loading) {

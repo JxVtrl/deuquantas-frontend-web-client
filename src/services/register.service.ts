@@ -58,11 +58,11 @@ export class RegisterService {
   }
 
   private static validateEstablishmentStep(data: RegisterFormData): boolean {
-    const { name, numCnpj, numCelularComercial, nomeEstab, razaoSocial } = data;
+    const { name, numCnpj, numCelular, nomeEstab, razaoSocial } = data;
     return !!(
       name &&
       numCnpj?.replace(/\D/g, '').length === 14 &&
-      numCelularComercial?.replace(/\D/g, '').length === 11 &&
+      numCelular?.replace(/\D/g, '').length === 11 &&
       nomeEstab &&
       razaoSocial
     );
@@ -105,7 +105,6 @@ export class RegisterService {
         numCpf: data.numCpf?.replace(/\D/g, ''),
         numCelular: data.numCelular?.replace(/\D/g, ''),
         numCnpj: data.numCnpj?.replace(/\D/g, ''),
-        numCelularComercial: data.numCelularComercial?.replace(/\D/g, ''),
         cep: data.cep.replace(/\D/g, ''),
       };
 
@@ -116,7 +115,7 @@ export class RegisterService {
             password: cleanedData.password,
             name: cleanedData.name,
             numCnpj: cleanedData.numCnpj || '',
-            numCelularComercial: cleanedData.numCelularComercial || '',
+            numCelular: cleanedData.numCelular || '',
             nomeEstab: cleanedData.nomeEstab || '',
             razaoSocial: cleanedData.razaoSocial || '',
             endereco: cleanedData.endereco,
@@ -152,7 +151,9 @@ export class RegisterService {
       }
 
       showSuccess('Cadastro realizado com sucesso. Bem-vindo!');
-      window.location.href = '/customer/home';
+      window.location.href = isRegisterAsEstablishment
+        ? '/establishment/home'
+        : '/customer/home';
     } catch (error) {
       console.error('Erro no processo de registro:', error);
       showError('Ocorreu um erro ao realizar o cadastro.');

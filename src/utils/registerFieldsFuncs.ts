@@ -6,7 +6,6 @@ export const getFieldLabel = (field: string) => {
     confirmSenha: 'Confirmar Senha',
     numCpf: 'CPF',
     numCelular: 'Número de Celular',
-    numCelularComercial: 'Número de Celular Comercial',
     dataNascimento: 'Data de Nascimento',
     nomeEstab: 'Nome Fantasia',
     razaoSocial: 'Razão Social',
@@ -25,7 +24,7 @@ export const getFieldLabel = (field: string) => {
 export const getFieldType = (field: string) => {
   if (field === 'email') return 'email';
   if (field === 'password' || field === 'confirmSenha') return 'password';
-  if (field === 'numCelular' || field === 'numCelularComercial') return 'tel';
+  if (field === 'numCelular') return 'tel';
   if (field === 'dataNascimento') return 'date';
   return 'text';
 };

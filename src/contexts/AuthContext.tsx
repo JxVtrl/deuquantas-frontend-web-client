@@ -92,7 +92,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
           // Se estiver na página de auth e tiver token válido, redireciona para home
           if (success && router.pathname === '/auth') {
-            router.replace('/customer/home');
+            if (isEstabelecimento) {
+              router.replace('/establishment/home');
+            } else {
+              router.replace('/customer/home');
+            }
           }
         }
       } finally {

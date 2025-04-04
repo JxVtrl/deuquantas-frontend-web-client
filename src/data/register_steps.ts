@@ -51,13 +51,7 @@ export const register_steps: Record<AccountType, Step[]> = {
     {
       id: 'estabelecimento',
       title: 'Dados do Estabelecimento',
-      fields: [
-        'name',
-        'nomeEstab',
-        'razaoSocial',
-        'numCnpj',
-        'numCelularComercial',
-      ],
+      fields: ['name', 'nomeEstab', 'razaoSocial', 'numCnpj', 'numCelular'],
     },
     {
       id: 'endereco',

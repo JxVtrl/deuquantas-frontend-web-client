@@ -28,7 +28,7 @@ export interface RegisterEstablishmentData {
   email: string;
   password: string;
   numCnpj: string;
-  numCelularComercial: string;
+  numCelular: string;
   nomeEstab: string;
   razaoSocial: string;
   endereco: string;
