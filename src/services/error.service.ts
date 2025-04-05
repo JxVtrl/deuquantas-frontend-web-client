@@ -8,6 +8,14 @@ export class ErrorService {
     if (error instanceof AxiosError) {
       const response = error.response;
 
+      // Tratamento especial para verificação de email
+      if (
+        error.config?.url?.includes('/check-email') &&
+        response?.status === 404
+      ) {
+        return '';
+      }
+
       if (!response) {
         return 'Erro de conexão. Verifique sua internet e tente novamente.';
       }
@@ -23,7 +31,7 @@ export class ErrorService {
         case 403:
           return 'Você não tem permissão para realizar esta ação.';
         case 404:
-          return response.data?.message || 'Recurso não encontrado.';
+          return 'Recurso não encontrado.';
         case 409:
           return (
             response.data?.message ||

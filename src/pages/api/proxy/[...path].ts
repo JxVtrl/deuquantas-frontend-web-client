@@ -11,8 +11,11 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
+  const isDocker = process.env.NEXT_PUBLIC_DOCKER_ENV === 'true';
+  const target = isDocker ? 'http://backend:3001' : 'http://localhost:3001';
+
   return httpProxyMiddleware(req, res, {
-    target: 'http://localhost:3001',
+    target,
     pathRewrite: [
       {
         patternStr: '^/api/proxy',
@@ -20,5 +23,6 @@ export default async function handler(
       },
     ],
     changeOrigin: true,
+    secure: false,
   });
 }

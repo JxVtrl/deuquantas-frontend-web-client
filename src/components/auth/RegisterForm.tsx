@@ -19,7 +19,6 @@ import { DocumentService } from '@/services/document.service';
 import { EmailService } from '@/services/email.service';
 import { PasswordService } from '@/services/password.service';
 import { AddressService } from '@/services/address.service';
-import { AuthService } from '@/services/auth.service';
 
 const RegisterForm: React.FC = () => {
   const {
@@ -61,17 +60,17 @@ const RegisterForm: React.FC = () => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [checkingEmail, setCheckingEmail] = useState(false);
-  const [checkingDocument, setCheckingDocument] = useState(false);
   const [searchingCep, setSearchingCep] = useState(false);
   const [isStepValid, setIsStepValid] = useState(false);
   const router = useRouter();
   const [emailMessage, setEmailMessage] = useState('');
+  const [emailExists, setEmailExists] = useState(false);
+  const [emailValidated, setEmailValidated] = useState(false);
 
   useEffect(() => {
     // Reseta todos os estados quando o componente é montado
     setLoading(false);
     setCheckingEmail(false);
-    setCheckingDocument(false);
     setSearchingCep(false);
 
     // Reseta os campos do formulário
@@ -103,16 +102,28 @@ const RegisterForm: React.FC = () => {
   // Efeito para validar os campos do step atual sempre que houver mudança nos valores
   useEffect(() => {
     const validateCurrentStep = async () => {
-      const isValid = await RegisterService.handleStepValidation(
-        currentStep,
-        watch(),
-        isRegisterAsEstablishment,
-      );
-      setIsStepValid(isValid);
+      if (currentStep === 0) {
+        // No primeiro passo, só permitir avançar se o email foi validado e não existe
+        setIsStepValid(emailValidated && !emailExists);
+      } else {
+        const isValid = await RegisterService.handleStepValidation(
+          currentStep,
+          watch(),
+          isRegisterAsEstablishment,
+        );
+        setIsStepValid(isValid);
+      }
     };
 
     validateCurrentStep();
-  }, [currentStep, watch(), currentStepData.fields, isRegisterAsEstablishment]);
+  }, [
+    currentStep,
+    watch(),
+    currentStepData.fields,
+    isRegisterAsEstablishment,
+    emailValidated,
+    emailExists,
+  ]);
 
   const handleCepChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const cep = e.target.value.replace(/\D/g, '');
@@ -140,9 +151,92 @@ const RegisterForm: React.FC = () => {
             });
           },
         );
-        setEmailMessage(result.message || '');
+        setEmailMessage(result.message);
+        setEmailExists(result.exists);
+        setEmailValidated(true);
       } finally {
         setCheckingEmail(false);
+      }
+    }
+  };
+
+  const handleCPFBlur = async (e: React.FocusEvent<HTMLInputElement>) => {
+    const cpf = e.target.value.replace(/\D/g, '');
+    if (cpf.length === 11) {
+      if (!DocumentService.validateCPF(cpf)) {
+        setError('numCpf', {
+          type: 'manual',
+          message: 'CPF inválido',
+        });
+        return;
+      }
+      try {
+        const cpfExists = await DocumentService.checkCPFExists(cpf);
+        if (cpfExists.exists) {
+          setError('numCpf', {
+            type: 'manual',
+            message: cpfExists.message,
+          });
+        }
+      } catch (error) {
+        console.error('Erro ao verificar CPF:', error);
+      }
+    }
+  };
+
+  const handleCNPJBlur = async (e: React.FocusEvent<HTMLInputElement>) => {
+    const cnpj = e.target.value.replace(/\D/g, '');
+    if (cnpj.length === 14) {
+      if (!DocumentService.validateCNPJ(cnpj)) {
+        setError('numCnpj', {
+          type: 'manual',
+          message: 'CNPJ inválido',
+        });
+        return;
+      }
+      try {
+        const result = await DocumentService.checkCNPJExists(
+          cnpj,
+          (message) => {
+            toast({
+              title: 'Erro!',
+              description: message,
+              variant: 'destructive',
+            });
+          },
+        );
+        if (result.exists) {
+          setError('numCnpj', {
+            type: 'manual',
+            message: result.message,
+          });
+        }
+      } catch (error) {
+        console.error('Erro ao verificar CNPJ:', error);
+      }
+    }
+  };
+
+  const handlePhoneBlur = async (e: React.FocusEvent<HTMLInputElement>) => {
+    const phone = e.target.value.replace(/\D/g, '');
+    if (phone.length === 11) {
+      if (!DocumentService.validatePhone(phone)) {
+        setError('numCelular', {
+          type: 'manual',
+          message: 'Número de celular inválido',
+        });
+        return;
+      }
+      try {
+        const result = await DocumentService.checkPhoneExists(phone);
+        if (result.exists) {
+          setError('numCelular', {
+            type: 'manual',
+            message: result.message,
+          });
+        }
+      } catch (error) {
+        console.error('Erro ao verificar telefone:', error);
       }
     }
   };
@@ -169,7 +263,7 @@ const RegisterForm: React.FC = () => {
             return;
           }
 
-          if (result.isValid) {
+          if (!result.exists) {
             nextStep();
           }
         } finally {
@@ -203,43 +297,11 @@ const RegisterForm: React.FC = () => {
 
         // Terceiro passo - Validação de documentos
         if (currentStep === 2) {
-          setCheckingDocument(true);
-          try {
-            let documentsValid = false;
-            if (isRegisterAsEstablishment) {
-              documentsValid =
-                await DocumentService.checkEstablishmentDocuments(
-                  data.numCnpj,
-                  data.numCelular,
-                  setError,
-                  (message) => {
-                    toast({
-                      title: 'Erro!',
-                      description: message,
-                      variant: 'destructive',
-                    });
-                  },
-                );
-            } else {
-              documentsValid = await DocumentService.checkClientDocuments(
-                data.numCpf,
-                data.numCelular,
-                setError,
-                (message) => {
-                  toast({
-                    title: 'Erro!',
-                    description: message,
-                    variant: 'destructive',
-                  });
-                },
-              );
-            }
-
-            if (documentsValid) {
-              nextStep();
-            }
-          } finally {
-            setCheckingDocument(false);
+          const isValid = await trigger(
+            currentStepData.fields as Array<keyof RegisterFormData>,
+          );
+          if (isValid) {
+            nextStep();
           }
           return;
         }
@@ -372,7 +434,7 @@ const RegisterForm: React.FC = () => {
                         ${checkingEmail ? 'bg-gray-100 cursor-not-allowed' : ''}
                       `}
                     />
-                    {emailMessage && (
+                    {emailExists && (
                       <p className='text-red-500 text-sm mt-1'>
                         {emailMessage}
                       </p>
@@ -423,22 +485,7 @@ const RegisterForm: React.FC = () => {
                     })}
                     error={!!errors[field as keyof RegisterFormData]}
                     value={watch(field as keyof RegisterFormData) || ''}
-                    onBlur={async (e) => {
-                      const cpf = e.target.value.replace(/\D/g, '');
-                      if (cpf.length === 11 && validateCPF(cpf)) {
-                        try {
-                          const exists = await AuthService.checkCPFExists(cpf);
-                          if (exists) {
-                            setError('numCpf', {
-                              type: 'manual',
-                              message: 'Este CPF já está cadastrado',
-                            });
-                          }
-                        } catch (error) {
-                          console.error('Erro ao verificar CPF:', error);
-                        }
-                      }
-                    }}
+                    onBlur={handleCPFBlur}
                   />
                 ) : field === 'numCelular' ? (
                   <MaskedInput
@@ -454,24 +501,7 @@ const RegisterForm: React.FC = () => {
                     })}
                     error={!!errors[field as keyof RegisterFormData]}
                     value={watch(field as keyof RegisterFormData) || ''}
-                    onBlur={async (e) => {
-                      const phone = e.target.value.replace(/\D/g, '');
-                      if (phone.length === 11) {
-                        try {
-                          const exists =
-                            await AuthService.checkPhoneExists(phone);
-                          if (exists) {
-                            setError('numCelular', {
-                              type: 'manual',
-                              message:
-                                'Este número de celular já está cadastrado',
-                            });
-                          }
-                        } catch (error) {
-                          console.error('Erro ao verificar celular:', error);
-                        }
-                      }
-                    }}
+                    onBlur={handlePhoneBlur}
                   />
                 ) : field === 'cep' ? (
                   <MaskedInput
@@ -522,59 +552,7 @@ const RegisterForm: React.FC = () => {
                     })}
                     error={!!errors[field as keyof RegisterFormData]}
                     value={watch(field as keyof RegisterFormData) || ''}
-                    onBlur={async (e) => {
-                      const cnpj = e.target.value.replace(/\D/g, '');
-                      if (cnpj.length === 14) {
-                        try {
-                          const exists =
-                            await AuthService.checkCNPJExists(cnpj);
-                          if (exists) {
-                            setError('numCnpj', {
-                              type: 'manual',
-                              message: 'Este CNPJ já está cadastrado',
-                            });
-                          }
-                        } catch (error) {
-                          console.error('Erro ao verificar CNPJ:', error);
-                        }
-                      }
-                    }}
-                  />
-                ) : field === 'numCelular' ? (
-                  <MaskedInput
-                    maskType='numCelular'
-                    {...register(field as keyof RegisterFormData, {
-                      required: 'Este campo é obrigatório',
-                      validate: (value) => {
-                        const numbers = value?.replace(/\D/g, '') || '';
-                        return (
-                          numbers.length === 11 || 'Número de celular inválido'
-                        );
-                      },
-                    })}
-                    error={!!errors[field as keyof RegisterFormData]}
-                    value={watch(field as keyof RegisterFormData) || ''}
-                    onBlur={async (e) => {
-                      const phone = e.target.value.replace(/\D/g, '');
-                      if (phone.length === 11) {
-                        try {
-                          const exists =
-                            await AuthService.checkPhoneExists(phone);
-                          if (exists) {
-                            setError('numCelular', {
-                              type: 'manual',
-                              message:
-                                'Este número de celular já está cadastrado',
-                            });
-                          }
-                        } catch (error) {
-                          console.error(
-                            'Erro ao verificar celular comercial:',
-                            error,
-                          );
-                        }
-                      }
-                    }}
+                    onBlur={handleCNPJBlur}
                   />
                 ) : (
                   <Input
@@ -603,21 +581,20 @@ const RegisterForm: React.FC = () => {
 
         <div className='flex flex-col gap-[12px] sticky bottom-0 pt-4'>
           <Button
-            disabled={
-              loading || checkingEmail || checkingDocument || !isStepValid
-            }
             type='submit'
             className='w-full'
+            disabled={!isStepValid || loading || checkingEmail}
           >
-            {loading
-              ? 'Cadastrando...'
-              : checkingEmail
-                ? 'Verificando email...'
-                : checkingDocument
-                  ? 'Verificando documentos...'
-                  : isLastStep
-                    ? 'Registrar'
-                    : 'Próximo'}
+            {loading || checkingEmail ? (
+              <div className='flex items-center justify-center'>
+                <div className='w-5 h-5 border-t-2 border-white rounded-full animate-spin mr-2'></div>
+                {checkingEmail ? 'Verificando...' : 'Carregando...'}
+              </div>
+            ) : isLastStep ? (
+              'Finalizar'
+            ) : (
+              'Próximo'
+            )}
           </Button>
           {!isFirstStep && (
             <Button

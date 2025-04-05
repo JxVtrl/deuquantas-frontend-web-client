@@ -1,7 +1,6 @@
 import type { NextConfig } from 'next';
 
 const isDocker = process.env.NEXT_PUBLIC_DOCKER_ENV === 'true';
-const backendUrl = isDocker ? 'http://backend:3001' : 'http://localhost:3001';
 
 const nextConfig: NextConfig = {
   /* config options here */
@@ -11,15 +10,17 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: false,
   },
+  devIndicators: false,
   async rewrites() {
     return [
       {
         source: '/api/proxy/:path*',
-        destination: `${backendUrl}/:path*`,
+        destination: isDocker
+          ? 'http://backend:3001/:path*'
+          : 'http://localhost:3001/:path*',
       },
     ];
   },
-  devIndicators: false,
 };
 
 export default nextConfig;

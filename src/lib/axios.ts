@@ -1,8 +1,13 @@
 import axios from 'axios';
 import Cookies from 'js-cookie';
 
+const isDocker = process.env.NEXT_PUBLIC_DOCKER_ENV === 'true';
+const baseURL = isDocker
+  ? process.env.NEXT_PUBLIC_API_URL || 'http://backend:3001'
+  : '/api/proxy';
+
 export const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001',
+  baseURL,
   headers: {
     'Content-Type': 'application/json',
   },

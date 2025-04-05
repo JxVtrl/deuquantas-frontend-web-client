@@ -7,12 +7,7 @@ import React, {
   useCallback,
 } from 'react';
 import { useRouter } from 'next/router';
-import {
-  RegisterData,
-  authService,
-  LoginData,
-  AuthService,
-} from '@/services/auth.service';
+import { RegisterData, LoginData, AuthService } from '@/services/auth.service';
 import { jwtDecode } from 'jwt-decode';
 import { setDefaultHeaderToken } from '../../services/api';
 import { saveUserPreferences, viewUserPreferences } from '../../services/user';
@@ -53,33 +48,23 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
   const processToken = useCallback(async (token: string) => {
     try {
-      // Garante que o token começa com "Bearer "
-      const formattedToken = token.startsWith('Bearer ')
-        ? token
-        : `Bearer ${token}`;
-      const decodedToken = jwtDecode<User>(
-        formattedToken.replace('Bearer ', ''),
-      );
+      if (!token) {
+        throw new Error('Token não fornecido');
+      }
+
+      // Remove "Bearer " se existir
+      const cleanToken = token.replace('Bearer ', '');
+      const decodedToken = jwtDecode<User>(cleanToken);
       console.log('Token decodificado:', decodedToken);
 
-      // Busca os dados completos do usuário
-      const response = await authService.getUserData();
-      console.log('Dados completos do usuário:', response);
-
-      // Combina os dados do token com os dados completos do usuário
-      const userData = {
-        ...decodedToken,
-        ...response.user,
-      };
-      console.log('Dados combinados do usuário:', userData);
-
-      setUser(userData);
-      Cookies.set('auth_token', formattedToken.replace('Bearer ', ''));
-      setDefaultHeaderToken(formattedToken);
+      // Usa apenas os dados do token
+      setUser(decodedToken);
+      Cookies.set('token', cleanToken);
+      setDefaultHeaderToken(`Bearer ${cleanToken}`);
       return true;
     } catch (error) {
       console.error('Erro ao processar token:', error);
-      Cookies.remove('auth_token');
+      Cookies.remove('token');
       setUser(null);
       return false;
     }
@@ -90,17 +75,19 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
     const initializeAuth = async () => {
       try {
-        const token = Cookies.get('auth_token');
+        const token = Cookies.get('token');
 
         if (token && mounted) {
           const success = await processToken(token);
 
           // Se estiver na página de auth e tiver token válido, redireciona para home
           if (success && router.pathname === '/auth') {
-            if (isEstabelecimento) {
-              router.replace('/establishment/home');
-            } else {
+            if (user?.hasEstabelecimento) {
+              router.replace('/estabelecimento/dashboard');
+            } else if (user?.hasCliente) {
               router.replace('/customer/home');
+            } else {
+              router.replace('/login');
             }
           }
         }
@@ -128,15 +115,23 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       console.log('Dados de login recebidos:', data);
       const response = await AuthService.login(data);
       console.log('Resposta do login:', response);
-      await processToken(response.token);
 
-      // Redireciona com base no tipo de usuário
-      if (isEstabelecimento) {
-        router.replace('/estabelecimento/dashboard');
-      } else if (isCliente) {
-        router.replace('/customer/home');
-      } else {
-        router.replace('/login');
+      const token = response.token;
+      if (!token) {
+        throw new Error('Token não encontrado na resposta');
+      }
+
+      const success = await processToken(token);
+
+      if (success) {
+        // Redireciona com base no tipo de usuário
+        if (user?.hasEstabelecimento) {
+          router.replace('/estabelecimento/dashboard');
+        } else if (user?.hasCliente) {
+          router.replace('/customer/home');
+        } else {
+          router.replace('/login');
+        }
       }
     } catch (error) {
       console.error('Erro no login:', error);
@@ -154,7 +149,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   };
 
   const logout = () => {
-    Cookies.remove('auth_token');
+    Cookies.remove('token');
     setUser(null);
     setDefaultHeaderToken('');
     router.replace('/login');
@@ -176,7 +171,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   };
 
   const clearSession = () => {
-    Cookies.remove('auth_token');
+    Cookies.remove('token');
     setUser(null);
     setDefaultHeaderToken('');
   };

@@ -48,7 +48,7 @@ export interface AuthResponse {
 }
 
 interface AuthApiResponse {
-  access_token: string;
+  token: string;
   user: User;
 }
 
@@ -70,7 +70,10 @@ export interface CheckAccountResponse {
 export class AuthService {
   static async login(data: LoginData) {
     try {
-      const response = await axios.post('/api/auth/login', data);
+      const response = await api.post('/auth/login', data);
+      if (!response.data.success) {
+        throw new Error(response.data.message);
+      }
       return response.data;
     } catch (error) {
       console.error('Erro no login:', error);
@@ -84,7 +87,7 @@ export class AuthService {
 
   static async register(data: RegisterData) {
     try {
-      const response = await axios.post('/api/auth/register', data);
+      const response = await api.post('/auth/register', data);
       return response.data;
     } catch (error) {
       console.error('Erro no registro:', error);
@@ -98,13 +101,10 @@ export class AuthService {
 
   static async registerEstablishment(data: RegisterEstablishmentData) {
     try {
-      const response = await axios.post(
-        '/api/auth/register-establishment',
-        data,
-      );
+      const response = await api.post('/auth/register/establishment', data);
       return response.data;
     } catch (error) {
-      console.error('Erro no registro de estabelecimento:', error);
+      console.error('Erro no registro do estabelecimento:', error);
       const errorMessage = ErrorService.handleError(
         error,
         'Erro ao realizar o cadastro do estabelecimento.',
