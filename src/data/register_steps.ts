@@ -78,7 +78,7 @@ export const registerSteps = [
   {
     id: 'user',
     title: 'Dados do Usuário',
-    fields: ['name', 'email', 'password', 'confirmPassword'],
+    fields: ['email', 'password', 'confirmPassword'],
   },
   {
     id: 'establishment',

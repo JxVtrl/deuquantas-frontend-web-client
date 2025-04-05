@@ -93,8 +93,8 @@ export const validatePassword = (
 };
 
 export const validateEstablishmentData = (data: RegisterFormData): boolean => {
-  const { numCnpj, numCelular, nomeEstab, razaoSocial, name } = data;
-  return !!(numCnpj && numCelular && nomeEstab && razaoSocial && name);
+  const { numCnpj, numCelular, nomeEstab, razaoSocial } = data;
+  return !!(numCnpj && numCelular && nomeEstab && razaoSocial);
 };
 
 export const validateClientData = (
