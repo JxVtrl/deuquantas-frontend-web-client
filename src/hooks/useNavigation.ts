@@ -9,6 +9,7 @@ import {
   HomeIcon,
   MoneyIcon,
 } from '@/components/Icons';
+import { useUserPreferences } from '@/contexts/UserPreferencesContext';
 
 export interface NavigationPill {
   label: string;
@@ -31,6 +32,8 @@ export interface NavigationItem {
 export const useNavigation = () => {
   // const router = useRouter();
   const [activePill, setActivePill] = useState('scan');
+  const { preferences } = useUserPreferences();
+  const { isLeftHanded } = preferences;
 
   const navigationPills: NavigationPill[] = [
     {
@@ -78,23 +81,29 @@ export const useNavigation = () => {
     },
   ];
 
-  const bottomNavItems: NavigationItem[] = [
-    {
-      icon: HomeIcon,
-      label: 'Início',
-      href: '/customer/home',
-    },
-    {
-      icon: MoneyIcon,
-      label: 'Conta',
-      href: '/customer/account',
-    },
-    {
-      icon: FavoriteIcon,
-      label: 'Favoritos',
-      href: '/customer/favorites',
-    },
-  ];
+  // Define os itens da navegação inferior
+  const homeItem: NavigationItem = {
+    icon: HomeIcon,
+    label: 'Início',
+    href: '/customer/home',
+  };
+
+  const accountItem: NavigationItem = {
+    icon: MoneyIcon,
+    label: 'Conta',
+    href: '/customer/account',
+  };
+
+  const favoritesItem: NavigationItem = {
+    icon: FavoriteIcon,
+    label: 'Favoritos',
+    href: '/customer/favorites',
+  };
+
+  // Organiza os itens com base na preferência do usuário
+  const bottomNavItems = isLeftHanded
+    ? [homeItem, accountItem, favoritesItem] // Ordem para canhotos: Início, Conta, Favoritos
+    : [homeItem, accountItem, favoritesItem]; // Ordem para destros: Início, Conta, Favoritos
 
   const handleAddClick = () => {
     // Implement add functionality
