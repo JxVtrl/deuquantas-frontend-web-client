@@ -101,7 +101,7 @@ export class AuthService {
 
   static async registerEstablishment(data: RegisterEstablishmentData) {
     try {
-      const response = await api.post('/auth/register/establishment', data);
+      const response = await api.post('/auth/register-establishment', data);
       return response.data;
     } catch (error) {
       console.error('Erro no registro do estabelecimento:', error);
@@ -115,9 +115,7 @@ export class AuthService {
 
   static async checkAccountType(email: string) {
     try {
-      const response = await axios.get(
-        `/api/auth/check-account-type?email=${email}`,
-      );
+      const response = await api.get(`/auth/check-account-type?email=${email}`);
       return response.data;
     } catch (error) {
       console.error('Erro ao verificar tipo de conta:', error);
@@ -131,7 +129,7 @@ export class AuthService {
 
   static async checkCPFExists(cpf: string) {
     try {
-      const response = await axios.get(`/api/auth/check-cpf?cpf=${cpf}`);
+      const response = await api.get(`/auth/check-cpf?cpf=${cpf}`);
       return response.data;
     } catch (error) {
       console.error('Erro ao verificar CPF:', error);
@@ -145,7 +143,7 @@ export class AuthService {
 
   static async checkCNPJExists(cnpj: string) {
     try {
-      const response = await axios.get(`/api/auth/check-cnpj?cnpj=${cnpj}`);
+      const response = await api.get(`/auth/check-cnpj?cnpj=${cnpj}`);
       return response.data;
     } catch (error) {
       console.error('Erro ao verificar CNPJ:', error);
@@ -159,7 +157,7 @@ export class AuthService {
 
   static async checkPhoneExists(phone: string) {
     try {
-      const response = await axios.get(`/api/auth/check-phone?phone=${phone}`);
+      const response = await api.get(`/auth/check-phone?phone=${phone}`);
       return response.data;
     } catch (error) {
       console.error('Erro ao verificar telefone:', error);

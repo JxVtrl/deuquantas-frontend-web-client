@@ -1,3 +1,5 @@
+import { RegisterFormData } from '@/interfaces/register';
+
 export function validateCPF(numCpf: string): boolean {
   // Remove caracteres não numéricos
   const numbers = numCpf.replace(/\D/g, '');
@@ -90,21 +92,9 @@ export const validatePassword = (
   };
 };
 
-export const validateEstablishmentData = (data: {
-  name: string;
-  numCnpj: string;
-  numCelular: string;
-  nomeEstab: string;
-  razaoSocial: string;
-}): boolean => {
-  const { name, numCnpj, numCelular, nomeEstab, razaoSocial } = data;
-  return !!(
-    name &&
-    numCnpj?.replace(/\D/g, '').length === 14 &&
-    numCelular?.replace(/\D/g, '').length === 11 &&
-    nomeEstab &&
-    razaoSocial
-  );
+export const validateEstablishmentData = (data: RegisterFormData): boolean => {
+  const { numCnpj, numCelular, nomeEstab, razaoSocial, name } = data;
+  return !!(numCnpj && numCelular && nomeEstab && razaoSocial && name);
 };
 
 export const validateClientData = (

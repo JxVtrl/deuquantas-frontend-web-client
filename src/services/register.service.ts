@@ -59,13 +59,13 @@ export class RegisterService {
   }
 
   private static validateEstablishmentStep(data: RegisterFormData): boolean {
-    const { name, numCnpj, numCelular, nomeEstab, razaoSocial } = data;
+    const { numCnpj, numCelular, nomeEstab, razaoSocial, name } = data;
     return !!(
-      name &&
       numCnpj?.replace(/\D/g, '').length === 14 &&
       numCelular?.replace(/\D/g, '').length === 11 &&
       nomeEstab &&
-      razaoSocial
+      razaoSocial &&
+      name
     );
   }
 
@@ -114,7 +114,6 @@ export class RegisterService {
         ? ({
             email: cleanedData.email,
             password: cleanedData.password,
-            name: cleanedData.name,
             numCnpj: cleanedData.numCnpj || '',
             numCelular: cleanedData.numCelular || '',
             nomeEstab: cleanedData.nomeEstab || '',

@@ -1,4 +1,4 @@
-import axios from 'axios';
+import { api } from '@/lib/axios';
 import { ErrorService } from './error.service';
 
 export class EmailService {
@@ -17,7 +17,7 @@ export class EmailService {
         };
       }
 
-      const response = await axios.get(`/api/proxy/auth/check-email/${email}`);
+      const response = await api.get(`/auth/check-email/${email}`);
 
       if (response.data.exists) {
         return {

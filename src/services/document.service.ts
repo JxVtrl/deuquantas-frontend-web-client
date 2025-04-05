@@ -1,7 +1,7 @@
 import { AuthService } from './auth.service';
 import { RegisterFormData } from '@/interfaces/register';
 import { UseFormSetError } from 'react-hook-form';
-import axios from 'axios';
+import { api } from '@/lib/axios';
 import { ErrorService } from './error.service';
 
 export class DocumentService {
@@ -153,9 +153,7 @@ export class DocumentService {
     cpf: string,
   ): Promise<{ exists: boolean; message: string }> {
     try {
-      const response = await axios.get(`/api/proxy/auth/check-cpf/${cpf}`, {
-        baseURL: '',
-      });
+      const response = await api.get(`/auth/check-cpf/${cpf}`);
       return {
         exists: response.data.exists,
         message: response.data.message,
@@ -174,7 +172,7 @@ export class DocumentService {
     showError: (message: string) => void,
   ): Promise<{ exists: boolean; message: string }> {
     try {
-      const response = await axios.get(`/api/auth/check-cnpj/${cnpj}`);
+      const response = await api.get(`/auth/check-cnpj/${cnpj}`);
       return {
         exists: response.data.exists,
         message: response.data.message,
@@ -196,9 +194,7 @@ export class DocumentService {
     phone: string,
   ): Promise<{ exists: boolean; message: string }> {
     try {
-      const response = await axios.get(`/api/proxy/auth/check-phone/${phone}`, {
-        baseURL: '',
-      });
+      const response = await api.get(`/auth/check-phone/${phone}`);
       return {
         exists: response.data.exists,
         message: response.data.message,
