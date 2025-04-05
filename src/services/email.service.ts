@@ -1,4 +1,5 @@
-import { authService } from './auth.service';
+import { AuthService } from './auth.service';
+import { ErrorService } from './error.service';
 
 export class EmailService {
   static async checkEmail(
@@ -6,7 +7,7 @@ export class EmailService {
     showError: (message: string) => void,
   ): Promise<{ isValid: boolean; exists: boolean; message?: string }> {
     try {
-      const accountInfo = await authService.checkAccountType(email);
+      const accountInfo = await AuthService.checkAccountType(email);
 
       if (accountInfo.hasClienteAccount) {
         return {
@@ -23,7 +24,11 @@ export class EmailService {
       };
     } catch (error) {
       console.error('Erro ao verificar email:', error);
-      showError('Não foi possível verificar o email. Tente novamente.');
+      const errorMessage = ErrorService.handleError(
+        error,
+        'Não foi possível verificar o email. Tente novamente.',
+      );
+      showError(errorMessage);
       return {
         isValid: false,
         exists: false,

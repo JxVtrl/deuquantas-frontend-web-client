@@ -8,7 +8,6 @@ import { Input } from '@/components/ui/input';
 import { MaskedInput } from '@/components/ui/masked-input';
 import { useToast } from '@/components/ui/use-toast';
 import { validateCPF } from '@/utils/validators';
-import { authService } from '@/services/auth.service';
 import { useRouter } from 'next/navigation';
 import { useAuthFormContext } from '@/contexts/AuthFormContext';
 import { register_steps } from '@/data/register_steps';
@@ -20,6 +19,7 @@ import { DocumentService } from '@/services/document.service';
 import { EmailService } from '@/services/email.service';
 import { PasswordService } from '@/services/password.service';
 import { AddressService } from '@/services/address.service';
+import { AuthService } from '@/services/auth.service';
 
 const RegisterForm: React.FC = () => {
   const {
@@ -130,13 +130,16 @@ const RegisterForm: React.FC = () => {
     if (email) {
       setCheckingEmail(true);
       try {
-        const result = await EmailService.checkEmail(email, (message) => {
-          toast({
-            title: 'Erro!',
-            description: message,
-            variant: 'destructive',
-          });
-        });
+        const result = await EmailService.checkEmail(
+          email.toLowerCase(),
+          (message) => {
+            toast({
+              title: 'Erro!',
+              description: message,
+              variant: 'destructive',
+            });
+          },
+        );
         setEmailMessage(result.message || '');
       } finally {
         setCheckingEmail(false);
@@ -151,7 +154,7 @@ const RegisterForm: React.FC = () => {
         setCheckingEmail(true);
         try {
           const result = await EmailService.checkEmail(
-            data.email,
+            data.email.toLowerCase(),
             (message) => {
               toast({
                 title: 'Erro!',
@@ -359,6 +362,11 @@ const RegisterForm: React.FC = () => {
                       id={field}
                       disabled={checkingEmail}
                       onBlur={handleEmailBlur}
+                      onChange={(e) => {
+                        const value = e.target.value.toLowerCase();
+                        e.target.value = value;
+                        register('email').onChange(e);
+                      }}
                       className={`flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background
                         ${errors[field as keyof RegisterFormData] ? 'border-red-500' : 'border-gray-300'}
                         ${checkingEmail ? 'bg-gray-100 cursor-not-allowed' : ''}
@@ -419,7 +427,7 @@ const RegisterForm: React.FC = () => {
                       const cpf = e.target.value.replace(/\D/g, '');
                       if (cpf.length === 11 && validateCPF(cpf)) {
                         try {
-                          const exists = await authService.checkCPFExists(cpf);
+                          const exists = await AuthService.checkCPFExists(cpf);
                           if (exists) {
                             setError('numCpf', {
                               type: 'manual',
@@ -451,7 +459,7 @@ const RegisterForm: React.FC = () => {
                       if (phone.length === 11) {
                         try {
                           const exists =
-                            await authService.checkPhoneExists(phone);
+                            await AuthService.checkPhoneExists(phone);
                           if (exists) {
                             setError('numCelular', {
                               type: 'manual',
@@ -478,6 +486,8 @@ const RegisterForm: React.FC = () => {
                     error={!!errors[field as keyof RegisterFormData]}
                     value={watch(field as keyof RegisterFormData) || ''}
                     onChange={(e) => {
+                      const value = e.target.value.replace(/\D/g, '');
+                      e.target.value = value;
                       register(field as keyof RegisterFormData).onChange(e);
                       handleCepChange(e);
                     }}
@@ -517,7 +527,7 @@ const RegisterForm: React.FC = () => {
                       if (cnpj.length === 14) {
                         try {
                           const exists =
-                            await authService.checkCNPJExists(cnpj);
+                            await AuthService.checkCNPJExists(cnpj);
                           if (exists) {
                             setError('numCnpj', {
                               type: 'manual',
@@ -549,7 +559,7 @@ const RegisterForm: React.FC = () => {
                       if (phone.length === 11) {
                         try {
                           const exists =
-                            await authService.checkPhoneExists(phone);
+                            await AuthService.checkPhoneExists(phone);
                           if (exists) {
                             setError('numCelular', {
                               type: 'manual',

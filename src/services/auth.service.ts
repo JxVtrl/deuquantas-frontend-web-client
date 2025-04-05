@@ -2,6 +2,7 @@ import { api } from '@/lib/axios';
 import Cookies from 'js-cookie';
 import { User } from '../../services/api/types';
 import axios from 'axios';
+import { ErrorService } from './error.service';
 
 export interface LoginData {
   email: string;
@@ -67,62 +68,120 @@ export interface CheckAccountResponse {
 }
 
 export class AuthService {
-  async login(data: LoginData): Promise<AuthResponse> {
+  static async login(data: LoginData) {
     try {
-      console.log('=== INÍCIO DO PROCESSO DE LOGIN ===');
-      console.log('Dados enviados para login:', {
-        email: data.email.toLowerCase(),
-        password: '[PROTEGIDO]',
-      });
-
-      const response = await api.post<AuthApiResponse>('/auth/login', {
-        email: data.email.toLowerCase(),
-        password: data.password,
-      });
-
-      console.log('Resposta do servidor:', {
-        access_token: response.data.access_token
-          ? '[TOKEN GERADO]'
-          : 'não gerado',
-        user: response.data.user,
-      });
-
-      const { access_token, user } = response.data;
-
-      // Formata o token corretamente
-      const formattedToken = access_token.startsWith('Bearer ')
-        ? access_token
-        : `Bearer ${access_token}`;
-      const tokenWithoutBearer = formattedToken.replace('Bearer ', '');
-
-      console.log('Token formatado:', {
-        original: access_token ? '[TOKEN]' : 'não gerado',
-        formatted: formattedToken ? '[TOKEN FORMATADO]' : 'não formatado',
-        withoutBearer: tokenWithoutBearer ? '[TOKEN SEM BEARER]' : 'não gerado',
-      });
-
-      // Salva o token nos cookies
-      Cookies.set('auth_token', tokenWithoutBearer, { expires: 7 }); // Expira em 7 dias
-      console.log('Token salvo nos cookies');
-
-      // Configura o token para as próximas requisições
-      api.defaults.headers.common['Authorization'] = formattedToken;
-      console.log('Token configurado no header das requisições');
-
-      console.log('=== FIM DO PROCESSO DE LOGIN ===');
-
-      return {
-        user,
-        token: tokenWithoutBearer,
-      };
+      const response = await axios.post('/api/auth/login', data);
+      return response.data;
     } catch (error) {
-      console.error('=== ERRO NO PROCESSO DE LOGIN ===', error);
-      if (axios.isAxiosError(error)) {
-        if (error.response?.status === 401) {
-          throw new Error('Email ou senha incorretos');
-        }
-      }
-      throw error;
+      console.error('Erro no login:', error);
+      const errorMessage = ErrorService.handleError(
+        error,
+        'Erro ao fazer login. Verifique suas credenciais.',
+      );
+      throw new Error(errorMessage);
+    }
+  }
+
+  static async register(data: RegisterData) {
+    try {
+      const response = await axios.post('/api/auth/register', data);
+      return response.data;
+    } catch (error) {
+      console.error('Erro no registro:', error);
+      const errorMessage = ErrorService.handleError(
+        error,
+        'Erro ao realizar o cadastro.',
+      );
+      throw new Error(errorMessage);
+    }
+  }
+
+  static async registerEstablishment(data: RegisterEstablishmentData) {
+    try {
+      const response = await axios.post(
+        '/api/auth/register-establishment',
+        data,
+      );
+      return response.data;
+    } catch (error) {
+      console.error('Erro no registro de estabelecimento:', error);
+      const errorMessage = ErrorService.handleError(
+        error,
+        'Erro ao realizar o cadastro do estabelecimento.',
+      );
+      throw new Error(errorMessage);
+    }
+  }
+
+  static async checkAccountType(email: string) {
+    try {
+      const response = await axios.get(
+        `/api/auth/check-account-type?email=${email}`,
+      );
+      return response.data;
+    } catch (error) {
+      console.error('Erro ao verificar tipo de conta:', error);
+      const errorMessage = ErrorService.handleError(
+        error,
+        'Erro ao verificar tipo de conta.',
+      );
+      throw new Error(errorMessage);
+    }
+  }
+
+  static async checkCPFExists(cpf: string) {
+    try {
+      const response = await axios.get(`/api/auth/check-cpf?cpf=${cpf}`);
+      return response.data;
+    } catch (error) {
+      console.error('Erro ao verificar CPF:', error);
+      const errorMessage = ErrorService.handleError(
+        error,
+        'Erro ao verificar CPF.',
+      );
+      throw new Error(errorMessage);
+    }
+  }
+
+  static async checkCNPJExists(cnpj: string) {
+    try {
+      const response = await axios.get(`/api/auth/check-cnpj?cnpj=${cnpj}`);
+      return response.data;
+    } catch (error) {
+      console.error('Erro ao verificar CNPJ:', error);
+      const errorMessage = ErrorService.handleError(
+        error,
+        'Erro ao verificar CNPJ.',
+      );
+      throw new Error(errorMessage);
+    }
+  }
+
+  static async checkPhoneExists(phone: string) {
+    try {
+      const response = await axios.get(`/api/auth/check-phone?phone=${phone}`);
+      return response.data;
+    } catch (error) {
+      console.error('Erro ao verificar telefone:', error);
+      const errorMessage = ErrorService.handleError(
+        error,
+        'Erro ao verificar telefone.',
+      );
+      throw new Error(errorMessage);
+    }
+  }
+
+  static async getUserData() {
+    try {
+      const response = await axios.get('/api/auth/user-data');
+      return response.data;
+    } catch (error) {
+      console.error('Erro ao buscar dados do usuário:', error);
+      const errorMessage = ErrorService.handleError(
+        error,
+        'Erro ao buscar dados do usuário.',
+      );
+      throw new Error(errorMessage);
     }
   }
 
@@ -137,103 +196,6 @@ export class AuthService {
       };
     } catch (error) {
       console.error('=== ERRO AO BUSCAR DADOS DO USUÁRIO ===', error);
-      throw error;
-    }
-  }
-
-  async register(data: RegisterData): Promise<AuthResponse> {
-    try {
-      console.log('=== INÍCIO DO PROCESSO DE REGISTRO ===');
-      console.log('Dados enviados para registro:', {
-        ...data,
-        email: data.email.toLowerCase(),
-        password: '[PROTEGIDO]',
-      });
-
-      const response = await api.post('/auth/register', {
-        ...data,
-        email: data.email.toLowerCase(),
-      });
-
-      const { access_token, user } = response.data;
-
-      // Formata o token corretamente
-      const formattedToken = access_token.startsWith('Bearer ')
-        ? access_token
-        : `Bearer ${access_token}`;
-      const tokenWithoutBearer = formattedToken.replace('Bearer ', '');
-
-      // Salva o token nos cookies
-      Cookies.set('auth_token', tokenWithoutBearer, { expires: 7 });
-
-      // Configura o token para as próximas requisições
-      api.defaults.headers.common['Authorization'] = formattedToken;
-
-      console.log('Registro concluído com sucesso');
-      console.log('=== FIM DO PROCESSO DE REGISTRO ===');
-
-      return {
-        user,
-        token: tokenWithoutBearer,
-      };
-    } catch (error) {
-      console.error('=== ERRO NO PROCESSO DE REGISTRO ===', error);
-      if (axios.isAxiosError(error)) {
-        if (error.response?.status === 409) {
-          throw new Error('Email já cadastrado');
-        }
-      }
-      throw error;
-    }
-  }
-
-  async registerEstablishment(
-    data: RegisterEstablishmentData,
-  ): Promise<AuthResponse> {
-    try {
-      console.log('=== INÍCIO DO PROCESSO DE REGISTRO DE ESTABELECIMENTO ===');
-      console.log('Dados enviados para registro:', {
-        ...data,
-        email: data.email.toLowerCase(),
-        password: '[PROTEGIDO]',
-      });
-
-      const response = await api.post('/auth/register-establishment', {
-        ...data,
-        email: data.email.toLowerCase(),
-      });
-
-      const { access_token, user } = response.data;
-
-      // Formata o token corretamente
-      const formattedToken = access_token.startsWith('Bearer ')
-        ? access_token
-        : `Bearer ${access_token}`;
-      const tokenWithoutBearer = formattedToken.replace('Bearer ', '');
-
-      // Salva o token nos cookies
-      Cookies.set('auth_token', tokenWithoutBearer, { expires: 7 });
-
-      // Configura o token para as próximas requisições
-      api.defaults.headers.common['Authorization'] = formattedToken;
-
-      console.log('Registro de estabelecimento concluído com sucesso');
-      console.log('=== FIM DO PROCESSO DE REGISTRO DE ESTABELECIMENTO ===');
-
-      return {
-        user,
-        token: tokenWithoutBearer,
-      };
-    } catch (error) {
-      console.error(
-        '=== ERRO NO PROCESSO DE REGISTRO DE ESTABELECIMENTO ===',
-        error,
-      );
-      if (axios.isAxiosError(error)) {
-        if (error.response?.status === 409) {
-          throw new Error('Email já cadastrado');
-        }
-      }
       throw error;
     }
   }
@@ -267,45 +229,6 @@ export class AuthService {
       console.error('Erro ao verificar email:', error);
       throw error;
     }
-  }
-
-  async checkCPFExists(numCpf: string): Promise<boolean> {
-    try {
-      const response = await api.get(`/auth/check-cpf/${numCpf}`);
-      return response.data.exists;
-    } catch (error) {
-      console.error('Erro ao verificar CPF:', error);
-      throw error;
-    }
-  }
-
-  async checkPhoneExists(numCelular: string): Promise<boolean> {
-    try {
-      const response = await api.get(`/auth/check-phone/${numCelular}`);
-      return response.data.exists;
-    } catch (error) {
-      console.error('Erro ao verificar número de celular:', error);
-      throw error;
-    }
-  }
-
-  async checkCNPJExists(numCnpj: string): Promise<boolean> {
-    try {
-      const response = await api.get(`/auth/check-cnpj/${numCnpj}`);
-      return response.data.exists;
-    } catch (error) {
-      if (axios.isAxiosError(error) && error.response?.status === 404) {
-        return false;
-      }
-      throw error;
-    }
-  }
-
-  async checkAccountType(email: string): Promise<CheckAccountResponse> {
-    const response = await api.get<CheckAccountResponse>(
-      `/auth/check-account?email=${email}`,
-    );
-    return response.data;
   }
 
   async getUserDataByEmail(email: string): Promise<UserResponse> {

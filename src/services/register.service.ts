@@ -1,10 +1,11 @@
-import { authService } from './auth.service';
+import { AuthService } from './auth.service';
 import { RegisterFormData } from '@/interfaces/register';
 import { validateCPF } from '@/utils/validators';
 import {
   RegisterData,
   RegisterEstablishmentData,
 } from '@/services/auth.service';
+import { ErrorService } from './error.service';
 
 export class RegisterService {
   static async handleStepValidation(
@@ -143,11 +144,11 @@ export class RegisterService {
           } as RegisterData);
 
       if (isRegisterAsEstablishment) {
-        await authService.registerEstablishment(
+        await AuthService.registerEstablishment(
           dataToSend as RegisterEstablishmentData,
         );
       } else {
-        await authService.register(dataToSend as RegisterData);
+        await AuthService.register(dataToSend as RegisterData);
       }
 
       showSuccess('Cadastro realizado com sucesso. Bem-vindo!');
@@ -156,7 +157,11 @@ export class RegisterService {
         : '/customer/home';
     } catch (error) {
       console.error('Erro no processo de registro:', error);
-      showError('Ocorreu um erro ao realizar o cadastro.');
+      const errorMessage = ErrorService.handleError(
+        error,
+        'Ocorreu um erro ao realizar o cadastro.',
+      );
+      showError(errorMessage);
       throw error;
     }
   }

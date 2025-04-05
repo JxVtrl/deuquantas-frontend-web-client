@@ -7,7 +7,12 @@ import React, {
   useCallback,
 } from 'react';
 import { useRouter } from 'next/router';
-import { RegisterData, authService, LoginData } from '@/services/auth.service';
+import {
+  RegisterData,
+  authService,
+  LoginData,
+  AuthService,
+} from '@/services/auth.service';
 import { jwtDecode } from 'jwt-decode';
 import { setDefaultHeaderToken } from '../../services/api';
 import { saveUserPreferences, viewUserPreferences } from '../../services/user';
@@ -121,7 +126,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   const login = async (data: LoginData) => {
     try {
       console.log('Dados de login recebidos:', data);
-      const response = await authService.login(data);
+      const response = await AuthService.login(data);
       console.log('Resposta do login:', response);
       await processToken(response.token);
 
@@ -141,7 +146,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
   const register = async (data: RegisterData) => {
     try {
-      await authService.register(data);
+      await AuthService.register(data);
     } catch (error) {
       console.error('Erro no registro:', error);
       throw error;

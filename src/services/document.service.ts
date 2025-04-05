@@ -1,4 +1,4 @@
-import { authService } from './auth.service';
+import { AuthService } from './auth.service';
 import { RegisterFormData } from '@/interfaces/register';
 import { UseFormSetError } from 'react-hook-form';
 
@@ -11,8 +11,8 @@ export class DocumentService {
   ): Promise<boolean> {
     try {
       const [cpfExists, phoneExists] = await Promise.all([
-        authService.checkCPFExists(numCpf.replace(/\D/g, '')),
-        authService.checkPhoneExists(numCelular.replace(/\D/g, '')),
+        AuthService.checkCPFExists(numCpf.replace(/\D/g, '')),
+        AuthService.checkPhoneExists(numCelular.replace(/\D/g, '')),
       ]);
 
       if (cpfExists) {
@@ -47,8 +47,8 @@ export class DocumentService {
   ): Promise<boolean> {
     try {
       const [cnpjExists, phoneExists] = await Promise.all([
-        authService.checkCNPJExists(numCnpj.replace(/\D/g, '')),
-        authService.checkPhoneExists(numCelular.replace(/\D/g, '')),
+        AuthService.checkCNPJExists(numCnpj.replace(/\D/g, '')),
+        AuthService.checkPhoneExists(numCelular.replace(/\D/g, '')),
       ]);
 
       if (cnpjExists) {
