@@ -1,5 +1,10 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { useAuth } from './AuthContext';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  //useEffect
+} from 'react';
+// import { useAuth } from './AuthContext';
 import { UserPreferences } from '@/services/api/types';
 import { api } from '@/lib/axios';
 
@@ -18,29 +23,29 @@ const UserPreferencesContext = createContext<UserPreferencesContextType>(
 export const UserPreferencesProvider: React.FC<{
   children: React.ReactNode;
 }> = ({ children }) => {
-  const { user } = useAuth();
+  // const { user } = useAuth();
   const [preferences, setPreferences] = useState<UserPreferences>({
     isLeftHanded: false,
     language: 'pt',
   });
 
-  useEffect(() => {
-    if (user?.usuario?.id) {
-      loadPreferences();
-    }
-  }, [user?.usuario?.id]);
+  // useEffect(() => {
+  //   if (user?.usuario?.id) {
+  //     loadPreferences();
+  //   }
+  // }, [user?.usuario?.id]);
 
-  const loadPreferences = async () => {
-    try {
-      const response = await api.get('/api/proxy/preferencias');
-      setPreferences({
-        isLeftHanded: response.data.isLeftHanded,
-        language: response.data.language,
-      });
-    } catch (error) {
-      console.error('Erro ao carregar preferências:', error);
-    }
-  };
+  // const loadPreferences = async () => {
+  //   try {
+  //     const response = await api.get('/api/proxy/preferencias');
+  //     setPreferences({
+  //       isLeftHanded: response.data.isLeftHanded,
+  //       language: response.data.language,
+  //     });
+  //   } catch (error) {
+  //     console.error('Erro ao carregar preferências:', error);
+  //   }
+  // };
 
   const updatePreferences = async (
     newPreferences: Partial<UserPreferences>,
