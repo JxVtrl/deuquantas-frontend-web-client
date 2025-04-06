@@ -38,7 +38,7 @@ const NavigationItem: React.FC<NavigationItem & { isActive: boolean }> = ({
 
 export const BottomNavigation: React.FC<{
   isEstablishment?: boolean;
-}> = () => {
+}> = ({ isEstablishment }) => {
   const { bottomNavItems, handleAddClick } = useNavigation();
   const { preferences } = useUserPreferences();
   const router = useRouter();
@@ -60,16 +60,18 @@ export const BottomNavigation: React.FC<{
             />
           ))}
         </div>
-        <button
-          onClick={handleAddClick}
-          className={`w-14 h-14 bg-[#FFCC00] rounded-full border-4 border-white outline outline-2 outline-black flex items-center justify-center -mt-[64px] ${
-            preferences.isLeftHanded ? 'mr-4' : 'ml-4'
-          }`}
-        >
-          <div className='text-black w-6 h-6'>
-            <PlusIcon />
-          </div>
-        </button>
+        {!isEstablishment && (
+          <button
+            onClick={handleAddClick}
+            className={`w-14 h-14 bg-[#FFCC00] rounded-full border-4 border-white outline outline-2 outline-black flex items-center justify-center -mt-[64px] ${
+              preferences.isLeftHanded ? 'mr-4' : 'ml-4'
+            }`}
+          >
+            <div className='text-black w-6 h-6'>
+              <PlusIcon />
+            </div>
+          </button>
+        )}
       </div>
     </MaxWidthLayout>
   );

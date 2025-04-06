@@ -219,7 +219,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     return () => {
       mounted = false;
     };
-  }, [processToken, redirectTo]);
+  }, [processToken]);
 
   const is_admin = user?.usuario?.is_admin ?? false;
   const isAuthenticated = !!user;
