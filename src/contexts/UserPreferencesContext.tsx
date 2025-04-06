@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from './AuthContext';
 import { UserPreferences } from '@/services/api/types';
-import api from 'services/api';
+import { api } from '@/lib/axios';
 
 export type AvailableLanguages = 'pt' | 'en';
 

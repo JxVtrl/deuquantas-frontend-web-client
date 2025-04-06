@@ -9,7 +9,6 @@ import React, {
 import { useRouter } from 'next/router';
 import { RegisterData, LoginData, AuthService } from '@/services/auth.service';
 import { jwtDecode } from 'jwt-decode';
-import { setDefaultHeaderToken } from '../../services/api';
 import Cookies from 'js-cookie';
 import { api } from '@/lib/axios';
 import { User, UserJwt } from '@/services/api/types';
@@ -56,7 +55,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       });
 
       // Define o token no cabeçalho padrão
-      setDefaultHeaderToken(`Bearer ${cleanToken}`);
+      AuthService.setDefaultHeaderToken(`Bearer ${cleanToken}`);
 
       let response;
 
@@ -81,9 +80,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
           throw new Error('Erro ao buscar dados do estabelecimento');
         }
       }
-
-      console.log('response', JSON.stringify(response, null, 2));
-      console.log('decodedToken', JSON.stringify(decodedToken, null, 2));
 
       // juntar os dados do decodedToken com os dados da response
       const usr = {
@@ -120,7 +116,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     } catch {
       Cookies.remove('token');
       setUser(null);
-      setDefaultHeaderToken('');
+      AuthService.setDefaultHeaderToken('');
       return false;
     }
   }, []);
@@ -199,14 +195,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   const logout = () => {
     Cookies.remove('token');
     setUser(null);
-    setDefaultHeaderToken('');
+    AuthService.setDefaultHeaderToken('');
     router.replace('/login');
   };
 
   const clearSession = () => {
     Cookies.remove('token');
     setUser(null);
-    setDefaultHeaderToken('');
+    AuthService.setDefaultHeaderToken('');
   };
 
   const processLogin = async (token: string) => {

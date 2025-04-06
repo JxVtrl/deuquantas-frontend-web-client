@@ -33,7 +33,7 @@ export const cepService = {
         estado: response.data.uf,
         cep: response.data.cep,
       };
-    } catch (error) {
+    } catch {
       throw new Error('Erro ao buscar endereço');
     }
   },

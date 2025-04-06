@@ -99,6 +99,10 @@ export class AuthService {
     }
   }
 
+  static setDefaultHeaderToken(token: string) {
+    api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+  }
+
   static async registerEstablishment(data: RegisterEstablishmentData) {
     try {
       const response = await api.post('/auth/register-establishment', data);
@@ -160,7 +164,6 @@ export class AuthService {
       const response = await api.get(`/auth/check-phone?phone=${phone}`);
       return response.data;
     } catch (error) {
-      console.error('Erro ao verificar telefone:', error);
       const errorMessage = ErrorService.handleError(
         error,
         'Erro ao verificar telefone.',
@@ -174,7 +177,6 @@ export class AuthService {
       const response = await axios.get('/api/auth/user-data');
       return response.data;
     } catch (error) {
-      console.error('Erro ao buscar dados do usuário:', error);
       const errorMessage = ErrorService.handleError(
         error,
         'Erro ao buscar dados do usuário.',
@@ -210,38 +212,12 @@ export class AuthService {
     console.log('=== FIM DO PROCESSO DE LOGOUT ===');
   }
 
-  isAuthenticated(): boolean {
-    const token = Cookies.get('token');
-    console.log('Verificando autenticação:', {
-      tokenPresent: !!token,
-      token: token ? '[TOKEN PRESENTE]' : 'não encontrado',
-    });
-    return !!token;
-  }
-
   async checkEmailExists(email: string): Promise<boolean> {
     try {
       const response = await api.get(`/auth/check-email/${email}`);
       return response.data.exists;
     } catch (error) {
-      console.error('Erro ao verificar email:', error);
-      throw error;
-    }
-  }
-
-  async getUserDataByEmail(email: string): Promise<UserResponse> {
-    try {
-      console.log('=== BUSCANDO DADOS DO USUÁRIO POR EMAIL ===');
-      const response = await api.get<UserResponse>(
-        `/auth/user-by-email/${email}`,
-      );
-      console.log('Dados do usuário obtidos:', response.data);
-      return response.data;
-    } catch (error) {
-      console.error('=== ERRO AO BUSCAR DADOS DO USUÁRIO POR EMAIL ===', error);
       throw error;
     }
   }
 }
-
-export const authService = new AuthService();
