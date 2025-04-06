@@ -6,20 +6,25 @@ export enum PermissionLevel {
 }
 
 export interface Cliente {
-  numCpf: string;
-  dataNascimento: Date;
-  numCelular: string;
+  num_cpf: string;
+  data_nascimento: Date;
+  num_celular: string;
 }
 
 export interface Estabelecimento {
-  numCnpj: string;
-  nomeEstab: string;
-  razaoSocial: string;
-  numCelular: string;
+  num_cnpj: string;
+  nome_estab: string;
+  razao_social: string;
+  num_celular: string;
   imgLogo?: string;
   latitude?: number;
   longitude?: number;
   status: 'ativo' | 'em_breve';
+}
+
+export interface UserPreferences {
+  isLeftHanded: boolean;
+  language: 'pt' | 'en';
 }
 
 export interface User {
@@ -36,14 +41,15 @@ export interface User {
     id: string;
     name: string;
     email: string;
-    isAdmin: boolean;
-    isAtivo: boolean;
-    dataCriacao: Date;
-    dataAtualizacao: Date;
+    is_admin: boolean;
+    is_ativo: boolean;
+    data_criacao: Date;
+    data_atualizacao: Date;
     permission_level: PermissionLevel;
   };
   cliente?: Cliente;
   estabelecimento?: Estabelecimento;
+  preferences?: UserPreferences;
 }
 
 export type UserJwt = User & {

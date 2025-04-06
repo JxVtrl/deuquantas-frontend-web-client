@@ -7,14 +7,14 @@ export interface RegisterFormData {
   accountType: 'cliente' | 'estabelecimento';
 
   // Dados pessoais (cliente)
-  numCpf: string;
-  numCelular: string;
-  dataNascimento: string;
+  num_cpf: string;
+  num_celular: string;
+  data_nascimento: string;
 
   // Dados do estabelecimento
-  nomeEstab: string;
-  razaoSocial: string;
-  numCnpj: string;
+  nome_estab: string;
+  razao_social: string;
+  num_cnpj: string;
 
   // Dados de endereço
   endereco: string;

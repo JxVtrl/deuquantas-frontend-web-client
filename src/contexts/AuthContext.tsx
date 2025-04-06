@@ -10,13 +10,9 @@ import { useRouter } from 'next/router';
 import { RegisterData, LoginData, AuthService } from '@/services/auth.service';
 import { jwtDecode } from 'jwt-decode';
 import { setDefaultHeaderToken } from '../../services/api';
-import { saveUserPreferences, viewUserPreferences } from '../../services/user';
 import Cookies from 'js-cookie';
-import { User, UserJwt } from '../../services/api/types';
 import { api } from '@/lib/axios';
-
-export type AvailableLanguages = 'pt' | 'en';
-export type AvailableThemes = 'dark' | 'light' | 'system';
+import { User, UserJwt } from '@/services/api/types';
 
 interface AuthContextData {
   user: User | null;
@@ -25,16 +21,11 @@ interface AuthContextData {
   register: (data: RegisterData) => Promise<void>;
   logout: () => void;
   isAuthenticated: boolean;
-  isAdmin: boolean;
+  is_admin: boolean;
   isCliente: boolean;
   isEstabelecimento: boolean;
   processLogin: (token: string) => void;
-  storeUserPreferences: (
-    theme: AvailableThemes,
-    language: AvailableLanguages,
-  ) => void;
   clearSession: () => void;
-  getUserPreferences: () => void;
 }
 
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
@@ -108,17 +99,17 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         usuario: {
           name: response.usuario.name,
           email: response.usuario.email,
-          isAdmin: response.usuario.isAdmin,
-          isAtivo: response.usuario.isAtivo,
-          dataCriacao: response.usuario.dataCriacao,
-          dataAtualizacao: response.usuario.dataAtualizacao,
+          is_admin: response.usuario.is_admin,
+          is_ativo: response.usuario.is_ativo,
+          data_criacao: response.usuario.data_criacao,
+          data_atualizacao: response.usuario.data_atualizacao,
           id: response.usuario.id,
           permission_level: decodedToken.permission_level,
         },
         cliente: {
-          numCpf: response.numCpf,
-          numCelular: response.numCelular,
-          dataNascimento: response.dataNascimento,
+          num_cpf: response.num_cpf,
+          num_celular: response.num_celular,
+          data_nascimento: response.data_nascimento,
         },
       };
 
@@ -169,7 +160,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     };
   }, [router.pathname, processToken]);
 
-  const isAdmin = user?.usuario?.isAdmin ?? false;
+  const is_admin = user?.usuario?.is_admin ?? false;
   const isAuthenticated = !!user;
 
   const login = async (data: LoginData) => {
@@ -212,21 +203,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     router.replace('/login');
   };
 
-  const storeUserPreferences = async (
-    theme: AvailableThemes,
-    language: AvailableLanguages,
-  ) => {
-    await saveUserPreferences(theme, language);
-  };
-
-  const getUserPreferences = async () => {
-    try {
-      await viewUserPreferences();
-    } catch {
-      throw new Error('Erro ao carregar preferências');
-    }
-  };
-
   const clearSession = () => {
     Cookies.remove('token');
     setUser(null);
@@ -246,13 +222,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         register,
         logout,
         isAuthenticated,
-        isAdmin,
+        is_admin,
         isCliente: !!user?.cliente,
         isEstabelecimento: !!user?.estabelecimento,
         processLogin,
-        storeUserPreferences,
         clearSession,
-        getUserPreferences,
       }}
     >
       {children}

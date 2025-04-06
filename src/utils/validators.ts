@@ -1,8 +1,8 @@
 import { RegisterFormData } from '@/interfaces/register';
 
-export function validateCPF(numCpf: string): boolean {
+export function validateCPF(num_cpf: string): boolean {
   // Remove caracteres não numéricos
-  const numbers = numCpf.replace(/\D/g, '');
+  const numbers = num_cpf.replace(/\D/g, '');
 
   // Verifica se tem 11 dígitos
   if (numbers.length !== 11) return false;
@@ -31,37 +31,37 @@ export function validateCPF(numCpf: string): boolean {
   return true;
 }
 
-export function validateCNPJ(numCnpj: string): boolean {
+export function validateCNPJ(num_cnpj: string): boolean {
   // Remove caracteres não numéricos
-  numCnpj = numCnpj.replace(/\D/g, '');
+  num_cnpj = num_cnpj.replace(/\D/g, '');
 
   // Verifica se tem 14 dígitos
-  if (numCnpj.length !== 14) return false;
+  if (num_cnpj.length !== 14) return false;
 
   // Elimina CNPJs inválidos conhecidos
-  if (/^(\d)\1+$/.test(numCnpj)) return false;
+  if (/^(\d)\1+$/.test(num_cnpj)) return false;
 
   // Validação do primeiro dígito verificador
   let soma = 0;
   let peso = 5;
   for (let i = 0; i < 12; i++) {
-    soma += parseInt(numCnpj.charAt(i)) * peso;
+    soma += parseInt(num_cnpj.charAt(i)) * peso;
     peso = peso === 2 ? 9 : peso - 1;
   }
   let digito = 11 - (soma % 11);
   if (digito > 9) digito = 0;
-  if (parseInt(numCnpj.charAt(12)) !== digito) return false;
+  if (parseInt(num_cnpj.charAt(12)) !== digito) return false;
 
   // Validação do segundo dígito verificador
   soma = 0;
   peso = 6;
   for (let i = 0; i < 13; i++) {
-    soma += parseInt(numCnpj.charAt(i)) * peso;
+    soma += parseInt(num_cnpj.charAt(i)) * peso;
     peso = peso === 2 ? 9 : peso - 1;
   }
   digito = 11 - (soma % 11);
   if (digito > 9) digito = 0;
-  if (parseInt(numCnpj.charAt(13)) !== digito) return false;
+  if (parseInt(num_cnpj.charAt(13)) !== digito) return false;
 
   return true;
 }
@@ -93,26 +93,26 @@ export const validatePassword = (
 };
 
 export const validateEstablishmentData = (data: RegisterFormData): boolean => {
-  const { numCnpj, numCelular, nomeEstab, razaoSocial } = data;
-  return !!(numCnpj && numCelular && nomeEstab && razaoSocial);
+  const { num_cnpj, num_celular, nome_estab, razao_social } = data;
+  return !!(num_cnpj && num_celular && nome_estab && razao_social);
 };
 
 export const validateClientData = (
   data: {
     name: string;
-    numCpf: string;
-    numCelular: string;
-    dataNascimento: string;
+    num_cpf: string;
+    num_celular: string;
+    data_nascimento: string;
   },
   validateCPF: (cpf: string) => boolean,
 ): boolean => {
-  const { name, numCpf, numCelular, dataNascimento } = data;
+  const { name, num_cpf, num_celular, data_nascimento } = data;
   return !!(
     name &&
-    numCpf?.replace(/\D/g, '').length === 11 &&
-    validateCPF(numCpf?.replace(/\D/g, '')) &&
-    numCelular?.replace(/\D/g, '').length === 11 &&
-    dataNascimento
+    num_cpf?.replace(/\D/g, '').length === 11 &&
+    validateCPF(num_cpf?.replace(/\D/g, '')) &&
+    num_celular?.replace(/\D/g, '').length === 11 &&
+    data_nascimento
   );
 };
 

@@ -1,11 +1,20 @@
-import axios from "axios";
+import axios from 'axios';
 
-import { Errors } from "../../src/utils/constants";
+import { Errors } from '../../src/utils/constants';
 
 const api = axios.create({ baseURL: process.env.NEXT_PUBLIC_BASE_URL });
 
+// Adiciona o token do localStorage aos headers
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('@DeuQuantas:token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
 export const setDefaultHeaderToken = (token: string) => {
-  api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+  api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 };
 
 export const setErrorInterceptor = (callback: (message: string) => void) => {
@@ -19,7 +28,7 @@ export const setErrorInterceptor = (callback: (message: string) => void) => {
         callback(message);
       }
       return Promise.reject(error);
-    }
+    },
   );
 };
 

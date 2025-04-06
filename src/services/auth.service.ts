@@ -1,8 +1,8 @@
 import { api } from '@/lib/axios';
 import Cookies from 'js-cookie';
-import { User } from '../../services/api/types';
 import axios from 'axios';
 import { ErrorService } from './error.service';
+import { User } from './api/types';
 
 export interface LoginData {
   email: string;
@@ -13,8 +13,8 @@ export interface RegisterData {
   name: string;
   email: string;
   password: string;
-  numCelular: string;
-  numCpf: string;
+  num_celular: string;
+  num_cpf: string;
   cep: string;
   endereco: string;
   numero: string;
@@ -28,10 +28,10 @@ export interface RegisterEstablishmentData {
   name: string;
   email: string;
   password: string;
-  numCnpj: string;
-  numCelular: string;
-  nomeEstab: string;
-  razaoSocial: string;
+  num_cnpj: string;
+  num_celular: string;
+  nome_estab: string;
+  razao_social: string;
   endereco: string;
   numero: string;
   complemento?: string;
@@ -56,10 +56,10 @@ export interface UserResponse {
   id: string;
   email: string;
   name: string;
-  isAdmin: boolean;
-  isAtivo: boolean;
-  dataCriacao: string;
-  dataAtualizacao: string;
+  is_admin: boolean;
+  is_ativo: boolean;
+  data_criacao: string;
+  data_atualizacao: string;
 }
 
 export interface CheckAccountResponse {

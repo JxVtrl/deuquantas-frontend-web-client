@@ -3,11 +3,10 @@ import { useAuth } from '@/contexts/AuthContext';
 import { withAuthCustomer } from '@/hoc/withAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { Button } from '@/components/ui/button';
 import { CustomerLayout } from '@/layout';
 
 const ProfilePage: React.FC = () => {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
 
   return (
     <CustomerLayout>
@@ -36,7 +35,7 @@ const ProfilePage: React.FC = () => {
             <div>
               <h3 className='font-medium'>Telefone</h3>
               <p className='text-sm text-gray-500'>
-                {user?.cliente?.numCelular}
+                {user?.cliente?.num_celular}
               </p>
             </div>
           </CardContent>
@@ -80,12 +79,6 @@ const ProfilePage: React.FC = () => {
             </div>
           </CardContent>
         </Card>
-
-        <div className='flex justify-end'>
-          <Button type='button' variant='outline' onClick={logout}>
-            Sair
-          </Button>
-        </div>
       </div>
     </CustomerLayout>
   );

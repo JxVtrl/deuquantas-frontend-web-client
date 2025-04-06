@@ -75,8 +75,8 @@ const CustomerQrCode: React.FC = () => {
       }
 
       // Obter CPF do usuário
-      const clienteCpf = user?.cliente?.numCpf
-        ? String(user.cliente.numCpf)
+      const clienteCpf = user?.cliente?.num_cpf
+        ? String(user.cliente.num_cpf)
         : '';
 
       // Se não tiver ID de usuário, não permitir continuar
@@ -91,8 +91,8 @@ const CustomerQrCode: React.FC = () => {
       // Dados para criar a comanda
       const dataAtual = new Date().toISOString();
       const comandaData: CreateComandaDto = {
-        numCpf: clienteCpf,
-        numCnpj: estabelecimentoId, // CNPJ do estabelecimento extraído do QR code
+        num_cpf: clienteCpf,
+        num_cnpj: estabelecimentoId, // CNPJ do estabelecimento extraído do QR code
         numMesa: mesaId,
         datApropriacao: dataAtual,
         horPedido: dataAtual,

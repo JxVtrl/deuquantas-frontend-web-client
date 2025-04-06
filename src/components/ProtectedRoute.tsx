@@ -11,7 +11,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   children,
   adminOnly = false,
 }) => {
-  const { isAuthenticated, isAdmin, loading } = useAuth();
+  const { isAuthenticated, is_admin, loading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
@@ -22,12 +22,12 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
           pathname: '/login',
           query: { state: router.asPath }, // Salva a página atual para redirecionar após o login
         });
-      } else if (adminOnly && !isAdmin) {
+      } else if (adminOnly && !is_admin) {
         // Redireciona para a página inicial se não for admin e a rota for apenas para admins
         router.push('/');
       }
     }
-  }, [isAuthenticated, isAdmin, loading, router, adminOnly]);
+  }, [isAuthenticated, is_admin, loading, router, adminOnly]);
 
   // Mostra nada enquanto verifica a autenticação
   if (loading) {
@@ -39,7 +39,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   }
 
   // Se não estiver autenticado ou se for uma rota de admin e o usuário não for admin, não mostra nada
-  if (!isAuthenticated || (adminOnly && !isAdmin)) {
+  if (!isAuthenticated || (adminOnly && !is_admin)) {
     return null;
   }
 

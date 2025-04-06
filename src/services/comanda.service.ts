@@ -2,8 +2,8 @@ import axios from 'axios';
 
 // Definição da interface para criação de comanda
 export interface CreateComandaDto {
-  numCpf: string;
-  numCnpj: string;
+  num_cpf: string;
+  num_cnpj: string;
   numMesa: string;
   datApropriacao: string;
   horPedido: string;
@@ -14,8 +14,8 @@ export interface CreateComandaDto {
 
 // Definição da interface para a resposta da comanda
 export interface ComandaResponse {
-  numCpf: string;
-  numCnpj: string;
+  num_cpf: string;
+  num_cnpj: string;
   numMesa: string;
   datApropriacao: string;
   horPedido: string;
@@ -231,10 +231,10 @@ export const ComandaService = {
 
       // Filtra comandas pelo ID do cliente
       return offlineComandas
-        .filter((comanda) => comanda.numCpf === clienteId)
+        .filter((comanda) => comanda.num_cpf === clienteId)
         .map((comanda) => ({
-          numCpf: comanda.numCpf,
-          numCnpj: comanda.numCnpj,
+          num_cpf: comanda.num_cpf,
+          num_cnpj: comanda.num_cnpj,
           numMesa: comanda.numMesa,
           datApropriacao: comanda.datApropriacao,
           horPedido: comanda.horPedido,
@@ -260,8 +260,8 @@ export const ComandaService = {
       ) as OfflineComanda[];
 
       return offlineComandas.map((comanda) => ({
-        numCpf: comanda.numCpf,
-        numCnpj: comanda.numCnpj,
+        num_cpf: comanda.num_cpf,
+        num_cnpj: comanda.num_cnpj,
         numMesa: comanda.numMesa,
         datApropriacao: comanda.datApropriacao,
         horPedido: comanda.horPedido,

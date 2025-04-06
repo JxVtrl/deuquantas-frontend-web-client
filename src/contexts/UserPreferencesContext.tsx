@@ -1,18 +1,9 @@
-import React, {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-  ReactNode,
-} from 'react';
-import Cookies from 'js-cookie';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useAuth } from './AuthContext';
+import { UserPreferences } from '@/services/api/types';
+import api from 'services/api';
 
 export type AvailableLanguages = 'pt' | 'en';
-
-interface UserPreferences {
-  isLeftHanded: boolean;
-  language: AvailableLanguages;
-}
 
 interface UserPreferencesContextType {
   preferences: UserPreferences;
@@ -24,41 +15,55 @@ const UserPreferencesContext = createContext<UserPreferencesContextType>(
   {} as UserPreferencesContextType,
 );
 
-export const UserPreferencesProvider: React.FC<{ children: ReactNode }> = ({
-  children,
-}) => {
+export const UserPreferencesProvider: React.FC<{
+  children: React.ReactNode;
+}> = ({ children }) => {
+  const { user } = useAuth();
   const [preferences, setPreferences] = useState<UserPreferences>({
     isLeftHanded: false,
     language: 'pt',
   });
 
   useEffect(() => {
-    // Carregar preferências do cookie
-    const savedPreferences = Cookies.get('userPreferences');
-    if (savedPreferences) {
-      setPreferences(JSON.parse(savedPreferences));
+    if (user?.usuario?.id) {
+      loadPreferences();
     }
-  }, []);
+  }, [user?.usuario?.id]);
 
-  useEffect(() => {
-    // Salvar preferências no cookie
-    Cookies.set('userPreferences', JSON.stringify(preferences), {
-      expires: 365, // 1 ano
-    });
-  }, [preferences]);
+  const loadPreferences = async () => {
+    try {
+      const response = await api.get('/api/proxy/preferencias');
+      setPreferences({
+        isLeftHanded: response.data.isLeftHanded,
+        language: response.data.language,
+      });
+    } catch (error) {
+      console.error('Erro ao carregar preferências:', error);
+    }
+  };
+
+  const updatePreferences = async (
+    newPreferences: Partial<UserPreferences>,
+  ) => {
+    try {
+      await api.put('/api/proxy/preferencias', newPreferences);
+      setPreferences((prev: UserPreferences) => ({
+        ...prev,
+        ...newPreferences,
+      }));
+    } catch (error) {
+      console.error('Erro ao atualizar preferências:', error);
+    }
+  };
 
   const toggleLeftHanded = () => {
-    setPreferences((prev) => ({
-      ...prev,
-      isLeftHanded: !prev.isLeftHanded,
-    }));
+    updatePreferences({ isLeftHanded: !preferences.isLeftHanded });
   };
 
   const toggleLanguage = () => {
-    setPreferences((prev) => ({
-      ...prev,
-      language: prev.language === 'pt' ? 'en' : 'pt',
-    }));
+    updatePreferences({
+      language: preferences.language === 'pt' ? 'en' : 'pt',
+    });
   };
 
   return (

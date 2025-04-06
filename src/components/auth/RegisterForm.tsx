@@ -71,13 +71,13 @@ const RegisterForm: React.FC = () => {
     setValue('password', '');
     setValue('confirmSenha', '');
     setValue('name', '');
-    setValue('numCpf', '');
-    setValue('numCelular', '');
-    setValue('dataNascimento', '');
-    setValue('nomeEstab', '');
-    setValue('razaoSocial', '');
-    setValue('numCnpj', '');
-    setValue('numCelular', '');
+    setValue('num_cpf', '');
+    setValue('num_celular', '');
+    setValue('data_nascimento', '');
+    setValue('nome_estab', '');
+    setValue('razao_social', '');
+    setValue('num_cnpj', '');
+    setValue('num_celular', '');
     setValue('endereco', '');
     setValue('numero', '');
     setValue('complemento', '');
@@ -157,7 +157,7 @@ const RegisterForm: React.FC = () => {
     const cpf = e.target.value.replace(/\D/g, '');
     if (cpf.length === 11) {
       if (!DocumentService.validateCPF(cpf)) {
-        setError('numCpf', {
+        setError('num_cpf', {
           type: 'manual',
           message: 'CPF inválido',
         });
@@ -166,7 +166,7 @@ const RegisterForm: React.FC = () => {
       try {
         const cpfExists = await DocumentService.checkCPFExists(cpf);
         if (cpfExists.exists) {
-          setError('numCpf', {
+          setError('num_cpf', {
             type: 'manual',
             message: cpfExists.message,
           });
@@ -181,7 +181,7 @@ const RegisterForm: React.FC = () => {
     const cnpj = e.target.value.replace(/\D/g, '');
     if (cnpj.length === 14) {
       if (!DocumentService.validateCNPJ(cnpj)) {
-        setError('numCnpj', {
+        setError('num_cnpj', {
           type: 'manual',
           message: 'CNPJ inválido',
         });
@@ -199,7 +199,7 @@ const RegisterForm: React.FC = () => {
           },
         );
         if (result.exists) {
-          setError('numCnpj', {
+          setError('num_cnpj', {
             type: 'manual',
             message: result.message,
           });
@@ -214,7 +214,7 @@ const RegisterForm: React.FC = () => {
     const phone = e.target.value.replace(/\D/g, '');
     if (phone.length === 11) {
       if (!DocumentService.validatePhone(phone)) {
-        setError('numCelular', {
+        setError('num_celular', {
           type: 'manual',
           message: 'Número de celular inválido',
         });
@@ -223,7 +223,7 @@ const RegisterForm: React.FC = () => {
       try {
         const result = await DocumentService.checkPhoneExists(phone);
         if (result.exists) {
-          setError('numCelular', {
+          setError('num_celular', {
             type: 'manual',
             message: result.message,
           });
@@ -465,9 +465,9 @@ const RegisterForm: React.FC = () => {
                       ${errors[field as keyof RegisterFormData] ? 'border-red-500' : 'border-gray-300'}
                     `}
                   />
-                ) : field === 'numCpf' ? (
+                ) : field === 'num_cpf' ? (
                   <MaskedInput
-                    maskType='numCpf'
+                    maskType='num_cpf'
                     {...register(field as keyof RegisterFormData, {
                       required: 'Este campo é obrigatório',
                       validate: (value) => {
@@ -480,9 +480,9 @@ const RegisterForm: React.FC = () => {
                     value={watch(field as keyof RegisterFormData) || ''}
                     onBlur={handleCPFBlur}
                   />
-                ) : field === 'numCelular' ? (
+                ) : field === 'num_celular' ? (
                   <MaskedInput
-                    maskType='numCelular'
+                    maskType='num_celular'
                     {...register(field as keyof RegisterFormData, {
                       required: 'Este campo é obrigatório',
                       validate: (value) => {
@@ -532,9 +532,9 @@ const RegisterForm: React.FC = () => {
                       bg-gray-100 cursor-not-allowed
                     `}
                   />
-                ) : field === 'numCnpj' ? (
+                ) : field === 'num_cnpj' ? (
                   <MaskedInput
-                    maskType='numCnpj'
+                    maskType='num_cnpj'
                     {...register(field as keyof RegisterFormData, {
                       required: 'Este campo é obrigatório',
                       validate: (value) => {

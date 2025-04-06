@@ -78,19 +78,19 @@ export class DocumentService {
   }
 
   static async checkClientDocuments(
-    numCpf: string,
-    numCelular: string,
+    num_cpf: string,
+    num_celular: string,
     setError: UseFormSetError<RegisterFormData>,
     showError: (message: string) => void,
   ): Promise<boolean> {
     try {
       const [cpfExists, phoneExists] = await Promise.all([
-        AuthService.checkCPFExists(numCpf.replace(/\D/g, '')),
-        AuthService.checkPhoneExists(numCelular.replace(/\D/g, '')),
+        AuthService.checkCPFExists(num_cpf.replace(/\D/g, '')),
+        AuthService.checkPhoneExists(num_celular.replace(/\D/g, '')),
       ]);
 
       if (cpfExists) {
-        setError('numCpf', {
+        setError('num_cpf', {
           type: 'manual',
           message: 'Este CPF já está cadastrado',
         });
@@ -98,7 +98,7 @@ export class DocumentService {
       }
 
       if (phoneExists) {
-        setError('numCelular', {
+        setError('num_celular', {
           type: 'manual',
           message: 'Este número de celular já está cadastrado',
         });
@@ -114,19 +114,19 @@ export class DocumentService {
   }
 
   static async checkEstablishmentDocuments(
-    numCnpj: string,
-    numCelular: string,
+    num_cnpj: string,
+    num_celular: string,
     setError: UseFormSetError<RegisterFormData>,
     showError: (message: string) => void,
   ): Promise<boolean> {
     try {
       const [cnpjExists, phoneExists] = await Promise.all([
-        AuthService.checkCNPJExists(numCnpj.replace(/\D/g, '')),
-        AuthService.checkPhoneExists(numCelular.replace(/\D/g, '')),
+        AuthService.checkCNPJExists(num_cnpj.replace(/\D/g, '')),
+        AuthService.checkPhoneExists(num_celular.replace(/\D/g, '')),
       ]);
 
       if (cnpjExists) {
-        setError('numCnpj', {
+        setError('num_cnpj', {
           type: 'manual',
           message: 'Este CNPJ já está cadastrado',
         });
@@ -134,7 +134,7 @@ export class DocumentService {
       }
 
       if (phoneExists) {
-        setError('numCelular', {
+        setError('num_celular', {
           type: 'manual',
           message: 'Este número de celular já está cadastrado',
         });

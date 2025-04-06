@@ -59,23 +59,23 @@ export class RegisterService {
   }
 
   private static validateEstablishmentStep(data: RegisterFormData): boolean {
-    const { numCnpj, numCelular, nomeEstab, razaoSocial } = data;
+    const { num_cnpj, num_celular, nome_estab, razao_social } = data;
     return !!(
-      numCnpj?.replace(/\D/g, '').length === 14 &&
-      numCelular?.replace(/\D/g, '').length === 11 &&
-      nomeEstab &&
-      razaoSocial
+      num_cnpj?.replace(/\D/g, '').length === 14 &&
+      num_celular?.replace(/\D/g, '').length === 11 &&
+      nome_estab &&
+      razao_social
     );
   }
 
   private static validateClientStep(data: RegisterFormData): boolean {
-    const { name, numCpf, numCelular, dataNascimento } = data;
+    const { name, num_cpf, num_celular, data_nascimento } = data;
     return !!(
       name &&
-      numCpf?.replace(/\D/g, '').length === 11 &&
-      validateCPF(numCpf?.replace(/\D/g, '')) &&
-      numCelular?.replace(/\D/g, '').length === 11 &&
-      dataNascimento
+      num_cpf?.replace(/\D/g, '').length === 11 &&
+      validateCPF(num_cpf?.replace(/\D/g, '')) &&
+      num_celular?.replace(/\D/g, '').length === 11 &&
+      data_nascimento
     );
   }
 
@@ -102,9 +102,9 @@ export class RegisterService {
       const cleanedData = {
         ...data,
         email: data.email.toLowerCase(),
-        numCpf: data.numCpf?.replace(/\D/g, ''),
-        numCelular: data.numCelular?.replace(/\D/g, ''),
-        numCnpj: data.numCnpj?.replace(/\D/g, ''),
+        num_cpf: data.num_cpf?.replace(/\D/g, ''),
+        num_celular: data.num_celular?.replace(/\D/g, ''),
+        num_cnpj: data.num_cnpj?.replace(/\D/g, ''),
         cep: data.cep.replace(/\D/g, ''),
       };
 
@@ -113,11 +113,11 @@ export class RegisterService {
         ? ({
             email: cleanedData.email,
             password: cleanedData.password,
-            name: cleanedData.nomeEstab,
-            numCnpj: cleanedData.numCnpj || '',
-            numCelular: cleanedData.numCelular || '',
-            nomeEstab: cleanedData.nomeEstab || '',
-            razaoSocial: cleanedData.razaoSocial || '',
+            name: cleanedData.nome_estab,
+            num_cnpj: cleanedData.num_cnpj || '',
+            num_celular: cleanedData.num_celular || '',
+            nome_estab: cleanedData.nome_estab || '',
+            razao_social: cleanedData.razao_social || '',
             endereco: cleanedData.endereco,
             numero: cleanedData.numero,
             complemento: cleanedData.complemento,
@@ -130,9 +130,9 @@ export class RegisterService {
             email: cleanedData.email,
             password: cleanedData.password,
             name: cleanedData.name,
-            numCpf: cleanedData.numCpf || '',
-            numCelular: cleanedData.numCelular || '',
-            dataNascimento: cleanedData.dataNascimento,
+            num_cpf: cleanedData.num_cpf || '',
+            num_celular: cleanedData.num_celular || '',
+            data_nascimento: cleanedData.data_nascimento,
             endereco: cleanedData.endereco,
             numero: cleanedData.numero,
             complemento: cleanedData.complemento,

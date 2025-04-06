@@ -4,12 +4,12 @@ export const getFieldLabel = (field: string) => {
     email: 'E-mail',
     password: 'Senha',
     confirmSenha: 'Confirmar Senha',
-    numCpf: 'CPF',
-    numCelular: 'Número de Celular',
-    dataNascimento: 'Data de Nascimento',
-    nomeEstab: 'Nome Fantasia',
-    razaoSocial: 'Razão Social',
-    numCnpj: 'CNPJ',
+    num_cpf: 'CPF',
+    num_celular: 'Número de Celular',
+    data_nascimento: 'Data de Nascimento',
+    nome_estab: 'Nome Fantasia',
+    razao_social: 'Razão Social',
+    num_cnpj: 'CNPJ',
     endereco: 'Endereço',
     numero: 'Número',
     complemento: 'Complemento',
@@ -24,7 +24,7 @@ export const getFieldLabel = (field: string) => {
 export const getFieldType = (field: string) => {
   if (field === 'email') return 'email';
   if (field === 'password' || field === 'confirmSenha') return 'password';
-  if (field === 'numCelular') return 'tel';
-  if (field === 'dataNascimento') return 'date';
+  if (field === 'num_celular') return 'tel';
+  if (field === 'data_nascimento') return 'date';
   return 'text';
 };

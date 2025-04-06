@@ -21,7 +21,7 @@ export const register_steps: Record<AccountType, Step[]> = {
     {
       id: 'pessoal',
       title: 'Dados Pessoais',
-      fields: ['name', 'numCpf', 'numCelular', 'dataNascimento'],
+      fields: ['name', 'num_cpf', 'num_celular', 'data_nascimento'],
     },
     {
       id: 'endereco',
@@ -51,7 +51,7 @@ export const register_steps: Record<AccountType, Step[]> = {
     {
       id: 'estabelecimento',
       title: 'Dados do Estabelecimento',
-      fields: ['nomeEstab', 'razaoSocial', 'numCnpj', 'numCelular'],
+      fields: ['nome_estab', 'razao_social', 'num_cnpj', 'num_celular'],
     },
     {
       id: 'endereco',
@@ -83,7 +83,7 @@ export const registerSteps = [
   {
     id: 'establishment',
     title: 'Dados do Estabelecimento',
-    fields: ['nomeEstab', 'razaoSocial', 'numCnpj', 'numCelular'],
+    fields: ['nome_estab', 'razao_social', 'num_cnpj', 'num_celular'],
   },
   {
     id: 'address',
