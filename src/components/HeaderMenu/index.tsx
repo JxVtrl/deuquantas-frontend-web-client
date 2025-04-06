@@ -20,33 +20,28 @@ const HeaderMenu: React.FC<HeaderMenuProps> = ({ isEstablishment = false }) => {
   const { logout } = useAuth();
   const router = useRouter();
 
-  const menu_items = [
-    {
-      label: 'Perfil',
-      onClick: () => {
-        router.push(
-          isEstablishment ? '/establishment/profile' : '/customer/profile',
-        );
-      },
-    },
-    {
-      label: 'Configurações',
-      onClick: () => {
-        router.push(
-          isEstablishment
-            ? '/establishment/configuracao'
-            : '/customer/configuracao',
-        );
-      },
-    },
-    {
-      label: 'Sair',
-      onClick: () => {
-        logout();
-      },
-    },
-  ];
-
+  const menu_items = isEstablishment
+    ? []
+    : [
+        {
+          label: 'Perfil',
+          onClick: () => {
+            router.push(
+              isEstablishment ? '/establishment/profile' : '/customer/profile',
+            );
+          },
+        },
+        {
+          label: 'Configurações',
+          onClick: () => {
+            router.push(
+              isEstablishment
+                ? '/establishment/configuracao'
+                : '/customer/configuracao',
+            );
+          },
+        },
+      ];
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className='flex items-center gap-2 p-0'>
@@ -68,15 +63,22 @@ const HeaderMenu: React.FC<HeaderMenuProps> = ({ isEstablishment = false }) => {
         <DropdownMenuLabel>Menu</DropdownMenuLabel>
         <DropdownMenuSeparator />
 
-        {menu_items.map((item) => (
-          <DropdownMenuItem
-            key={item.label}
-            onClick={item.onClick}
-            className='cursor-pointer'
-          >
-            {item.label}
-          </DropdownMenuItem>
-        ))}
+        {menu_items
+          .concat({
+            label: 'Sair',
+            onClick: () => {
+              logout();
+            },
+          })
+          .map((item) => (
+            <DropdownMenuItem
+              key={item.label}
+              onClick={item.onClick}
+              className='cursor-pointer'
+            >
+              {item.label}
+            </DropdownMenuItem>
+          ))}
       </DropdownMenuContent>
     </DropdownMenu>
   );
