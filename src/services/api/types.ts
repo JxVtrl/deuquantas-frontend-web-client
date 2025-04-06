@@ -60,19 +60,11 @@ export type UserJwt = User & {
   permission_level: PermissionLevel;
 };
 
-export type UserYjs = User & {
-  clientId: string;
-  color: string;
-  avatar: string;
-};
-
-export interface BeerMenu {
-  menuId: string;
-  establishmentId: string;
-}
-
-export interface Establishment {
-  establishmentId: string;
-  name: string;
-  menu: BeerMenu;
+export interface Mesa {
+  num_cnpj: string;
+  numMesa: string;
+  numMaxPax: number;
+  is_ativo: boolean;
+  data_criacao: Date;
+  data_atualizacao: Date;
 }

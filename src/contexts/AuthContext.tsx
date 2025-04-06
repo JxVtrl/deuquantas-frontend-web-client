@@ -71,55 +71,125 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         }
       } else if (decodedToken.hasEstabelecimento) {
         try {
-          try {
-            response = await api.get(`/estabelecimentos/${decodedToken.sub}`);
-          } catch {
-            throw new Error('Erro ao buscar dados do estabelecimento');
-          }
+          // Primeiro buscar o estabelecimento pelo ID do usuário
+          const estabelecimentoResponse = await api.get(
+            `/estabelecimentos/usuario/${decodedToken.sub}`,
+          );
+          response = estabelecimentoResponse.data;
         } catch {
           throw new Error('Erro ao buscar dados do estabelecimento');
         }
       }
 
-      // juntar os dados do decodedToken com os dados da response
-      const usr = {
+      const {
+        cep,
+        endereco,
+        numero,
+        complemento,
+        bairro,
+        cidade,
+        estado,
+        num_cnpj,
+        nome_estab,
+        razao_social,
+        num_celular,
+        imgLogo,
+        status,
+        latitude,
+        longitude,
+        usuario: {
+          name,
+          email,
+          is_admin,
+          is_ativo,
+          data_criacao,
+          data_atualizacao,
+          id,
+        },
+      } = response;
+
+      const usr: User = {
         endereco: {
-          cep: response.cep,
-          endereco: response.endereco,
-          numero: response.numero,
-          complemento: response.complemento,
-          bairro: response.bairro,
-          cidade: response.cidade,
-          estado: response.estado,
+          cep,
+          endereco,
+          numero,
+          complemento,
+          bairro,
+          cidade,
+          estado,
         },
         usuario: {
-          name: response.usuario.name,
-          email: response.usuario.email,
-          is_admin: response.usuario.is_admin,
-          is_ativo: response.usuario.is_ativo,
-          data_criacao: response.usuario.data_criacao,
-          data_atualizacao: response.usuario.data_atualizacao,
-          id: response.usuario.id,
+          name,
+          email,
+          is_admin,
+          is_ativo,
+          data_criacao,
+          data_atualizacao,
+          id,
           permission_level: decodedToken.permission_level,
         },
-        cliente: {
-          num_cpf: response.num_cpf,
-          num_celular: response.num_celular,
-          data_nascimento: response.data_nascimento,
-        },
+        cliente: decodedToken.hasCliente
+          ? {
+              num_cpf: response.num_cpf,
+              num_celular: response.num_celular,
+              data_nascimento: response.data_nascimento,
+            }
+          : undefined,
+        estabelecimento: decodedToken.hasEstabelecimento
+          ? {
+              num_cnpj,
+              nome_estab,
+              razao_social,
+              num_celular,
+              imgLogo,
+              status,
+              latitude,
+              longitude,
+            }
+          : undefined,
       };
-
-      console.log('usr', usr);
-
       setUser(usr);
-      return true;
+      return { success: true, user: usr };
     } catch {
       Cookies.remove('token');
       setUser(null);
       AuthService.setDefaultHeaderToken('');
-      return false;
+      return { success: false, user: null };
     }
   }, []);
+
+  const redirectTo = (user: User | null) => {
+    try {
+      // Se não houver usuário, redireciona para login
+      if (!user) {
+        console.warn('Usuário não autenticado, redirecionando para login');
+        router.replace('/login');
+        return;
+      }
+
+      // Verifica se o usuário está ativo
+      if (!user.usuario.is_ativo) {
+        console.warn('Usuário inativo, redirecionando para login');
+        router.replace('/login');
+        return;
+      }
+
+      // Determina a rota baseada no tipo de usuário
+      const route = !!user.estabelecimento
+        ? '/establishment/home'
+        : !!user.cliente
+          ? '/customer/home'
+          : '/login';
+
+      // Verifica se a rota atual é diferente da rota de destino
+      if (router.pathname !== route) {
+        router.replace(route);
+      }
+    } catch (error) {
+      console.error('Erro durante redirecionamento:', error);
+      router.replace('/login');
+    }
+  };
 
   useEffect(() => {
     let mounted = true;
@@ -129,17 +199,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         const token = Cookies.get('token');
 
         if (token && mounted) {
-          const success = await processToken(token);
-
-          // Se estiver na página de auth e tiver token válido, redireciona para home
-          if (success && router.pathname === '/auth') {
-            if (user?.estabelecimento) {
-              router.replace('/establishment/home');
-            } else if (user?.cliente) {
-              router.replace('/customer/home');
-            } else {
-              router.replace('/login');
-            }
+          const { success, user: processedUser } = await processToken(token);
+          if (success && processedUser) {
+            redirectTo(processedUser);
           }
         }
       } finally {
@@ -154,7 +216,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     return () => {
       mounted = false;
     };
-  }, [router.pathname, processToken]);
+  }, []);
 
   const is_admin = user?.usuario?.is_admin ?? false;
   const isAuthenticated = !!user;
@@ -163,21 +225,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     try {
       const response = await AuthService.login(data);
       const token = response.token;
-      if (!token) {
-        throw new Error('Token não encontrado na resposta');
-      }
-
-      const success = await processToken(token);
-
-      if (success) {
-        // Redireciona com base no tipo de usuário
-        if (user?.estabelecimento) {
-          router.replace('/establishment/home');
-        } else if (user?.cliente) {
-          router.replace('/customer/home');
-        } else {
-          router.replace('/login');
-        }
+      const { success, user: processedUser } = await processToken(token);
+      if (success && processedUser) {
+        redirectTo(processedUser);
       }
     } catch (error) {
       throw error;
@@ -196,7 +246,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     Cookies.remove('token');
     setUser(null);
     AuthService.setDefaultHeaderToken('');
-    router.replace('/login');
   };
 
   const clearSession = () => {
