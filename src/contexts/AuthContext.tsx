@@ -158,38 +158,41 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     }
   }, []);
 
-  const redirectTo = (user: User | null) => {
-    try {
-      // Se não houver usuário, redireciona para login
-      if (!user) {
-        console.warn('Usuário não autenticado, redirecionando para login');
+  const redirectTo = useCallback(
+    (user: User | null) => {
+      try {
+        // Se não houver usuário, redireciona para login
+        if (!user) {
+          console.warn('Usuário não autenticado, redirecionando para login');
+          router.replace('/login');
+          return;
+        }
+
+        // Verifica se o usuário está ativo
+        if (!user.usuario.is_ativo) {
+          console.warn('Usuário inativo, redirecionando para login');
+          router.replace('/login');
+          return;
+        }
+
+        // Determina a rota baseada no tipo de usuário
+        const route = !!user.estabelecimento
+          ? '/establishment/home'
+          : !!user.cliente
+            ? '/customer/home'
+            : '/login';
+
+        // Verifica se a rota atual é diferente da rota de destino
+        if (router.pathname !== route) {
+          router.replace(route);
+        }
+      } catch (error) {
+        console.error('Erro durante redirecionamento:', error);
         router.replace('/login');
-        return;
       }
-
-      // Verifica se o usuário está ativo
-      if (!user.usuario.is_ativo) {
-        console.warn('Usuário inativo, redirecionando para login');
-        router.replace('/login');
-        return;
-      }
-
-      // Determina a rota baseada no tipo de usuário
-      const route = !!user.estabelecimento
-        ? '/establishment/home'
-        : !!user.cliente
-          ? '/customer/home'
-          : '/login';
-
-      // Verifica se a rota atual é diferente da rota de destino
-      if (router.pathname !== route) {
-        router.replace(route);
-      }
-    } catch (error) {
-      console.error('Erro durante redirecionamento:', error);
-      router.replace('/login');
-    }
-  };
+    },
+    [router],
+  );
 
   useEffect(() => {
     let mounted = true;
@@ -216,7 +219,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [processToken, redirectTo]);
 
   const is_admin = user?.usuario?.is_admin ?? false;
   const isAuthenticated = !!user;
