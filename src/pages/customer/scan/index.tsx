@@ -10,6 +10,7 @@ import { StatusBar } from '@/components/StatusBar';
 import { CodeInput } from '@/components/CodeInput';
 import Image from 'next/image';
 import Cookies from 'js-cookie';
+import { CustomerLayout } from '@/layout';
 const CustomerQrCode: React.FC = () => {
   const router = useRouter();
   const { setActiveHomeTab } = useCustomerContext();
@@ -158,29 +159,7 @@ const CustomerQrCode: React.FC = () => {
   };
 
   return (
-    <div className='min-h-screen bg-[#FFCC00]'>
-      <StatusBar />
-
-      <header className='px-4 py-2 flex justify-between items-center'>
-        <div className='flex items-center gap-2'>
-          <Image
-            src='/brand/logo-dark.svg'
-            alt='Logo DeuQuantas'
-            width={56}
-            height={24}
-            quality={100}
-            priority
-          />
-          <div className='flex items-center gap-2'>
-            <div className='text-sm'>Bem-vindo</div>
-            <div className='text-sm font-bold'>{firstName}</div>
-          </div>
-        </div>
-        <button className='w-8 h-8 rounded-full bg-white flex items-center justify-center'>
-          {firstName.charAt(0).toUpperCase()}
-        </button>
-      </header>
-
+    <CustomerLayout>
       <div className='flex-1 bg-black min-h-[calc(100vh-120px)] rounded-t-3xl mt-4 relative'>
         {isOfflineMode && (
           <div className='fixed top-2 right-2 bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs'>
@@ -250,7 +229,7 @@ const CustomerQrCode: React.FC = () => {
           </div>
         )}
       </div>
-    </div>
+    </CustomerLayout>
   );
 };
 
