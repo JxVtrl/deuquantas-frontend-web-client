@@ -4,16 +4,21 @@ import { useAuth } from '@/contexts/AuthContext';
 import Image from 'next/image';
 import { capitalize } from '@/utils/formatters';
 import HeaderMenu from '../HeaderMenu';
-export const Header: React.FC = () => {
+
+type HeaderProps = {
+  isEstablishment?: boolean;
+};
+
+export const Header: React.FC<HeaderProps> = ({ isEstablishment = false }) => {
   const { user } = useAuth();
   const firstName = user?.name || 'Usuário';
 
   return (
-    <MaxWidthLayout backgroundColor='#FFCC00'>
+    <MaxWidthLayout backgroundColor={isEstablishment ? '#000' : '#FFCC00'}>
       <header className='py-[7px] flex justify-between items-center'>
         <div className='flex items-center gap-[12px]'>
           <Image
-            src='/brand/logo-dark.svg'
+            src={isEstablishment ? '/brand/logo.svg' : '/brand/logo-dark.svg'}
             width={47}
             height={20}
             alt='Logo Deu Quantas?'
@@ -28,14 +33,16 @@ export const Header: React.FC = () => {
           />
 
           <div className='flex items-center gap-2'>
-            <p className='text-[14px] text-black font-[300]'>
+            <p
+              className={`text-[14px] text-${isEstablishment ? 'white' : 'black'} font-[300]`}
+            >
               Bem-vindo{' '}
               <strong className='font-[700]'>{capitalize(firstName)}</strong>
             </p>
           </div>
         </div>
 
-        <HeaderMenu />
+        <HeaderMenu isEstablishment={isEstablishment} />
       </header>
     </MaxWidthLayout>
   );

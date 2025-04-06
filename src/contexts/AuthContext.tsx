@@ -83,7 +83,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
           // Se estiver na página de auth e tiver token válido, redireciona para home
           if (success && router.pathname === '/auth') {
             if (user?.hasEstabelecimento) {
-              router.replace('/estabelecimento/dashboard');
+              router.replace('/establishment/home');
             } else if (user?.hasCliente) {
               router.replace('/customer/home');
             } else {
@@ -126,7 +126,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       if (success) {
         // Redireciona com base no tipo de usuário
         if (user?.hasEstabelecimento) {
-          router.replace('/estabelecimento/dashboard');
+          router.replace('/establishment/home');
         } else if (user?.hasCliente) {
           router.replace('/customer/home');
         } else {

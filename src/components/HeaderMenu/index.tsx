@@ -13,7 +13,11 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useUserPreferences } from '@/contexts/UserPreferencesContext';
 import { IOSSwitch } from '@/components/ui/ios-switch';
 
-const HeaderMenu: React.FC = () => {
+type HeaderMenuProps = {
+  isEstablishment?: boolean;
+};
+
+const HeaderMenu: React.FC<HeaderMenuProps> = ({ isEstablishment = false }) => {
   const { logout } = useAuth();
   const { preferences, toggleLeftHanded } = useUserPreferences();
   const { isLeftHanded } = preferences;
@@ -38,7 +42,11 @@ const HeaderMenu: React.FC = () => {
         <Avatar />
         <div className='w-[16px] h-[16px] flex items-center justify-center relative '>
           <Image
-            src='/icons/chevron-down.svg'
+            src={
+              isEstablishment
+                ? '/icons/chevron-down-white.svg'
+                : '/icons/chevron-down.svg'
+            }
             alt='Chevron down'
             className='absolute top-0 left-0 p-[4px]'
             layout='fill'
