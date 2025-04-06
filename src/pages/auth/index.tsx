@@ -14,10 +14,6 @@ function AuthPageContent() {
   const [logoSrc, setLogoSrc] = useState<string>('/brand/logo-dark.svg');
 
   useEffect(() => {
-    console.log(
-      'isRegisterAsEstablishment na página de auth:',
-      isRegisterAsEstablishment,
-    );
     setBackgroundColor(isRegisterAsEstablishment ? '#000000' : '#FFCC00');
     setLogoSrc(
       isRegisterAsEstablishment ? '/brand/logo.svg' : '/brand/logo-dark.svg',

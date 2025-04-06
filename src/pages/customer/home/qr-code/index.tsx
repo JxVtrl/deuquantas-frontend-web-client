@@ -65,7 +65,7 @@ const CustomerQrCode: React.FC = () => {
       }
 
       // Obter token de autenticação do localStorage ou de onde estiver armazenado
-      const token = Cookies.get('auth_token') || '';
+      const token = Cookies.get('token') || '';
 
       // Verificar se o usuário está autenticado
       if (!user) {
@@ -75,7 +75,9 @@ const CustomerQrCode: React.FC = () => {
       }
 
       // Obter CPF do usuário
-      const clienteCpf = user?.id ? String(user.id) : '';
+      const clienteCpf = user?.cliente?.numCpf
+        ? String(user.cliente.numCpf)
+        : '';
 
       // Se não tiver ID de usuário, não permitir continuar
       if (!clienteCpf) {

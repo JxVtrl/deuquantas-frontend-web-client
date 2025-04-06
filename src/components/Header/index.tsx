@@ -11,7 +11,7 @@ type HeaderProps = {
 
 export const Header: React.FC<HeaderProps> = ({ isEstablishment = false }) => {
   const { user } = useAuth();
-  const firstName = user?.name || 'Usuário';
+  const firstName = user?.usuario?.name || 'Usuário';
 
   return (
     <MaxWidthLayout backgroundColor={isEstablishment ? '#000' : '#FFCC00'}>

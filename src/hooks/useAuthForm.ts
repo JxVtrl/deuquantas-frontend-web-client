@@ -32,7 +32,6 @@ export function useAuthForm({
   };
 
   const setRegisterType = (type: 'cliente' | 'estabelecimento') => {
-    console.log('setRegisterType chamado com:', type);
     setIsRegisterAsEstablishment(type === 'estabelecimento');
     setError(null);
   };
@@ -49,7 +48,7 @@ export function useAuthForm({
     setLoading(true);
     setError(null);
 
-    Cookies.remove('auth_token');
+    Cookies.remove('token');
 
     try {
       if ('password' in data) {

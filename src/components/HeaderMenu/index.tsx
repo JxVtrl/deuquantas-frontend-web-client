@@ -23,7 +23,6 @@ const HeaderMenu: React.FC<HeaderMenuProps> = ({ isEstablishment = false }) => {
   const { isLeftHanded } = preferences;
 
   const handleToggleLeftHanded = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log('Toggle left-handed:', e.target.checked);
     toggleLeftHanded();
   };
 

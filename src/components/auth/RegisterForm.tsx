@@ -38,13 +38,6 @@ const RegisterForm: React.FC = () => {
   const { setRegisterType, isRegisterAsEstablishment, toggleForm } =
     useAuthFormContext();
 
-  useEffect(() => {
-    console.log(
-      'isRegisterAsEstablishment mudou para:',
-      isRegisterAsEstablishment,
-    );
-  }, [isRegisterAsEstablishment]);
-
   const accountType = isRegisterAsEstablishment ? 'estabelecimento' : 'cliente';
 
   const {

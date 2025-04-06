@@ -18,7 +18,7 @@ const CustomerQrCode: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isOfflineMode, setIsOfflineMode] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const firstName = user?.name || 'Usuário';
+  const firstName = user?.usuario.name || 'Usuário';
 
   useEffect(() => {
     const checkBackendStatus = async () => {
@@ -68,14 +68,16 @@ const CustomerQrCode: React.FC = () => {
         return;
       }
 
-      const token = Cookies.get('auth_token') || '';
+      const token = Cookies.get('token') || '';
 
       if (!user) {
         setError('Usuário não autenticado. Faça login novamente.');
         return;
       }
 
-      const clienteCpf = user?.id ? String(user.id) : '';
+      const clienteCpf = user?.cliente?.numCpf
+        ? String(user.cliente.numCpf)
+        : '';
 
       if (!clienteCpf) {
         setError(

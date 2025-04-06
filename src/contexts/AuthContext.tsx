@@ -12,7 +12,8 @@ import { jwtDecode } from 'jwt-decode';
 import { setDefaultHeaderToken } from '../../services/api';
 import { saveUserPreferences, viewUserPreferences } from '../../services/user';
 import Cookies from 'js-cookie';
-import { PermissionLevel, User } from '../../services/api/types';
+import { User, UserJwt } from '../../services/api/types';
+import { api } from '@/lib/axios';
 
 export type AvailableLanguages = 'pt' | 'en';
 export type AvailableThemes = 'dark' | 'light' | 'system';
@@ -54,18 +55,81 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
       // Remove "Bearer " se existir
       const cleanToken = token.replace('Bearer ', '');
-      const decodedToken = jwtDecode<User>(cleanToken);
-      console.log('Token decodificado:', decodedToken);
+      const decodedToken = jwtDecode<UserJwt>(cleanToken);
 
-      // Usa apenas os dados do token
-      setUser(decodedToken);
-      Cookies.set('token', cleanToken);
+      // Salva o token no cookie
+      Cookies.set('token', cleanToken, {
+        expires: 7, // expira em 7 dias
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+      });
+
+      // Define o token no cabeçalho padrão
       setDefaultHeaderToken(`Bearer ${cleanToken}`);
+
+      let response;
+
+      // Verificar se é cliente ou estabelecimento
+      if (decodedToken.hasCliente) {
+        try {
+          const clienteResponse = await api.get(
+            `/clientes/usuario/${decodedToken.sub}`,
+          );
+          response = clienteResponse.data;
+        } catch {
+          throw new Error('Erro ao buscar dados do cliente');
+        }
+      } else if (decodedToken.hasEstabelecimento) {
+        try {
+          try {
+            response = await api.get(`/estabelecimentos/${decodedToken.sub}`);
+          } catch {
+            throw new Error('Erro ao buscar dados do estabelecimento');
+          }
+        } catch {
+          throw new Error('Erro ao buscar dados do estabelecimento');
+        }
+      }
+
+      console.log('response', JSON.stringify(response, null, 2));
+      console.log('decodedToken', JSON.stringify(decodedToken, null, 2));
+
+      // juntar os dados do decodedToken com os dados da response
+      const usr = {
+        endereco: {
+          cep: response.cep,
+          endereco: response.endereco,
+          numero: response.numero,
+          complemento: response.complemento,
+          bairro: response.bairro,
+          cidade: response.cidade,
+          estado: response.estado,
+        },
+        usuario: {
+          name: response.usuario.name,
+          email: response.usuario.email,
+          isAdmin: response.usuario.isAdmin,
+          isAtivo: response.usuario.isAtivo,
+          dataCriacao: response.usuario.dataCriacao,
+          dataAtualizacao: response.usuario.dataAtualizacao,
+          id: response.usuario.id,
+          permission_level: decodedToken.permission_level,
+        },
+        cliente: {
+          numCpf: response.numCpf,
+          numCelular: response.numCelular,
+          dataNascimento: response.dataNascimento,
+        },
+      };
+
+      console.log('usr', usr);
+
+      setUser(usr);
       return true;
-    } catch (error) {
-      console.error('Erro ao processar token:', error);
+    } catch {
       Cookies.remove('token');
       setUser(null);
+      setDefaultHeaderToken('');
       return false;
     }
   }, []);
@@ -82,9 +146,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
           // Se estiver na página de auth e tiver token válido, redireciona para home
           if (success && router.pathname === '/auth') {
-            if (user?.hasEstabelecimento) {
+            if (user?.estabelecimento) {
               router.replace('/establishment/home');
-            } else if (user?.hasCliente) {
+            } else if (user?.cliente) {
               router.replace('/customer/home');
             } else {
               router.replace('/login');
@@ -105,17 +169,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     };
   }, [router.pathname, processToken]);
 
-  const isAdmin = user?.permission_level === PermissionLevel.Admin;
-  const isCliente = user?.hasCliente ?? false;
-  const isEstabelecimento = user?.hasEstabelecimento ?? false;
+  const isAdmin = user?.usuario?.isAdmin ?? false;
   const isAuthenticated = !!user;
 
   const login = async (data: LoginData) => {
     try {
-      console.log('Dados de login recebidos:', data);
       const response = await AuthService.login(data);
-      console.log('Resposta do login:', response);
-
       const token = response.token;
       if (!token) {
         throw new Error('Token não encontrado na resposta');
@@ -125,16 +184,15 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
       if (success) {
         // Redireciona com base no tipo de usuário
-        if (user?.hasEstabelecimento) {
+        if (user?.estabelecimento) {
           router.replace('/establishment/home');
-        } else if (user?.hasCliente) {
+        } else if (user?.cliente) {
           router.replace('/customer/home');
         } else {
           router.replace('/login');
         }
       }
     } catch (error) {
-      console.error('Erro no login:', error);
       throw error;
     }
   };
@@ -143,7 +201,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     try {
       await AuthService.register(data);
     } catch (error) {
-      console.error('Erro no registro:', error);
       throw error;
     }
   };
@@ -165,8 +222,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   const getUserPreferences = async () => {
     try {
       await viewUserPreferences();
-    } catch (error) {
-      console.error('Erro ao carregar preferências:', error);
+    } catch {
+      throw new Error('Erro ao carregar preferências');
     }
   };
 
@@ -190,8 +247,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         logout,
         isAuthenticated,
         isAdmin,
-        isCliente,
-        isEstabelecimento,
+        isCliente: !!user?.cliente,
+        isEstabelecimento: !!user?.estabelecimento,
         processLogin,
         storeUserPreferences,
         clearSession,

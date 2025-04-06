@@ -36,7 +36,7 @@ export function withAuth(Component: React.FC, requiredRole?: string) {
       // Se tiver uma role específica, verifica a permissão
       if (requiredRole) {
         const requiredLevel = getPermissionLevel(requiredRole);
-        const userLevel = user.permission_level || 3; // Default para customer
+        const userLevel = user.usuario.permission_level || 3; // Default para customer
 
         if (userLevel !== requiredLevel) {
           router.replace('/login');
@@ -55,7 +55,7 @@ export function withAuth(Component: React.FC, requiredRole?: string) {
       !isAuthenticated ||
       !user ||
       (requiredRole &&
-        user.permission_level !== getPermissionLevel(requiredRole))
+        user.usuario.permission_level !== getPermissionLevel(requiredRole))
     ) {
       return null;
     }

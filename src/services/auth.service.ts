@@ -190,7 +190,7 @@ export class AuthService {
       console.log('Dados do usuário obtidos:', response.data);
       return {
         user: response.data.user,
-        token: Cookies.get('auth_token') || '',
+        token: Cookies.get('token') || '',
       };
     } catch (error) {
       console.error('=== ERRO AO BUSCAR DADOS DO USUÁRIO ===', error);
@@ -201,7 +201,7 @@ export class AuthService {
   logout(): void {
     console.log('=== INÍCIO DO PROCESSO DE LOGOUT ===');
     // Remove o token dos cookies
-    Cookies.remove('auth_token');
+    Cookies.remove('token');
     console.log('Token removido dos cookies');
 
     // Remove o token do header das requisições
@@ -211,7 +211,7 @@ export class AuthService {
   }
 
   isAuthenticated(): boolean {
-    const token = Cookies.get('auth_token');
+    const token = Cookies.get('token');
     console.log('Verificando autenticação:', {
       tokenPresent: !!token,
       token: token ? '[TOKEN PRESENTE]' : 'não encontrado',

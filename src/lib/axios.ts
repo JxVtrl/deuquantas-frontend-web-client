@@ -15,7 +15,7 @@ export const api = axios.create({
 
 // Interceptor para adicionar o token de autenticação em todas as requisições
 api.interceptors.request.use((config) => {
-  const token = Cookies.get('auth_token');
+  const token = Cookies.get('token');
   if (token) {
     const formattedToken = token.startsWith('Bearer ')
       ? token
@@ -24,3 +24,16 @@ api.interceptors.request.use((config) => {
   }
   return config;
 });
+
+// Interceptor para lidar com erros de autenticação
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      // Limpa o token e redireciona para o login em caso de erro 401
+      Cookies.remove('token');
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  },
+);

@@ -16,7 +16,7 @@ const ProfilePage: React.FC = () => {
 
   useEffect(() => {
     if (user) {
-      setName(user.name || '');
+      setName(user.usuario.name || '');
       setNumCelular('');
     }
   }, [user]);
@@ -28,9 +28,9 @@ const ProfilePage: React.FC = () => {
     setLoading(true);
 
     try {
-      const token = Cookies.get('auth_token');
+      const token = Cookies.get('token');
       await axios.put(
-        `${API_URL}/usuarios/${user?.id}`,
+        `${API_URL}/usuarios/${user?.usuario.id}`,
         { name, numCelular },
         {
           headers: {
@@ -79,7 +79,7 @@ const ProfilePage: React.FC = () => {
                 <input
                   type='email'
                   id='email'
-                  value={user?.email || ''}
+                  value={user?.usuario.email || ''}
                   className='w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100'
                   disabled
                 />
