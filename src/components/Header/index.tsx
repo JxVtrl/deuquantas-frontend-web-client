@@ -4,6 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import Image from 'next/image';
 import { capitalize } from '@/utils/formatters';
 import HeaderMenu from '../HeaderMenu';
+import { useRouter } from 'next/router';
 
 type HeaderProps = {
   isEstablishment?: boolean;
@@ -12,6 +13,8 @@ type HeaderProps = {
 export const Header: React.FC<HeaderProps> = ({ isEstablishment = false }) => {
   const { user } = useAuth();
   const firstName = user?.usuario?.name || 'Usuário';
+
+  const router = useRouter();
 
   return (
     <MaxWidthLayout backgroundColor={isEstablishment ? '#000' : '#FFCC00'}>
@@ -22,6 +25,12 @@ export const Header: React.FC<HeaderProps> = ({ isEstablishment = false }) => {
             width={47}
             height={20}
             alt='Logo Deu Quantas?'
+            onClick={() => {
+              router.push(
+                isEstablishment ? '/establishment/home' : '/customer/home',
+              );
+            }}
+            className='cursor-pointer'
           />
 
           <Image

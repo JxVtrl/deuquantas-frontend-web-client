@@ -5,40 +5,46 @@ import React, {
   useEffect,
   ReactNode,
 } from 'react';
+import Cookies from 'js-cookie';
+
+export type AvailableLanguages = 'pt' | 'en';
 
 interface UserPreferences {
   isLeftHanded: boolean;
+  language: AvailableLanguages;
 }
 
 interface UserPreferencesContextType {
   preferences: UserPreferences;
   toggleLeftHanded: () => void;
+  toggleLanguage: () => void;
 }
 
-const UserPreferencesContext = createContext<
-  UserPreferencesContextType | undefined
->(undefined);
+const UserPreferencesContext = createContext<UserPreferencesContextType>(
+  {} as UserPreferencesContextType,
+);
 
 export const UserPreferencesProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  const [preferences, setPreferences] = useState<UserPreferences>(() => {
-    // Tenta recuperar as preferências do localStorage
-    if (typeof window !== 'undefined') {
-      const savedPreferences = localStorage.getItem('userPreferences');
-      if (savedPreferences) {
-        return JSON.parse(savedPreferences);
-      }
-    }
-    // Valores padrão
-    return { isLeftHanded: false };
+  const [preferences, setPreferences] = useState<UserPreferences>({
+    isLeftHanded: false,
+    language: 'pt',
   });
 
-  // Salva as preferências no localStorage quando mudam
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('userPreferences', JSON.stringify(preferences));
+    // Carregar preferências do cookie
+    const savedPreferences = Cookies.get('userPreferences');
+    if (savedPreferences) {
+      setPreferences(JSON.parse(savedPreferences));
     }
+  }, []);
+
+  useEffect(() => {
+    // Salvar preferências no cookie
+    Cookies.set('userPreferences', JSON.stringify(preferences), {
+      expires: 365, // 1 ano
+    });
   }, [preferences]);
 
   const toggleLeftHanded = () => {
@@ -48,18 +54,31 @@ export const UserPreferencesProvider: React.FC<{ children: ReactNode }> = ({
     }));
   };
 
+  const toggleLanguage = () => {
+    setPreferences((prev) => ({
+      ...prev,
+      language: prev.language === 'pt' ? 'en' : 'pt',
+    }));
+  };
+
   return (
-    <UserPreferencesContext.Provider value={{ preferences, toggleLeftHanded }}>
+    <UserPreferencesContext.Provider
+      value={{
+        preferences,
+        toggleLeftHanded,
+        toggleLanguage,
+      }}
+    >
       {children}
     </UserPreferencesContext.Provider>
   );
 };
 
-export const useUserPreferences = (): UserPreferencesContextType => {
+export const useUserPreferences = () => {
   const context = useContext(UserPreferencesContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error(
-      'useUserPreferences must be used within a UserPreferencesProvider',
+      'useUserPreferences deve ser usado dentro de um UserPreferencesProvider',
     );
   }
   return context;

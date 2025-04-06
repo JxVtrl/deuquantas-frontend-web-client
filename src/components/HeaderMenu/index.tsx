@@ -10,8 +10,7 @@ import {
 import Avatar from '../Avatar';
 import Image from 'next/image';
 import { useAuth } from '@/contexts/AuthContext';
-import { useUserPreferences } from '@/contexts/UserPreferencesContext';
-import { IOSSwitch } from '@/components/ui/ios-switch';
+import { useRouter } from 'next/router';
 
 type HeaderMenuProps = {
   isEstablishment?: boolean;
@@ -19,14 +18,27 @@ type HeaderMenuProps = {
 
 const HeaderMenu: React.FC<HeaderMenuProps> = ({ isEstablishment = false }) => {
   const { logout } = useAuth();
-  const { preferences, toggleLeftHanded } = useUserPreferences();
-  const { isLeftHanded } = preferences;
-
-  const handleToggleLeftHanded = (e: React.ChangeEvent<HTMLInputElement>) => {
-    toggleLeftHanded();
-  };
+  const router = useRouter();
 
   const menu_items = [
+    {
+      label: 'Perfil',
+      onClick: () => {
+        router.push(
+          isEstablishment ? '/establishment/profile' : '/customer/profile',
+        );
+      },
+    },
+    {
+      label: 'Configurações',
+      onClick: () => {
+        router.push(
+          isEstablishment
+            ? '/establishment/configuracao'
+            : '/customer/configuracao',
+        );
+      },
+    },
     {
       label: 'Sair',
       onClick: () => {
@@ -54,17 +66,6 @@ const HeaderMenu: React.FC<HeaderMenuProps> = ({ isEstablishment = false }) => {
       </DropdownMenuTrigger>
       <DropdownMenuContent className='w-56'>
         <DropdownMenuLabel>Menu</DropdownMenuLabel>
-        <DropdownMenuSeparator />
-
-        <div className='px-2 py-1.5'>
-          <IOSSwitch
-            checked={isLeftHanded}
-            onChange={handleToggleLeftHanded}
-            label='Modo Canhoto'
-            description='Posiciona o botão de adicionar à esquerda'
-          />
-        </div>
-
         <DropdownMenuSeparator />
 
         {menu_items.map((item) => (
