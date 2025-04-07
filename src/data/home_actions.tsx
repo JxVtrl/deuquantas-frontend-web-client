@@ -22,7 +22,7 @@ export const establishmentActions: ActionItem[] = [
   },
   {
     icon: TableIcon,
-    label: 'Gerenciar mesas',
+    label: 'Mesas',
     href: '/establishment/manage/tables',
   },
 ];
