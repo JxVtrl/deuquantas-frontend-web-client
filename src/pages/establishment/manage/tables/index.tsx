@@ -83,11 +83,12 @@ const TablesManagement: React.FC = () => {
         const response = await api.get(
           `/mesas/estabelecimento/${user.estabelecimento.num_cnpj}`,
         );
-        setMesas(response.data);
+        setMesas(Array.isArray(response.data.data) ? response.data.data : []);
       }
     } catch (error) {
       toast.error('Erro ao carregar mesas');
       console.error(error);
+      setMesas([]);
     } finally {
       setLoading(false);
     }
@@ -140,8 +141,15 @@ const TablesManagement: React.FC = () => {
 
   const handleCreate = async () => {
     try {
+      if (formData.numMaxPax <= 0) {
+        toast.error('A capacidade da mesa deve ser maior que 0');
+        return;
+      }
+
       await api.post('/mesas', {
-        ...formData,
+        numMesa: formData.numMesa,
+        numMaxPax: formData.numMaxPax,
+        is_ativo: formData.is_ativo,
         num_cnpj: user?.estabelecimento?.num_cnpj,
       });
       toast.success('Mesa criada com sucesso');

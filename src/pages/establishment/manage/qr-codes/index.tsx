@@ -28,7 +28,7 @@ const QrCodesManagement: React.FC = () => {
         const response = await api.get(
           `/mesas/estabelecimento/${user.estabelecimento.num_cnpj}`,
         );
-        setMesas(response.data);
+        setMesas(Array.isArray(response.data.data) ? response.data.data : []);
       }
     } catch (error) {
       toast.error('Erro ao carregar mesas');
