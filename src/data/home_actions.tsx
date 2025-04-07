@@ -1,6 +1,6 @@
 import {
   ConsumptionIcon,
-  DashboardIcon,
+  // DashboardIcon,
   FavoriteIcon,
   LocationIcon,
   OrdersIcon,
@@ -16,11 +16,11 @@ export interface ActionItem {
 }
 
 export const establishmentActions: ActionItem[] = [
-  {
-    icon: DashboardIcon,
-    label: 'Dashboard',
-    href: '/establishment/dashboard',
-  },
+  // {
+  //   icon: DashboardIcon,
+  //   label: 'Dashboard',
+  //   href: '/establishment/dashboard',
+  // },
   {
     icon: QrCodeIcon,
     label: 'QR Codes',
