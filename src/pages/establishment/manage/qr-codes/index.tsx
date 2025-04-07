@@ -63,12 +63,12 @@ const QrCodesManagement: React.FC = () => {
 
   return (
     <EstablishmentLayout>
-      <div className='h-[calc(100vh-4rem)] overflow-hidden flex flex-col'>
+      <div className='h-[calc(100vh-120px)] overflow-hidden flex flex-col'>
         <div className='flex justify-between items-center p-6 border-b'>
           <h1 className='text-2xl font-bold'>QR Codes das Mesas</h1>
         </div>
 
-        <div className='flex-1 overflow-y-auto p-6'>
+        <div className='flex-1 overflow-y-auto py-6'>
           {loading ? (
             <div className='flex justify-center items-center h-full'>
               <div className='animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#FFCC00]'></div>
