@@ -4,11 +4,10 @@ import { CustomerLayout } from '@/layout';
 import { Scanner } from '@yudiel/react-qr-scanner';
 import { useRouter } from 'next/router';
 import { useCustomerContext } from '@/contexts/CustomerContext';
-import { ComandaService, CreateComandaDto } from '@/services/comanda.service';
+import { ComandaService } from '@/services/comanda.service';
 import { useAuth } from '@/contexts/AuthContext';
-import axios from 'axios';
 import { ScanQrCodeIcon } from '@/components/Icons';
-import InputQrCode from '@/components/InputQrCode';
+import QrCodeInput from '@/components/InputQrCode';
 import Cookies from 'js-cookie';
 /**
  * Componente para escaneamento de QR Code
@@ -48,101 +47,77 @@ const CustomerQrCode: React.FC = () => {
     }
   };
 
-  const criarComanda = async (mesaId: string, estabelecimentoId: string) => {
+  const processarQrCode = async (qrCode: string) => {
     try {
       setIsLoading(true);
       setError(null);
       setSuccessMessage(null);
 
-      // Verificar se o backend está disponível
-      const backendAvailable = await ComandaService.isBackendAvailable();
-
-      if (!backendAvailable) {
-        console.warn('Backend não está disponível.');
-        setError('Servidor não está disponível. Tente novamente mais tarde.');
-        setIsLoading(false);
+      // Validar formato do QR Code
+      const partes = qrCode.split(':');
+      if (
+        partes.length !== 4 ||
+        partes[0] !== 'estabelecimento' ||
+        partes[2] !== 'mesa'
+      ) {
+        setError('QR Code inválido. Tente novamente.');
         return;
       }
 
-      // Obter token de autenticação do localStorage ou de onde estiver armazenado
+      const estabelecimentoId = partes[1];
+      const mesaId = partes[3];
+
+      // Verificar disponibilidade da mesa
+      const disponivel = await ComandaService.verificarDisponibilidadeMesa(
+        estabelecimentoId,
+        mesaId,
+      );
+      if (!disponivel) {
+        setError('Mesa não está disponível no momento.');
+        return;
+      }
+
+      // Obter token de autenticação
       const token = Cookies.get('token') || '';
 
-      // Verificar se o usuário está autenticado
       if (!user) {
         setError('Usuário não autenticado. Faça login novamente.');
-        setIsLoading(false);
         return;
       }
 
-      // Obter CPF do usuário
       const clienteCpf = user?.cliente?.num_cpf
         ? String(user.cliente.num_cpf)
         : '';
 
-      // Se não tiver ID de usuário, não permitir continuar
       if (!clienteCpf) {
         setError(
           'Não foi possível identificar o usuário. Faça login novamente.',
         );
-        setIsLoading(false);
         return;
       }
 
-      // Dados para criar a comanda
+      // Criar comanda
       const dataAtual = new Date().toISOString();
-      const comandaData: CreateComandaDto = {
+      const comandaData = {
         num_cpf: clienteCpf,
-        num_cnpj: estabelecimentoId, // CNPJ do estabelecimento extraído do QR code
+        num_cnpj: estabelecimentoId,
         numMesa: mesaId,
         datApropriacao: dataAtual,
         horPedido: dataAtual,
-        codItem: '0', // Item inicial vazio ou padrão
+        codItem: '0',
         numQuant: 0,
         valPreco: 0,
       };
 
-      try {
-        console.log('Tentando criar comanda:', comandaData);
-        const response = await ComandaService.criarComanda(comandaData, token);
-        console.log('Comanda criada com sucesso!', response);
-        setSuccessMessage('Comanda criada com sucesso!');
-      } catch (apiError) {
-        console.error('Erro na API ao criar comanda:', apiError);
+      const response = await ComandaService.criarComanda(comandaData, token);
+      console.log('Comanda criada com sucesso!', response);
+      setSuccessMessage('Comanda criada com sucesso!');
 
-        // Mensagem de erro mais informativa
-        let errorMessage = 'Erro ao criar comanda.';
-
-        if (axios.isAxiosError(apiError)) {
-          if (!apiError.response) {
-            errorMessage =
-              'Erro de conexão com o servidor. Verifique sua conexão de internet ou se o servidor está em execução.';
-          } else if (apiError.response.status === 401) {
-            errorMessage = 'Não autorizado. Faça login novamente.';
-          } else if (apiError.response.status === 400) {
-            errorMessage =
-              'Dados inválidos. Verifique as informações e tente novamente.';
-          } else if (apiError.response.status === 500) {
-            errorMessage =
-              'Erro interno do servidor. Tente novamente mais tarde.';
-          }
-        }
-
-        setError(errorMessage);
-        setIsLoading(false);
-        return;
-      }
-
-      // Comanda criada com sucesso, redirecionar para a página da comanda
+      // Navegar para a comanda
       navegarParaComanda(mesaId, clienteCpf);
     } catch (err) {
-      console.error('Erro ao criar comanda:', err);
-
-      // Se o erro já foi tratado e definido, não sobrescreve
-      if (!error) {
-        setError(
-          'Erro ao criar comanda. Verifique sua conexão e tente novamente.',
-        );
-      }
+      console.error('Erro ao processar QR Code:', err);
+      setError('Erro ao processar QR Code. Tente novamente.');
     } finally {
       setIsLoading(false);
     }
@@ -203,34 +178,14 @@ const CustomerQrCode: React.FC = () => {
                   setError('Erro ao escanear QR Code. Tente novamente.');
                 }}
                 onScan={(result) => {
-                  try {
-                    // Extrair informações do QR code
-                    // Formato esperado: "estabelecimento:CNPJ:mesa:ID"
-                    const qrData = result[0].rawValue;
-                    const dataParts = qrData.split(':');
-
-                    if (
-                      dataParts.length < 4 ||
-                      dataParts[0] !== 'estabelecimento'
-                    ) {
-                      setError('QR Code inválido. Tente novamente.');
-                      return;
-                    }
-
-                    const estabelecimentoId = dataParts[1];
-                    const mesaId = dataParts[3];
-
-                    // Criar comanda e redirecionar
-                    criarComanda(mesaId, estabelecimentoId);
-                  } catch (err) {
-                    console.error('Erro ao processar QR Code:', err);
-                    setError('Erro ao processar QR Code. Formato inválido.');
+                  if (result && result.length > 0) {
+                    processarQrCode(result[0].rawValue);
                   }
                 }}
               />
               <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[9999999]'>
                 <ScanQrCodeIcon />
-                <InputQrCode />
+                <QrCodeInput onScan={processarQrCode} />
               </div>
             </div>
           </>

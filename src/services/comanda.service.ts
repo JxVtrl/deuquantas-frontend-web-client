@@ -12,7 +12,6 @@ export interface CreateComandaDto {
   valPreco: number;
 }
 
-// Definição da interface para a resposta da comanda
 export interface ComandaResponse {
   num_cpf: string;
   num_cnpj: string;
@@ -272,6 +271,21 @@ export const ComandaService = {
     } catch (error) {
       console.error('Erro ao obter todas as comandas offline:', error);
       return [];
+    }
+  },
+
+  async verificarDisponibilidadeMesa(
+    num_cnpj: string,
+    numMesa: string,
+  ): Promise<boolean> {
+    try {
+      const response = await axios.get(
+        `/api/qr-code/mesa/${num_cnpj}/${numMesa}/disponibilidade`,
+      );
+      return response.data.disponivel;
+    } catch (error) {
+      console.error('Erro ao verificar disponibilidade da mesa:', error);
+      throw error;
     }
   },
 };

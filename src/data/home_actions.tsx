@@ -7,6 +7,7 @@ import {
   ScanIcon,
   TableIcon,
 } from '@/components/Icons';
+import { QrCodeIcon } from 'lucide-react';
 
 export interface ActionItem {
   icon: React.FC;
@@ -19,6 +20,11 @@ export const establishmentActions: ActionItem[] = [
     icon: DashboardIcon,
     label: 'Dashboard',
     href: '/establishment/dashboard',
+  },
+  {
+    icon: QrCodeIcon,
+    label: 'QR Codes',
+    href: '/establishment/manage/qr-codes',
   },
   {
     icon: TableIcon,

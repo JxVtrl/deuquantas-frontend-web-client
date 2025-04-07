@@ -1,11 +1,21 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
-const InputQrCode: React.FC = () => {
+interface InputQrCodeProps {
+  onScan: (qrCode: string) => Promise<void>;
+}
+
+const InputQrCode: React.FC<InputQrCodeProps> = ({ onScan }) => {
   const [qrCode, setQrCode] = useState('');
 
   const handleQrCodeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setQrCode(event.target.value);
   };
+
+  useEffect(() => {
+    if (qrCode.length === 13) {
+      onScan(qrCode);
+    }
+  }, [onScan, qrCode]);
 
   return (
     <div className='flex items-center max-w-[200px] w-full mx-auto bg-[rgba(0, 0, 0, 0.5)]'>

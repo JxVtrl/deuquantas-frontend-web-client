@@ -65,6 +65,8 @@ export interface Mesa {
   numMesa: string;
   numMaxPax: number;
   is_ativo: boolean;
-  data_criacao: Date;
-  data_atualizacao: Date;
+  status: 'disponivel' | 'ocupada';
+  data_criacao: string;
+  data_atualizacao: string;
+  qrCode: string;
 }
