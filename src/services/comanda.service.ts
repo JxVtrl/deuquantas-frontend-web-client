@@ -121,17 +121,8 @@ export const ComandaService = {
     comandaData: CreateComandaDto,
     token: string,
   ): Promise<ComandaResponse> {
-    // Verifica se o backend está acessível
-    const backendAvailable = await this.isBackendAvailable();
-
-    // Se o backend não estiver acessível, não podemos continuar
-    if (!backendAvailable) {
-      throw new Error('Servidor não disponível. Tente novamente mais tarde.');
-    }
-
-    // Se chegou aqui, temos um servidor disponível
     try {
-      const url = `${API_URL}/comandas`;
+      const url = `/api/proxy/comandas`;
 
       console.log('Tentando criar comanda em:', url);
 
@@ -140,7 +131,6 @@ export const ComandaService = {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
-        // Aumenta o timeout para 10 segundos
         timeout: 10000,
       });
 
@@ -280,7 +270,7 @@ export const ComandaService = {
   ): Promise<boolean> {
     try {
       const response = await axios.get(
-        `/api/qr-code/mesa/${num_cnpj}/${numMesa}/disponibilidade`,
+        `/api/proxy/qr-code/mesa/${num_cnpj}/${numMesa}/disponibilidade`,
       );
       return response.data.disponivel;
     } catch (error) {

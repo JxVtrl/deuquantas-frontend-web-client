@@ -24,8 +24,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Plus, Pencil, Trash2, Eye } from 'lucide-react';
+import { Plus, Pencil, Trash2, Eye, Bell } from 'lucide-react';
 import MaxWidthLayout from '@/layout/MaxWidthLayout';
+import { mesaService, MesaSolicitacao } from '@/services/mesa.service';
 
 const TablesManagement: React.FC = () => {
   const { user } = useAuth();
@@ -52,12 +53,28 @@ const TablesManagement: React.FC = () => {
     busca: '',
     ordenacao: 'numero',
   });
+  const [solicitacoesPendentes, setSolicitacoesPendentes] = useState<
+    MesaSolicitacao[]
+  >([]);
+  const [showNotificacoes, setShowNotificacoes] = useState(false);
 
   useEffect(() => {
     if (user?.estabelecimento?.num_cnpj) {
       fetchMesas();
     }
   }, [user?.estabelecimento?.num_cnpj]);
+
+  useEffect(() => {
+    // Ouvir novas solicitações
+    mesaService.onNovaSolicitacao((solicitacao: MesaSolicitacao) => {
+      setSolicitacoesPendentes((prev) => [...prev, solicitacao]);
+      setShowNotificacoes(true);
+    });
+
+    return () => {
+      mesaService.removerListeners();
+    };
+  }, []);
 
   const fetchMesas = async () => {
     try {
@@ -153,6 +170,32 @@ const TablesManagement: React.FC = () => {
     }
   };
 
+  const handleAprovarSolicitacao = async (solicitacao: MesaSolicitacao) => {
+    try {
+      mesaService.aprovarSolicitacao(solicitacao.id);
+      setSolicitacoesPendentes((prev) =>
+        prev.filter((s) => s.id !== solicitacao.id),
+      );
+      toast.success('Solicitação aprovada com sucesso');
+    } catch (error) {
+      console.error('Erro ao aprovar solicitação:', error);
+      toast.error('Erro ao aprovar solicitação');
+    }
+  };
+
+  const handleRejeitarSolicitacao = async (solicitacao: MesaSolicitacao) => {
+    try {
+      mesaService.rejeitarSolicitacao(solicitacao.id);
+      setSolicitacoesPendentes((prev) =>
+        prev.filter((s) => s.id !== solicitacao.id),
+      );
+      toast.success('Solicitação rejeitada');
+    } catch (error) {
+      console.error('Erro ao rejeitar solicitação:', error);
+      toast.error('Erro ao rejeitar solicitação');
+    }
+  };
+
   const mesasFiltradas = mesas
     .filter((mesa) => {
       if (filtros.status !== 'todos' && mesa.status !== filtros.status) {
@@ -209,11 +252,66 @@ const TablesManagement: React.FC = () => {
         <div className='h-[calc(100vh-120px)] flex flex-col gap-6 py-6'>
           <div className='flex justify-between items-center'>
             <h1 className='text-2xl font-bold'>Gerenciar Mesas</h1>
-            <Button onClick={handleCreateClick}>
-              <Plus className='mr-2 h-4 w-4' />
-              Nova Mesa
-            </Button>
+            <div className='flex items-center gap-4'>
+              {solicitacoesPendentes.length > 0 && (
+                <Button
+                  variant='outline'
+                  size='icon'
+                  onClick={() => setShowNotificacoes(!showNotificacoes)}
+                  className='relative'
+                >
+                  <Bell className='h-5 w-5' />
+                  <span className='absolute -top-1 -right-1 bg-red-500 text-white rounded-full h-5 w-5 flex items-center justify-center text-xs'>
+                    {solicitacoesPendentes.length}
+                  </span>
+                </Button>
+              )}
+              <Button onClick={handleCreateClick}>
+                <Plus className='mr-2 h-4 w-4' />
+                Nova Mesa
+              </Button>
+            </div>
           </div>
+
+          {/* Notificações de Solicitações */}
+          {showNotificacoes && solicitacoesPendentes.length > 0 && (
+            <div className='bg-white p-4 rounded-lg shadow-lg'>
+              <h3 className='font-semibold mb-2'>Solicitações Pendentes</h3>
+              <div className='space-y-2'>
+                {solicitacoesPendentes.map((solicitacao) => (
+                  <div
+                    key={solicitacao.id}
+                    className='flex items-center justify-between p-2 bg-gray-50 rounded'
+                  >
+                    <div>
+                      <p className='font-medium'>
+                        Mesa {solicitacao.numMesa} - Cliente{' '}
+                        {solicitacao.clienteId}
+                      </p>
+                      <p className='text-sm text-gray-500'>
+                        {new Date(solicitacao.dataSolicitacao).toLocaleString()}
+                      </p>
+                    </div>
+                    <div className='flex gap-2'>
+                      <Button
+                        variant='outline'
+                        size='sm'
+                        onClick={() => handleRejeitarSolicitacao(solicitacao)}
+                      >
+                        Rejeitar
+                      </Button>
+                      <Button
+                        size='sm'
+                        onClick={() => handleAprovarSolicitacao(solicitacao)}
+                      >
+                        Aprovar
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           <div
             className='bg-white p-3 border-none rounded-lg
