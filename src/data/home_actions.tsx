@@ -1,5 +1,6 @@
 import {
   ConsumptionIcon,
+  DashboardIcon,
   FavoriteIcon,
   LocationIcon,
   OrdersIcon,
@@ -14,6 +15,11 @@ export interface ActionItem {
 }
 
 export const establishmentActions: ActionItem[] = [
+  {
+    icon: DashboardIcon,
+    label: 'Dashboard',
+    href: '/establishment/dashboard',
+  },
   {
     icon: TableIcon,
     label: 'Gerenciar mesas',

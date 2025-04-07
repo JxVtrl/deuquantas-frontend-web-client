@@ -37,13 +37,12 @@ export const ActionGrid: React.FC = () => {
   return (
     <MaxWidthLayout>
       <div className='flex gap-[15px] overflow-x-auto py-[20px]'>
-        {actionItems.map((item, index) => (
-          <ActionGridItem
-            key={item.href}
-            {...item}
-            isScanQR={index === 0} // First item is Scan QR
-          />
-        ))}
+        {actionItems.map((item) => {
+          const isScanQr = item.href === '/customer/home/qr-code';
+          return (
+            <ActionGridItem key={item.href} {...item} isScanQR={isScanQr} />
+          );
+        })}
       </div>
     </MaxWidthLayout>
   );

@@ -247,18 +247,36 @@ export const ScanQrCodeIcon = (props: SVGProps<SVGSVGElement>) => (
 
 export const TableIcon = () => (
   <svg
+    xmlns='http://www.w3.org/2000/svg'
+    viewBox='0 0 24 24'
     width='24'
     height='24'
-    viewBox='0 0 24 24'
     fill='none'
-    xmlns='http://www.w3.org/2000/svg'
   >
     <path
-      d='M12 2L2 12H12V22L22 12H12V2Z'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-    />
+      fill='currentColor'
+      d='M22 7.5C22 5.57 17.52 4 12 4S2 5.57 2 7.5c0 1.81 3.95 3.31 9 3.48V15H9.35c-.82 0-1.55.5-1.86 1.26L6 20h2l1.2-3h5.6l1.2 3h2l-1.5-3.74c-.3-.76-1.04-1.26-1.85-1.26H13v-4.02c5.05-.17 9-1.67 9-3.48'
+    ></path>
+  </svg>
+);
+
+export const DashboardIcon = () => (
+  <svg
+    xmlns='http://www.w3.org/2000/svg'
+    viewBox='0 0 24 24'
+    width='24'
+    height='24'
+    fill='none'
+  >
+    <path
+      fill='currentColor'
+      d='M8.143 15.857H5.57V9.43h2.572v6.428zm5.143 0h-2.572V3h2.572zm5.142 0h-2.571v-9h2.571z'
+    ></path>
+    <path
+      fill='currentColor'
+      fillRule='evenodd'
+      d='M21 20.714H3v-2h18z'
+      clipRule='evenodd'
+    ></path>
   </svg>
 );
