@@ -4,7 +4,6 @@ import { useAuth } from '@/contexts/AuthContext';
 import Image from 'next/image';
 import { capitalize } from '@/utils/formatters';
 import HeaderMenu from '../HeaderMenu';
-import { useRouter } from 'next/router';
 import Logo from '../Logo';
 
 type HeaderProps = {
@@ -14,8 +13,6 @@ type HeaderProps = {
 export const Header: React.FC<HeaderProps> = ({ isEstablishment = false }) => {
   const { user } = useAuth();
   const firstName = user?.usuario?.name || 'Usuário';
-
-  const router = useRouter();
 
   return (
     <MaxWidthLayout backgroundColor={isEstablishment ? '#000' : '#FFCC00'}>
