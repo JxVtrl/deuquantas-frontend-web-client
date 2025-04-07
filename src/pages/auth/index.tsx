@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
-import { useRouter } from 'next/router';
 import { LoginForm } from '@/components/auth/LoginForm';
 import RegisterForm from '@/components/auth/RegisterForm';
 import { AuthFormProvider } from '@/contexts/AuthFormContext';
@@ -47,14 +46,15 @@ function AuthPageContent() {
 }
 
 export default function AuthPage() {
-  const router = useRouter();
   const { login, register } = useAuth();
 
   return (
     <AuthFormProvider
       login={login}
       register={register}
-      onSuccess={() => router.push('/customer/home')}
+      onSuccess={() => {
+        // Não precisa fazer nada aqui, o redirecionamento será feito pelo AuthContext
+      }}
     >
       <AuthPageContent />
     </AuthFormProvider>

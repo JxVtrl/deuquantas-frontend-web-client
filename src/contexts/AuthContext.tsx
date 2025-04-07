@@ -39,6 +39,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
   const processToken = useCallback(async (token: string) => {
     try {
+      console.log('Processando token:', token);
       if (!token) {
         throw new Error('Token não fornecido');
       }
@@ -46,6 +47,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       // Remove "Bearer " se existir
       const cleanToken = token.replace('Bearer ', '');
       const decodedToken = jwtDecode<UserJwt>(cleanToken);
+      console.log('Token decodificado:', decodedToken);
 
       // Salva o token no cookie
       Cookies.set('token', cleanToken, {
@@ -61,6 +63,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
       // Verificar se é cliente ou estabelecimento
       if (decodedToken.hasCliente) {
+        console.log('Usuário é cliente');
         try {
           const clienteResponse = await api.get(
             `/clientes/usuario/${decodedToken.sub}`,
@@ -70,12 +73,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
           throw new Error('Erro ao buscar dados do cliente');
         }
       } else if (decodedToken.hasEstabelecimento) {
+        console.log('Usuário é estabelecimento');
         try {
           // Primeiro buscar o estabelecimento pelo ID do usuário
           const estabelecimentoResponse = await api.get(
             `/estabelecimentos/usuario/${decodedToken.sub}`,
           );
           response = estabelecimentoResponse.data;
+          console.log('Dados do estabelecimento:', response);
         } catch {
           throw new Error('Erro ao buscar dados do estabelecimento');
         }
@@ -161,6 +166,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   const redirectTo = useCallback(
     (user: User | null) => {
       try {
+        console.log('Usuário no redirectTo:', user);
+        console.log('É estabelecimento?', !!user?.estabelecimento);
+        console.log('É cliente?', !!user?.cliente);
+        console.log('Permission level:', user?.usuario?.permission_level);
+
         // Se não houver usuário, redireciona para login
         if (!user) {
           console.warn('Usuário não autenticado, redirecionando para login');
@@ -181,6 +191,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
           : !!user.cliente
             ? '/customer/home'
             : '/login';
+
+        console.log('Rota de destino:', route);
+        console.log('Rota atual:', router.pathname);
 
         // Verifica se a rota atual é diferente da rota de destino
         if (router.pathname !== route) {
