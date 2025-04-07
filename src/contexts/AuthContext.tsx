@@ -68,69 +68,54 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
           const clienteResponse = await api.get(
             `/clientes/usuario/${decodedToken.sub}`,
           );
-          response = clienteResponse.data;
-        } catch {
+          if (!clienteResponse.data.success) {
+            throw new Error('Erro ao buscar dados do cliente');
+          }
+          response = clienteResponse.data.data;
+          console.log('Dados do cliente:', response);
+        } catch (error) {
+          console.error('Erro ao buscar cliente:', error);
           throw new Error('Erro ao buscar dados do cliente');
         }
       } else if (decodedToken.hasEstabelecimento) {
         console.log('Usuário é estabelecimento');
         try {
-          // Primeiro buscar o estabelecimento pelo ID do usuário
           const estabelecimentoResponse = await api.get(
             `/estabelecimentos/usuario/${decodedToken.sub}`,
           );
-          response = estabelecimentoResponse.data;
+          if (!estabelecimentoResponse.data.success) {
+            throw new Error('Erro ao buscar dados do estabelecimento');
+          }
+          response = estabelecimentoResponse.data.data;
           console.log('Dados do estabelecimento:', response);
-        } catch {
+        } catch (error) {
+          console.error('Erro ao buscar estabelecimento:', error);
           throw new Error('Erro ao buscar dados do estabelecimento');
         }
       }
 
-      const {
-        cep,
-        endereco,
-        numero,
-        complemento,
-        bairro,
-        cidade,
-        estado,
-        num_cnpj,
-        nome_estab,
-        razao_social,
-        num_celular,
-        imgLogo,
-        status,
-        latitude,
-        longitude,
-        usuario: {
-          name,
-          email,
-          is_admin,
-          is_ativo,
-          data_criacao,
-          data_atualizacao,
-          id,
-        },
-      } = response;
+      if (!response) {
+        throw new Error('Dados do usuário não encontrados');
+      }
 
       const usr: User = {
         endereco: {
-          cep,
-          endereco,
-          numero,
-          complemento,
-          bairro,
-          cidade,
-          estado,
+          cep: response.cep,
+          endereco: response.endereco,
+          numero: response.numero,
+          complemento: response.complemento,
+          bairro: response.bairro,
+          cidade: response.cidade,
+          estado: response.estado,
         },
         usuario: {
-          name,
-          email,
-          is_admin,
-          is_ativo,
-          data_criacao,
-          data_atualizacao,
-          id,
+          name: response.usuario.name,
+          email: response.usuario.email,
+          is_admin: response.usuario.is_admin,
+          is_ativo: response.usuario.is_ativo,
+          data_criacao: response.usuario.data_criacao,
+          data_atualizacao: response.usuario.data_atualizacao,
+          id: response.usuario.id,
           permission_level: decodedToken.permission_level,
         },
         cliente: decodedToken.hasCliente
@@ -142,20 +127,24 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
           : undefined,
         estabelecimento: decodedToken.hasEstabelecimento
           ? {
-              num_cnpj,
-              nome_estab,
-              razao_social,
-              num_celular,
-              imgLogo,
-              status,
-              latitude,
-              longitude,
+              num_cnpj: response.num_cnpj,
+              nome_estab: response.nome_estab,
+              razao_social: response.razao_social,
+              num_celular: response.num_celular,
+              imgLogo: response.imgLogo,
+              status: response.status,
+              latitude: response.latitude,
+              longitude: response.longitude,
             }
           : undefined,
       };
+
+      console.log('Usuário processado:', usr);
+
       setUser(usr);
       return { success: true, user: usr };
-    } catch {
+    } catch (error) {
+      console.error('Erro no processamento do token:', error);
       Cookies.remove('token');
       setUser(null);
       AuthService.setDefaultHeaderToken('');
@@ -242,6 +231,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       const response = await AuthService.login(data);
       const token = response.token;
       const { success, user: processedUser } = await processToken(token);
+
+      console.log('Login:', { success, processedUser });
       if (success && processedUser) {
         redirectTo(processedUser);
       }

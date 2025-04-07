@@ -23,13 +23,13 @@ const CustomerQrCode: React.FC = () => {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   // Função para navegar para a página da comanda com tratamento de erro
-  const navegarParaComanda = (mesaId: string, clienteId: string) => {
+  const navegarParaComanda = () => {
     try {
       // Definir a aba ativa antes de navegar
       setActiveHomeTab('comanda');
 
-      // Usar um caminho mais simples para evitar problemas de rota
-      const path = `/customer/comanda/${mesaId}?clienteId=${clienteId}`;
+      // Usar o caminho correto para a página de comanda
+      const path = '/customer/comanda';
       console.log('Redirecionando para:', path);
 
       // Usar setTimeout para garantir que a navegação ocorra após a atualização do estado
@@ -114,7 +114,7 @@ const CustomerQrCode: React.FC = () => {
       setSuccessMessage('Comanda criada com sucesso!');
 
       // Navegar para a comanda
-      navegarParaComanda(mesaId, clienteCpf);
+      navegarParaComanda();
     } catch (err) {
       console.error('Erro ao processar QR Code:', err);
       setError('Erro ao processar QR Code. Tente novamente.');

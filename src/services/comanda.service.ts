@@ -278,6 +278,68 @@ export const ComandaService = {
       throw error;
     }
   },
+
+  /**
+   * Obtém a comanda ativa de um cliente
+   * @param clienteId ID do cliente (CPF)
+   * @param token Token de autenticação
+   * @returns Promise com a resposta da API
+   */
+  async getComandaAtivaByCliente(
+    clienteId: string,
+    token: string,
+  ): Promise<ComandaResponse | null> {
+    // Verifica se o backend está acessível
+    const backendAvailable = await this.isBackendAvailable();
+
+    // Se o backend não estiver acessível, retorna comanda ativa do localStorage
+    if (!backendAvailable) {
+      console.warn('Modo offline: retornando comanda ativa do localStorage');
+      return this.getOfflineComandaAtiva(clienteId);
+    }
+
+    try {
+      const url = `/api/proxy/comandas/ativa/${clienteId}`;
+
+      const response = await axios.get(url, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      return response.data;
+    } catch (error) {
+      console.error('Erro ao buscar comanda ativa:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Obtém a comanda ativa offline do localStorage
+   * @param clienteId ID do cliente (CPF)
+   * @returns Comanda ativa ou null se não encontrar
+   */
+  getOfflineComandaAtiva(clienteId: string): ComandaResponse | null {
+    try {
+      // Obtém comandas offline existentes
+      const offlineComandas = JSON.parse(
+        localStorage.getItem('offlineComandas') || '[]',
+      ) as OfflineComanda[];
+
+      // Filtra comandas pelo ID do cliente e status ativo
+      const comandaAtiva = offlineComandas
+        .filter((comanda) => comanda.num_cpf === clienteId)
+        .sort(
+          (a, b) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+        )[0];
+
+      return comandaAtiva || null;
+    } catch (error) {
+      console.error('Erro ao obter comanda ativa offline:', error);
+      return null;
+    }
+  },
 };
 
 export default ComandaService;

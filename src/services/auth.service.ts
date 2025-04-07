@@ -50,6 +50,8 @@ export interface AuthResponse {
 interface AuthApiResponse {
   token: string;
   user: User;
+  success: boolean;
+  message?: string;
 }
 
 export interface UserResponse {
@@ -70,11 +72,22 @@ export interface CheckAccountResponse {
 export class AuthService {
   static async login(data: LoginData) {
     try {
-      const response = await api.post('/auth/login', data);
+      const response = await api.post<AuthApiResponse>('/auth/login', data);
+
       if (!response.data.success) {
-        throw new Error(response.data.message);
+        throw new Error(response.data.message || 'Erro ao fazer login');
       }
-      return response.data;
+
+      // Salvar o token nos cookies
+      Cookies.set('token', response.data.token);
+
+      // Configurar o token no header das requisições
+      this.setDefaultHeaderToken(response.data.token);
+
+      return {
+        user: response.data.user,
+        token: response.data.token,
+      };
     } catch (error) {
       console.error('Erro no login:', error);
       const errorMessage = ErrorService.handleError(

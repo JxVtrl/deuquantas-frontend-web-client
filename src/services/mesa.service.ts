@@ -10,13 +10,48 @@ export interface MesaSolicitacao {
 }
 
 class MesaService {
-  private socket: Socket;
+  private socket: Socket | null = null;
   private static instance: MesaService;
+  private isConnecting: boolean = false;
+  private connectionPromise: Promise<void> | null = null;
 
   private constructor() {
-    this.socket = io(
-      process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000',
-    );
+    this.connect();
+  }
+
+  private async connect() {
+    if (this.isConnecting) {
+      return this.connectionPromise;
+    }
+
+    this.isConnecting = true;
+    this.connectionPromise = new Promise((resolve) => {
+      const apiUrl = '/api/proxy';
+
+      this.socket = io(apiUrl, {
+        path: '/socket.io',
+        transports: ['websocket'],
+        reconnection: true,
+        reconnectionAttempts: 5,
+        reconnectionDelay: 1000,
+      });
+
+      this.socket.on('connect', () => {
+        console.log('Socket conectado com sucesso');
+        this.isConnecting = false;
+        resolve();
+      });
+
+      this.socket.on('connect_error', (error) => {
+        console.error('Erro na conexão do socket:', error);
+      });
+
+      this.socket.on('disconnect', () => {
+        console.log('Socket desconectado');
+      });
+    });
+
+    return this.connectionPromise;
   }
 
   public static getInstance(): MesaService {
@@ -26,37 +61,60 @@ class MesaService {
     return MesaService.instance;
   }
 
+  private async ensureConnection() {
+    if (!this.socket?.connected) {
+      await this.connect();
+    }
+  }
+
   // Método para solicitar uma mesa
-  public solicitarMesa(num_cnpj: string, numMesa: string, clienteId: string) {
-    this.socket.emit('solicitar-mesa', { num_cnpj, numMesa, clienteId });
+  public async solicitarMesa(
+    num_cnpj: string,
+    numMesa: string,
+    clienteId: string,
+  ) {
+    await this.ensureConnection();
+    this.socket?.emit('solicitar-mesa', { num_cnpj, numMesa, clienteId });
   }
 
   // Método para aprovar uma solicitação
-  public aprovarSolicitacao(solicitacaoId: string) {
-    this.socket.emit('aprovar-solicitacao', { solicitacaoId });
+  public async aprovarSolicitacao(solicitacaoId: string) {
+    await this.ensureConnection();
+    this.socket?.emit('aprovar-solicitacao', { solicitacaoId });
   }
 
   // Método para rejeitar uma solicitação
-  public rejeitarSolicitacao(solicitacaoId: string) {
-    this.socket.emit('rejeitar-solicitacao', { solicitacaoId });
+  public async rejeitarSolicitacao(solicitacaoId: string) {
+    await this.ensureConnection();
+    this.socket?.emit('rejeitar-solicitacao', { solicitacaoId });
   }
 
   // Método para ouvir atualizações de uma solicitação específica
-  public onAtualizacaoSolicitacao(
+  public async onAtualizacaoSolicitacao(
     callback: (solicitacao: MesaSolicitacao) => void,
   ) {
-    this.socket.on('atualizacao-solicitacao', callback);
+    await this.ensureConnection();
+    this.socket?.on('atualizacao-solicitacao', callback);
   }
 
   // Método para ouvir novas solicitações (para o estabelecimento)
-  public onNovaSolicitacao(callback: (solicitacao: MesaSolicitacao) => void) {
-    this.socket.on('nova-solicitacao', callback);
+  public async onNovaSolicitacao(
+    callback: (solicitacao: MesaSolicitacao) => void,
+  ) {
+    await this.ensureConnection();
+    this.socket?.on('nova-solicitacao', callback);
   }
 
   // Método para remover listeners
   public removerListeners() {
-    this.socket.off('atualizacao-solicitacao');
-    this.socket.off('nova-solicitacao');
+    this.socket?.off('atualizacao-solicitacao');
+    this.socket?.off('nova-solicitacao');
+  }
+
+  // Método para desconectar o socket
+  public disconnect() {
+    this.socket?.disconnect();
+    this.socket = null;
   }
 }
 
