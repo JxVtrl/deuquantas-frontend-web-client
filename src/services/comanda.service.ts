@@ -40,7 +40,7 @@ const possibleUrls = [
 const validUrls = possibleUrls.filter((url) => url);
 
 // URL padrão caso nenhuma das URLs acima funcione
-let API_URL = validUrls[0] || 'http://localhost:3001';
+export let API_URL = validUrls[0] || 'http://localhost:3001';
 
 // Flag para indicar se estamos em modo offline
 let isOfflineMode = false;
@@ -122,7 +122,7 @@ export const ComandaService = {
     token: string,
   ): Promise<ComandaResponse> {
     try {
-      const url = `/api/proxy/comandas`;
+      const url = `${API_URL}/comandas`;
 
       console.log('Tentando criar comanda em:', url);
 
@@ -270,7 +270,7 @@ export const ComandaService = {
   ): Promise<boolean> {
     try {
       const response = await axios.get(
-        `/api/proxy/qr-code/mesa/${num_cnpj}/${numMesa}/disponibilidade`,
+        `${API_URL}/qr-code/mesa/${num_cnpj}/${numMesa}/disponibilidade`,
       );
       return response.data.disponivel;
     } catch (error) {
@@ -299,7 +299,7 @@ export const ComandaService = {
     }
 
     try {
-      const url = `/api/proxy/comandas/ativa/${clienteId}`;
+      const url = `${API_URL}/comandas/ativa/${clienteId}`;
 
       const response = await axios.get(url, {
         headers: {

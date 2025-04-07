@@ -14,6 +14,8 @@ class MesaService {
   private static instance: MesaService;
   private isConnecting: boolean = false;
   private connectionPromise: Promise<void> | null = null;
+  private reconnectAttempts: number = 0;
+  private maxReconnectAttempts: number = 5;
 
   private constructor() {
     this.connect();
@@ -26,28 +28,44 @@ class MesaService {
 
     this.isConnecting = true;
     this.connectionPromise = new Promise((resolve) => {
-      const apiUrl = '/api/proxy';
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002';
 
       this.socket = io(apiUrl, {
         path: '/socket.io',
-        transports: ['websocket'],
+        transports: ['websocket', 'polling'],
         reconnection: true,
-        reconnectionAttempts: 5,
+        reconnectionAttempts: this.maxReconnectAttempts,
         reconnectionDelay: 1000,
+        timeout: 10000,
+        withCredentials: true,
+        forceNew: true,
       });
 
       this.socket.on('connect', () => {
         console.log('Socket conectado com sucesso');
         this.isConnecting = false;
+        this.reconnectAttempts = 0;
         resolve();
       });
 
       this.socket.on('connect_error', (error) => {
         console.error('Erro na conexão do socket:', error);
+        this.reconnectAttempts++;
+
+        if (this.reconnectAttempts >= this.maxReconnectAttempts) {
+          console.error('Número máximo de tentativas de reconexão atingido');
+          this.isConnecting = false;
+        }
       });
 
       this.socket.on('disconnect', () => {
         console.log('Socket desconectado');
+        this.isConnecting = false;
+      });
+
+      this.socket.on('error', (error) => {
+        console.error('Erro no socket:', error);
+        this.isConnecting = false;
       });
     });
 
