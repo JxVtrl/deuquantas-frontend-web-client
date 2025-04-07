@@ -20,7 +20,7 @@ export const Header: React.FC<HeaderProps> = ({ isEstablishment = false }) => {
         <div className='flex items-center gap-[12px]'>
           <Logo
             isEstablishment={isEstablishment}
-            variant={isEstablishment ? 'dark' : 'light'}
+            variant={isEstablishment ? 'light' : 'dark'}
           />
 
           <Image
