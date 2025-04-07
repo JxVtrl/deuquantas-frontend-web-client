@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { capitalize } from '@/utils/formatters';
 import HeaderMenu from '../HeaderMenu';
 import { useRouter } from 'next/router';
+import Logo from '../Logo';
 
 type HeaderProps = {
   isEstablishment?: boolean;
@@ -20,17 +21,9 @@ export const Header: React.FC<HeaderProps> = ({ isEstablishment = false }) => {
     <MaxWidthLayout backgroundColor={isEstablishment ? '#000' : '#FFCC00'}>
       <header className='py-[7px] flex justify-between items-center'>
         <div className='flex items-center gap-[12px]'>
-          <Image
-            src={isEstablishment ? '/brand/logo.svg' : '/brand/logo-dark.svg'}
-            width={47}
-            height={20}
-            alt='Logo Deu Quantas?'
-            onClick={() => {
-              router.push(
-                isEstablishment ? '/establishment/home' : '/customer/home',
-              );
-            }}
-            className='cursor-pointer'
+          <Logo
+            isEstablishment={isEstablishment}
+            variant={isEstablishment ? 'dark' : 'light'}
           />
 
           <Image

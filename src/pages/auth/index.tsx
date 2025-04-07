@@ -1,23 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import Image from 'next/image';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/router';
 import { LoginForm } from '@/components/auth/LoginForm';
 import RegisterForm from '@/components/auth/RegisterForm';
 import { AuthFormProvider } from '@/contexts/AuthFormContext';
 import { useAuthFormContext } from '@/contexts/AuthFormContext';
+import Logo from '@/components/Logo';
 
 function AuthPageContent() {
   const { isLogin, isRegisterAsEstablishment } = useAuthFormContext();
   const [backgroundColor, setBackgroundColor] = useState<string>('#FFCC00');
-  const [logoSrc, setLogoSrc] = useState<string>('/brand/logo-dark.svg');
 
   useEffect(() => {
     setBackgroundColor(isRegisterAsEstablishment ? '#000000' : '#FFCC00');
-    setLogoSrc(
-      isRegisterAsEstablishment ? '/brand/logo.svg' : '/brand/logo-dark.svg',
-    );
   }, [isRegisterAsEstablishment]);
 
   return (
@@ -25,13 +21,11 @@ function AuthPageContent() {
       style={{ backgroundColor }}
       className='min-h-screen flex items-center justify-center p-4 transition-all duration-300'
     >
-      <div className='w-[75vw] max-w-[314px] flex flex-col items-end'>
-        <Image
-          src={logoSrc}
-          alt='Logo'
-          width={202}
-          height={86}
-          className='mb-[42px] transition-all duration-300'
+      <div className='w-[75vw] max-w-[314px] flex flex-col items-end gap-4'>
+        <Logo
+          isEstablishment={isRegisterAsEstablishment}
+          variant={isRegisterAsEstablishment ? 'light' : 'dark'}
+          size='large'
         />
 
         <AnimatePresence mode='wait'>
