@@ -206,8 +206,8 @@ const TablesManagement: React.FC = () => {
   return (
     <EstablishmentLayout>
       <MaxWidthLayout>
-        <div className='h-[calc(100vh-120px)] flex flex-col'>
-          <div className='flex justify-between items-center py-6 '>
+        <div className='h-[calc(100vh-120px)] flex flex-col gap-6 py-6'>
+          <div className='flex justify-between items-center'>
             <h1 className='text-2xl font-bold'>Gerenciar Mesas</h1>
             <Button onClick={handleCreateClick}>
               <Plus className='mr-2 h-4 w-4' />
@@ -215,7 +215,6 @@ const TablesManagement: React.FC = () => {
             </Button>
           </div>
 
-          {/* Filtros e Ordenação */}
           <div
             className='bg-white p-3 border-none rounded-lg
             shadow hover:shadow-md transition-shadow
@@ -274,7 +273,7 @@ const TablesManagement: React.FC = () => {
             </div>
           </div>
 
-          <div className='flex-1 overflow-y-auto py-6'>
+          <div className='flex-1 overflow-y-auto'>
             {loading ? (
               <div className='flex justify-center items-center h-full'>
                 <div className='animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#FFCC00]'></div>

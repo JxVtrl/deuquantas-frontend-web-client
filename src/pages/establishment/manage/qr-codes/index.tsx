@@ -8,6 +8,7 @@ import { QRCodeSVG } from 'qrcode.react';
 import { Mesa } from '@/services/api/types';
 import { toast } from 'react-hot-toast';
 import { Download } from 'lucide-react';
+import MaxWidthLayout from '@/layout/MaxWidthLayout';
 
 const QrCodesManagement: React.FC = () => {
   const { user } = useAuth();
@@ -63,74 +64,76 @@ const QrCodesManagement: React.FC = () => {
 
   return (
     <EstablishmentLayout>
-      <div className='h-[calc(100vh-120px)] overflow-hidden flex flex-col'>
-        <div className='flex justify-between items-center p-6 border-b'>
-          <h1 className='text-2xl font-bold'>QR Codes das Mesas</h1>
-        </div>
+      <MaxWidthLayout>
+        <div className='h-[calc(100vh-120px)] flex flex-col gap-6 py-6'>
+          <div className='flex justify-between items-center'>
+            <h1 className='text-2xl font-bold'>QR Codes das Mesas</h1>
+          </div>
 
-        <div className='flex-1 overflow-y-auto py-6'>
-          {loading ? (
-            <div className='flex justify-center items-center h-full'>
-              <div className='animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#FFCC00]'></div>
-            </div>
-          ) : (
-            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
-              {mesas.map((mesa) => (
-                <div
-                  key={mesa.numMesa}
-                  className='bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow'
-                >
-                  <div className='flex justify-between items-start mb-4'>
-                    <div>
-                      <h3 className='text-lg font-semibold'>
-                        Mesa {mesa.numMesa}
-                      </h3>
-                      <p className='text-sm text-gray-500'>
-                        Capacidade: {mesa.numMaxPax} pessoas
-                      </p>
+          <div className='flex-1 overflow-y-auto'>
+            {loading ? (
+              <div className='flex justify-center items-center h-full'>
+                <div className='animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#FFCC00]'></div>
+              </div>
+            ) : (
+              <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+                {mesas.map((mesa) => (
+                  <div
+                    key={mesa.numMesa}
+                    className='bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow'
+                  >
+                    <div className='flex justify-between items-start mb-4'>
+                      <div>
+                        <h3 className='text-lg font-semibold'>
+                          Mesa {mesa.numMesa}
+                        </h3>
+                        <p className='text-sm text-gray-500'>
+                          Capacidade: {mesa.numMaxPax} pessoas
+                        </p>
+                      </div>
+                      <div className='flex items-center gap-2'>
+                        <div
+                          className={`w-3 h-3 rounded-full ${
+                            mesa.status === 'disponivel'
+                              ? 'bg-green-500'
+                              : 'bg-red-500'
+                          }`}
+                        />
+                        <span className='text-sm font-medium'>
+                          {mesa.status === 'disponivel'
+                            ? 'Disponível'
+                            : 'Ocupada'}
+                        </span>
+                      </div>
                     </div>
-                    <div className='flex items-center gap-2'>
+
+                    <div className='flex flex-col items-center gap-4'>
                       <div
-                        className={`w-3 h-3 rounded-full ${
-                          mesa.status === 'disponivel'
-                            ? 'bg-green-500'
-                            : 'bg-red-500'
-                        }`}
-                      />
-                      <span className='text-sm font-medium'>
-                        {mesa.status === 'disponivel'
-                          ? 'Disponível'
-                          : 'Ocupada'}
-                      </span>
+                        id={`qr-code-${mesa.numMesa}`}
+                        className='flex justify-center'
+                      >
+                        <QRCodeSVG
+                          value={mesa.qrCode}
+                          size={200}
+                          level='H'
+                          includeMargin
+                        />
+                      </div>
+                      <Button
+                        onClick={() => handleDownloadQrCode(mesa)}
+                        className='bg-[#FFCC00] text-black hover:bg-[#FFCC00]/80'
+                      >
+                        <Download className='mr-2 h-4 w-4' />
+                        Baixar QR Code
+                      </Button>
                     </div>
                   </div>
-
-                  <div className='flex flex-col items-center gap-4'>
-                    <div
-                      id={`qr-code-${mesa.numMesa}`}
-                      className='flex justify-center'
-                    >
-                      <QRCodeSVG
-                        value={mesa.qrCode}
-                        size={200}
-                        level='H'
-                        includeMargin
-                      />
-                    </div>
-                    <Button
-                      onClick={() => handleDownloadQrCode(mesa)}
-                      className='bg-[#FFCC00] text-black hover:bg-[#FFCC00]/80'
-                    >
-                      <Download className='mr-2 h-4 w-4' />
-                      Baixar QR Code
-                    </Button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
+                ))}
+              </div>
+            )}
+          </div>
         </div>
-      </div>
+      </MaxWidthLayout>
     </EstablishmentLayout>
   );
 };
