@@ -1,5 +1,5 @@
 import { api } from '@/lib/axios';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { withAuthEstablishment } from '@/hoc/withAuth';
 import EstablishmentLayout from '@/layout/EstablishmentLayout';
@@ -14,6 +14,8 @@ const QrCodesManagement: React.FC = () => {
   const { user } = useAuth();
   const [mesas, setMesas] = useState<Mesa[]>([]);
   const [loading, setLoading] = useState(false);
+  const [downloading, setDownloading] = useState<string | null>(null);
+  const downloadLinkRef = useRef<HTMLAnchorElement | null>(null);
 
   useEffect(() => {
     if (user?.estabelecimento?.num_cnpj) {
@@ -38,27 +40,35 @@ const QrCodesManagement: React.FC = () => {
     }
   };
 
-  const handleDownloadQrCode = (mesa: Mesa) => {
-    const qrCodeElement = document.getElementById(`qr-code-${mesa.numMesa}`);
-    if (qrCodeElement) {
-      const svg = qrCodeElement.querySelector('svg');
-      if (svg) {
-        const svgData = new XMLSerializer().serializeToString(svg);
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        const img = new Image();
-        img.onload = () => {
-          canvas.width = img.width;
-          canvas.height = img.height;
-          ctx?.drawImage(img, 0, 0);
-          const pngFile = canvas.toDataURL('image/png');
-          const downloadLink = document.createElement('a');
-          downloadLink.download = `qr-code-mesa-${mesa.numMesa}.png`;
-          downloadLink.href = pngFile;
-          downloadLink.click();
-        };
-        img.src = 'data:image/svg+xml;base64,' + btoa(svgData);
+  const handleDownloadQrCode = async (mesa: Mesa) => {
+    try {
+      setDownloading(mesa.numMesa);
+
+      // Criar um Blob com o SVG
+      const svgString = `<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
+        <rect width="200" height="200" fill="white"/>
+        ${mesa.qrCode}
+      </svg>`;
+
+      const blob = new Blob([svgString], { type: 'image/svg+xml' });
+      const url = URL.createObjectURL(blob);
+
+      // Atualizar a referência do link
+      if (downloadLinkRef.current) {
+        downloadLinkRef.current.href = url;
+        downloadLinkRef.current.download = `qr-code-mesa-${mesa.numMesa}.svg`;
+        downloadLinkRef.current.click();
       }
+
+      // Limpar URL após um tempo
+      setTimeout(() => {
+        URL.revokeObjectURL(url);
+      }, 100);
+    } catch (error) {
+      toast.error('Erro ao baixar QR Code');
+      console.error(error);
+    } finally {
+      setDownloading(null);
     }
   };
 
@@ -108,10 +118,7 @@ const QrCodesManagement: React.FC = () => {
                     </div>
 
                     <div className='flex flex-col items-center gap-4'>
-                      <div
-                        id={`qr-code-${mesa.numMesa}`}
-                        className='flex justify-center'
-                      >
+                      <div className='flex justify-center'>
                         <QRCodeSVG
                           value={mesa.qrCode}
                           size={200}
@@ -122,9 +129,12 @@ const QrCodesManagement: React.FC = () => {
                       <Button
                         onClick={() => handleDownloadQrCode(mesa)}
                         className='bg-[#FFCC00] text-black hover:bg-[#FFCC00]/80'
+                        disabled={downloading === mesa.numMesa}
                       >
                         <Download className='mr-2 h-4 w-4' />
-                        Baixar QR Code
+                        {downloading === mesa.numMesa
+                          ? 'Baixando...'
+                          : 'Baixar QR Code'}
                       </Button>
                     </div>
                   </div>
@@ -133,6 +143,8 @@ const QrCodesManagement: React.FC = () => {
             )}
           </div>
         </div>
+        {/* Link virtual para download */}
+        <a ref={downloadLinkRef} style={{ display: 'none' }} />
       </MaxWidthLayout>
     </EstablishmentLayout>
   );

@@ -6,8 +6,6 @@ const baseURL = isDocker
   ? process.env.NEXT_PUBLIC_API_URL || 'http://backend:3001'
   : process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
-console.log('Axios baseURL:', baseURL);
-
 export const api = axios.create({
   baseURL,
   headers: {

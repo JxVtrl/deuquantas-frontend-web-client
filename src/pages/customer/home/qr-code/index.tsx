@@ -159,7 +159,7 @@ const CustomerQrCode: React.FC = () => {
     mesaService.onAtualizacaoSolicitacao(handleAtualizacaoSolicitacao);
 
     return () => {
-      mesaService.removerListeners();
+      mesaService.removeAllListeners();
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
       }

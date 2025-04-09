@@ -72,7 +72,7 @@ const TablesManagement: React.FC = () => {
     });
 
     return () => {
-      mesaService.removerListeners();
+      mesaService.removeAllListeners();
     };
   }, []);
 

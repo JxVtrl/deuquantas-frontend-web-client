@@ -31,7 +31,7 @@ export const MesaAguardandoAprovacao: React.FC<
       );
 
       // Ouvir atualizações da solicitação
-      mesaService.onAtualizacaoSolicitacao((solicitacao: MesaSolicitacao) => {
+      const handleAtualizacao = (solicitacao: MesaSolicitacao) => {
         setStatus(solicitacao.status);
         setLoading(false);
 
@@ -41,10 +41,12 @@ export const MesaAguardandoAprovacao: React.FC<
             onClose();
           }, 3000);
         }
-      });
+      };
+
+      mesaService.onAtualizacaoSolicitacao(handleAtualizacao);
 
       return () => {
-        mesaService.removerListeners();
+        mesaService.removeAllListeners();
       };
     }
   }, [isOpen, solicitacao, onClose]);

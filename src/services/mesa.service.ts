@@ -1,5 +1,5 @@
 import { io, Socket } from 'socket.io-client';
-
+import Cookies from 'js-cookie';
 export interface MesaSolicitacao {
   id: string;
   num_cnpj: string;
@@ -9,68 +9,116 @@ export interface MesaSolicitacao {
   dataSolicitacao: Date;
 }
 
+type SocketCallback = (solicitacao: MesaSolicitacao) => void;
+type SocketResponse = {
+  error?: string;
+  data?: MesaSolicitacao;
+};
+
 class MesaService {
   private socket: Socket | null = null;
   private static instance: MesaService;
+  private listeners: Map<string, SocketCallback[]> = new Map();
   private isConnecting: boolean = false;
-  private connectionPromise: Promise<void> | null = null;
-  private reconnectAttempts: number = 0;
-  private maxReconnectAttempts: number = 5;
+  private currentRoom: string | null = null;
 
   private constructor() {
-    this.connect();
+    this.initializeSocket();
   }
 
-  private async connect() {
-    if (this.isConnecting) {
-      return this.connectionPromise;
-    }
+  private initializeSocket() {
+    try {
+      if (this.socket?.connected) {
+        console.log('[DEBUG] Socket já está conectado');
+        return;
+      }
 
-    this.isConnecting = true;
-    this.connectionPromise = new Promise((resolve) => {
-      const apiUrl =
+      const socketUrl =
         process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:3002';
+      console.log('[DEBUG] Inicializando socket com URL:', socketUrl);
 
-      this.socket = io(apiUrl, {
+      this.socket = io(socketUrl, {
         path: '/socket.io',
         transports: ['websocket', 'polling'],
         reconnection: true,
-        reconnectionAttempts: this.maxReconnectAttempts,
+        reconnectionAttempts: Infinity,
         reconnectionDelay: 1000,
-        timeout: 10000,
+        reconnectionDelayMax: 5000,
+        timeout: 20000,
         withCredentials: true,
-        forceNew: true,
+        autoConnect: true,
+        auth: {
+          token: Cookies.get('token') || undefined,
+        },
       });
 
-      this.socket.on('connect', () => {
-        console.log('Socket conectado com sucesso');
-        this.isConnecting = false;
-        this.reconnectAttempts = 0;
-        resolve();
-      });
+      this.setupSocketListeners();
 
-      this.socket.on('connect_error', (error) => {
-        console.error('Erro na conexão do socket:', error);
-        this.reconnectAttempts++;
+      // Forçar a conexão
+      this.socket.connect();
 
-        if (this.reconnectAttempts >= this.maxReconnectAttempts) {
-          console.error('Número máximo de tentativas de reconexão atingido');
-          this.isConnecting = false;
-        }
-      });
+      console.log('[DEBUG] Socket inicializado com sucesso');
+    } catch (error) {
+      console.error('[DEBUG] Erro ao inicializar socket:', error);
+      this.socket = null;
+    }
+  }
 
-      this.socket.on('disconnect', () => {
-        console.log('Socket desconectado');
-        this.isConnecting = false;
-      });
+  private setupSocketListeners() {
+    if (!this.socket) {
+      console.error('[DEBUG] Socket não inicializado');
+      return;
+    }
 
-      this.socket.on('error', (error) => {
-        console.error('Erro no socket:', error);
-        this.isConnecting = false;
-      });
+    this.socket.on('connect', () => {
+      console.log('[DEBUG] Conectado ao servidor Socket.IO');
+      this.isConnecting = false;
+
+      if (this.currentRoom) {
+        console.log('[DEBUG] Reconectando à sala:', this.currentRoom);
+        this.joinRoom(this.currentRoom).catch((error) => {
+          console.error('[DEBUG] Erro ao reconectar à sala:', error);
+        });
+      }
     });
 
-    return this.connectionPromise;
+    this.socket.on('connect_error', (error) => {
+      console.error('[DEBUG] Erro na conexão Socket.IO:', error);
+      this.isConnecting = false;
+
+      // Tentar reconectar após um erro
+      setTimeout(() => {
+        if (!this.socket?.connected && !this.isConnecting) {
+          console.log('[DEBUG] Tentando reconectar após erro...');
+          this.socket?.connect();
+        }
+      }, 5000);
+    });
+
+    this.socket.on('disconnect', (reason) => {
+      console.log('[DEBUG] Desconectado do servidor Socket.IO:', reason);
+      this.isConnecting = false;
+
+      // Tentar reconectar se não foi uma desconexão intencional
+      if (reason !== 'io client disconnect') {
+        setTimeout(() => {
+          if (!this.socket?.connected && !this.isConnecting) {
+            console.log('[DEBUG] Tentando reconectar após desconexão...');
+            this.socket?.connect();
+          }
+        }, 5000);
+      }
+    });
+
+    this.socket.on('reconnect', (attemptNumber) => {
+      console.log(`[DEBUG] Reconectado após ${attemptNumber} tentativas`);
+      this.isConnecting = false;
+    });
+
+    this.socket.on('reconnect_attempt', (attemptNumber) => {
+      console.log(`[DEBUG] Tentativa de reconexão ${attemptNumber}`);
+      this.isConnecting = true;
+    });
   }
 
   public static getInstance(): MesaService {
@@ -80,74 +128,186 @@ class MesaService {
     return MesaService.instance;
   }
 
-  private async ensureConnection() {
-    if (!this.socket?.connected) {
-      await this.connect();
+  private ensureSocket() {
+    if (!this.socket || !this.socket.connected) {
+      console.log('[DEBUG] Socket não conectado, tentando reconectar...');
+      this.initializeSocket();
     }
   }
 
-  // Método para entrar em uma sala
-  public async joinRoom(room: string) {
-    await this.ensureConnection();
-    this.socket?.emit('join-room', room);
+  public async joinRoom(room: string): Promise<void> {
+    console.log('[DEBUG] Tentando entrar na sala:', room);
+
+    if (!this.socket) {
+      console.error('[DEBUG] Socket não inicializado');
+      throw new Error('Socket não inicializado');
+    }
+
+    // Aguardar até que o socket esteja conectado
+    if (!this.socket.connected) {
+      console.log('[DEBUG] Socket não está conectado. Aguardando conexão...');
+      await new Promise<void>((resolve, reject) => {
+        const timeout = setTimeout(() => {
+          reject(new Error('Timeout ao aguardar conexão do socket'));
+        }, 10000);
+
+        this.socket?.on('connect', () => {
+          clearTimeout(timeout);
+          resolve();
+        });
+
+        this.socket?.connect();
+      });
+    }
+
+    const socket = this.socket; // Capturar referência local
+
+    return new Promise((resolve, reject) => {
+      // Configurar listeners antes de emitir o evento
+      const onRoomJoined = (data: { room: string; status: string }) => {
+        console.log('[DEBUG] Evento room-joined recebido:', data);
+        if (data.status === 'ok') {
+          this.currentRoom = room;
+          socket.off('room-joined', onRoomJoined);
+          socket.off('room-join-error', onRoomJoinError);
+          clearTimeout(timeoutId);
+          resolve();
+        }
+      };
+
+      const onRoomJoinError = (error: { status: string; message: string }) => {
+        console.error('[DEBUG] Erro ao entrar na sala:', error);
+        socket.off('room-joined', onRoomJoined);
+        socket.off('room-join-error', onRoomJoinError);
+        clearTimeout(timeoutId);
+        reject(new Error(error.message));
+      };
+
+      // Configurar timeout para evitar espera infinita
+      const timeoutId = setTimeout(() => {
+        console.error('[DEBUG] Timeout ao tentar entrar na sala');
+        socket.off('room-joined', onRoomJoined);
+        socket.off('room-join-error', onRoomJoinError);
+        reject(new Error('Timeout ao tentar entrar na sala'));
+      }, 10000);
+
+      // Adicionar listeners
+      socket.on('room-joined', onRoomJoined);
+      socket.on('room-join-error', onRoomJoinError);
+
+      // Emitir evento para entrar na sala
+      console.log('[DEBUG] Emitindo evento join-room para sala:', room);
+      socket.emit('join-room', room);
+    });
   }
 
-  // Método para solicitar uma mesa
   public async solicitarMesa(
     num_cnpj: string,
     numMesa: string,
     clienteId: string,
-  ) {
-    await this.ensureConnection();
-    this.socket?.emit('solicitar-mesa', { num_cnpj, numMesa, clienteId });
+  ): Promise<SocketResponse> {
+    this.ensureSocket();
+    return new Promise((resolve, reject) => {
+      this.socket?.emit(
+        'solicitar-mesa',
+        { num_cnpj, numMesa, clienteId },
+        (response: SocketResponse) => {
+          if (response.error) {
+            reject(new Error(response.error));
+          } else {
+            resolve(response);
+          }
+        },
+      );
+    });
   }
 
-  // Método para aprovar uma solicitação
-  public async aprovarSolicitacao(solicitacaoId: string) {
-    await this.ensureConnection();
-    this.socket?.emit('aprovar-solicitacao', { solicitacaoId });
+  public async aprovarSolicitacao(
+    solicitacaoId: string,
+  ): Promise<SocketResponse> {
+    this.ensureSocket();
+    return new Promise((resolve, reject) => {
+      this.socket?.emit(
+        'aprovar-solicitacao',
+        { solicitacaoId },
+        (response: SocketResponse) => {
+          if (response.error) {
+            reject(new Error(response.error));
+          } else {
+            resolve(response);
+          }
+        },
+      );
+    });
   }
 
-  // Método para rejeitar uma solicitação
-  public async rejeitarSolicitacao(solicitacaoId: string) {
-    await this.ensureConnection();
-    this.socket?.emit('rejeitar-solicitacao', { solicitacaoId });
+  public async rejeitarSolicitacao(
+    solicitacaoId: string,
+  ): Promise<SocketResponse> {
+    this.ensureSocket();
+    return new Promise((resolve, reject) => {
+      this.socket?.emit(
+        'rejeitar-solicitacao',
+        { solicitacaoId },
+        (response: SocketResponse) => {
+          if (response.error) {
+            reject(new Error(response.error));
+          } else {
+            resolve(response);
+          }
+        },
+      );
+    });
   }
 
-  // Método para ouvir atualizações de uma solicitação específica
-  public async onAtualizacaoSolicitacao(
-    callback: (solicitacao: MesaSolicitacao) => void,
-  ) {
-    await this.ensureConnection();
-    this.socket?.on('atualizacao-solicitacao', callback);
+  public onNovaSolicitacao(callback: SocketCallback): void {
+    this.ensureSocket();
+    const eventName = 'nova-solicitacao';
+
+    if (!this.listeners.has(eventName)) {
+      this.listeners.set(eventName, []);
+    }
+
+    this.listeners.get(eventName)?.push(callback);
+    this.socket?.on(eventName, callback);
   }
 
-  // Método para ouvir novas solicitações (para o estabelecimento)
-  public async onNovaSolicitacao(
-    callback: (solicitacao: MesaSolicitacao) => void,
-  ) {
-    await this.ensureConnection();
-    this.socket?.on('nova-solicitacao', callback);
+  public onSolicitacaoAtualizada(callback: SocketCallback): void {
+    this.ensureSocket();
+    const eventName = 'solicitacao-atualizada';
+
+    if (!this.listeners.has(eventName)) {
+      this.listeners.set(eventName, []);
+    }
+
+    this.listeners.get(eventName)?.push(callback);
+    this.socket?.on(eventName, callback);
   }
 
-  public async onSolicitacaoAtualizada(
-    callback: (solicitacao: MesaSolicitacao) => void,
-  ) {
-    await this.ensureConnection();
-    this.socket?.on('solicitacao-atualizada', callback);
+  public onAtualizacaoSolicitacao(callback: SocketCallback): void {
+    this.ensureSocket();
+    const eventName = 'atualizacao-solicitacao';
+
+    if (!this.listeners.has(eventName)) {
+      this.listeners.set(eventName, []);
+    }
+
+    this.listeners.get(eventName)?.push(callback);
+    this.socket?.on(eventName, callback);
   }
 
-  // Método para remover listeners
-  public removerListeners() {
-    this.socket?.off('atualizacao-solicitacao');
-    this.socket?.off('nova-solicitacao');
-    this.socket?.off('solicitacao-atualizada');
+  public removeAllListeners(): void {
+    if (this.socket) {
+      this.socket.removeAllListeners();
+    }
+    this.listeners.clear();
   }
 
-  // Método para desconectar o socket
-  public disconnect() {
+  public disconnect(): void {
+    this.removeAllListeners();
     this.socket?.disconnect();
     this.socket = null;
+    this.currentRoom = null;
   }
 }
 
