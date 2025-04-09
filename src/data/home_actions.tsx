@@ -4,6 +4,7 @@ import {
   FavoriteIcon,
   LocationIcon,
   OrdersIcon,
+  RequestIcon,
   ScanIcon,
   TableIcon,
 } from '@/components/Icons';
@@ -16,11 +17,11 @@ export interface ActionItem {
 }
 
 export const establishmentActions: ActionItem[] = [
-  // {
-  //   icon: DashboardIcon,
-  //   label: 'Dashboard',
-  //   href: '/establishment/dashboard',
-  // },
+  {
+    icon: RequestIcon,
+    label: 'Solicitações',
+    href: '/establishment/manage/requests',
+  },
   {
     icon: QrCodeIcon,
     label: 'QR Codes',
@@ -42,21 +43,21 @@ export const customerActions: ActionItem[] = [
   {
     icon: ConsumptionIcon,
     label: 'Consumo',
-    href: '/consumo',
+    href: '/customer/home/consumption',
   },
   {
     icon: FavoriteIcon,
     label: 'Favoritos',
-    href: '/favoritos',
+    href: '/customer/home/favorites',
   },
   {
     icon: OrdersIcon,
     label: 'Pedidos',
-    href: '/pedidos',
+    href: '/customer/home/orders',
   },
   {
     icon: LocationIcon,
     label: 'Locais',
-    href: '/locais',
+    href: '/customer/home/locations',
   },
 ];

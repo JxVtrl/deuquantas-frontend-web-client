@@ -28,7 +28,8 @@ class MesaService {
 
     this.isConnecting = true;
     this.connectionPromise = new Promise((resolve) => {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002';
+      const apiUrl =
+        process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:3002';
 
       this.socket = io(apiUrl, {
         path: '/socket.io',
@@ -85,6 +86,12 @@ class MesaService {
     }
   }
 
+  // Método para entrar em uma sala
+  public async joinRoom(room: string) {
+    await this.ensureConnection();
+    this.socket?.emit('join-room', room);
+  }
+
   // Método para solicitar uma mesa
   public async solicitarMesa(
     num_cnpj: string,
@@ -123,10 +130,18 @@ class MesaService {
     this.socket?.on('nova-solicitacao', callback);
   }
 
+  public async onSolicitacaoAtualizada(
+    callback: (solicitacao: MesaSolicitacao) => void,
+  ) {
+    await this.ensureConnection();
+    this.socket?.on('solicitacao-atualizada', callback);
+  }
+
   // Método para remover listeners
   public removerListeners() {
     this.socket?.off('atualizacao-solicitacao');
     this.socket?.off('nova-solicitacao');
+    this.socket?.off('solicitacao-atualizada');
   }
 
   // Método para desconectar o socket

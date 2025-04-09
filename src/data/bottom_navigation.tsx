@@ -1,4 +1,4 @@
-import { FavoriteIcon } from '@/components/Icons';
+import { FavoriteIcon, RequestIcon } from '@/components/Icons';
 
 import { HomeIcon } from '@/components/Icons';
 
@@ -9,6 +9,11 @@ export const establishmentBottomNavigation = [
     icon: HomeIcon,
     label: 'Início',
     href: '/establishment/home',
+  },
+  {
+    icon: RequestIcon,
+    label: 'Solicitações',
+    href: '/establishment/manage/requests',
   },
   {
     icon: QrCodeIcon,

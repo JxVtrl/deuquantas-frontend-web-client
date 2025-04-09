@@ -70,3 +70,13 @@ export interface Mesa {
   data_atualizacao: string;
   qrCode: string;
 }
+
+export interface SolicitacaoMesa {
+  id: string;
+  num_cnpj: string;
+  numMesa: string;
+  clienteId: string;
+  status: 'pendente' | 'aprovado' | 'rejeitado';
+  dataSolicitacao: Date;
+  dataAtualizacao: Date;
+}
