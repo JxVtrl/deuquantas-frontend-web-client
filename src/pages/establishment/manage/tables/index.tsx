@@ -26,7 +26,7 @@ import {
 } from '@/components/ui/select';
 import { Plus, Pencil, Trash2, Eye, Bell } from 'lucide-react';
 import MaxWidthLayout from '@/layout/MaxWidthLayout';
-import { mesaService, MesaSolicitacao } from '@/services/mesa.service';
+import { mesaService, SolicitacaoMesa } from '@/services/mesa.service';
 
 const TablesManagement: React.FC = () => {
   const { user } = useAuth();
@@ -54,7 +54,7 @@ const TablesManagement: React.FC = () => {
     ordenacao: 'numero',
   });
   const [solicitacoesPendentes, setSolicitacoesPendentes] = useState<
-    MesaSolicitacao[]
+    SolicitacaoMesa[]
   >([]);
   const [showNotificacoes, setShowNotificacoes] = useState(false);
 
@@ -66,7 +66,7 @@ const TablesManagement: React.FC = () => {
 
   useEffect(() => {
     // Ouvir novas solicitações
-    mesaService.onNovaSolicitacao((solicitacao: MesaSolicitacao) => {
+    mesaService.onNovaSolicitacao((solicitacao: SolicitacaoMesa) => {
       setSolicitacoesPendentes((prev) => [...prev, solicitacao]);
       setShowNotificacoes(true);
     });
@@ -178,7 +178,7 @@ const TablesManagement: React.FC = () => {
     }
   };
 
-  const handleAprovarSolicitacao = async (solicitacao: MesaSolicitacao) => {
+  const handleAprovarSolicitacao = async (solicitacao: SolicitacaoMesa) => {
     try {
       mesaService.aprovarSolicitacao(solicitacao.id);
       setSolicitacoesPendentes((prev) =>
@@ -191,7 +191,7 @@ const TablesManagement: React.FC = () => {
     }
   };
 
-  const handleRejeitarSolicitacao = async (solicitacao: MesaSolicitacao) => {
+  const handleRejeitarSolicitacao = async (solicitacao: SolicitacaoMesa) => {
     try {
       mesaService.rejeitarSolicitacao(solicitacao.id);
       setSolicitacoesPendentes((prev) =>

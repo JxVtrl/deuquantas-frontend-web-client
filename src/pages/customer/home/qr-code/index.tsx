@@ -8,7 +8,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { ScanQrCodeIcon } from '@/components/Icons';
 import QrCodeInput from '@/components/InputQrCode';
 import { toast } from 'react-hot-toast';
-import { mesaService, MesaSolicitacao } from '@/services/mesa.service';
+import { mesaService, SolicitacaoMesa } from '@/services/mesa.service';
 import LoadingLottie from '@/components/LoadingLottie';
 import Button from '@/components/Button';
 
@@ -24,6 +24,7 @@ const CustomerQrCode: React.FC = () => {
   const [showScanner, setShowScanner] = useState(true);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [socketError, setSocketError] = useState(false);
+  const [timeoutSeconds, setTimeoutSeconds] = useState<number>(300); // 5 minutos em segundos
 
   const processarQrCode = async (qrCode: string) => {
     try {
@@ -32,6 +33,7 @@ const CustomerQrCode: React.FC = () => {
       setSuccessMessage(null);
       setShowScanner(false);
       setSocketError(false);
+      setTimeoutSeconds(300); // Reset para 5 minutos
 
       // Validar formato do QR Code
       const partes = qrCode.split(':');
@@ -72,12 +74,39 @@ const CustomerQrCode: React.FC = () => {
       try {
         await mesaService.solicitarMesa(
           estabelecimentoId,
-          mesaId,
+          parseInt(mesaId),
           user.cliente.num_cpf.toString(),
         );
         setSuccessMessage(
           'Solicitação enviada. Aguardando aprovação do estabelecimento...',
         );
+
+        // Iniciar contagem regressiva
+        const countdownInterval = setInterval(() => {
+          setTimeoutSeconds((prev) => {
+            if (prev <= 1) {
+              clearInterval(countdownInterval);
+              setError('Tempo de espera excedido. Tente novamente.');
+              setShowScanner(true);
+              setSuccessMessage(null);
+              setIsLoading(false);
+              return 0;
+            }
+            return prev - 1;
+          });
+        }, 1000);
+
+        // Configurar timeout de 5 minutos
+        if (timeoutRef.current) {
+          clearTimeout(timeoutRef.current);
+        }
+        timeoutRef.current = setTimeout(() => {
+          clearInterval(countdownInterval);
+          setError('Tempo de espera excedido. Tente novamente.');
+          setShowScanner(true);
+          setSuccessMessage(null);
+          setIsLoading(false);
+        }, 300000); // 5 minutos
       } catch (socketErr) {
         console.error('Erro ao conectar com o socket:', socketErr);
         setSocketError(true);
@@ -86,17 +115,6 @@ const CustomerQrCode: React.FC = () => {
         );
         return;
       }
-
-      // Configurar timeout de 2 minutos
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-      timeoutRef.current = setTimeout(() => {
-        setError('Tempo de espera excedido. Tente novamente.');
-        setShowScanner(true);
-        setSuccessMessage(null);
-        setIsLoading(false);
-      }, 120000);
     } catch (err) {
       console.error('Erro ao processar QR Code:', err);
       setError('Erro ao processar QR Code. Tente novamente.');
@@ -109,6 +127,8 @@ const CustomerQrCode: React.FC = () => {
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
     }
+    // Desconectar do socket
+    mesaService.disconnect();
     router.push('/customer/home');
   };
 
@@ -123,7 +143,7 @@ const CustomerQrCode: React.FC = () => {
           setShowScanner(false);
           await mesaService.solicitarMesa(
             num_cnpj as string,
-            numMesa as string,
+            parseInt(numMesa as string),
             user?.cliente?.num_cpf as string,
           );
         } catch (error) {
@@ -140,15 +160,17 @@ const CustomerQrCode: React.FC = () => {
   }, [router.query, user?.cliente?.num_cpf]);
 
   useEffect(() => {
-    const handleAtualizacaoSolicitacao = (solicitacao: MesaSolicitacao) => {
+    const handleAtualizacaoSolicitacao = (solicitacao: SolicitacaoMesa) => {
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
       }
 
       if (solicitacao.status === 'aprovado') {
+        console.log('[DEBUG] Solicitação aprovada');
         toast.success('Sua solicitação foi aprovada!');
         router.push(`/customer/comanda/${solicitacao.numMesa}`);
       } else if (solicitacao.status === 'rejeitado') {
+        console.log('[DEBUG] Solicitação rejeitada');
         toast.error('Sua solicitação foi rejeitada');
         setShowScanner(true);
         setSuccessMessage(null);
@@ -156,13 +178,14 @@ const CustomerQrCode: React.FC = () => {
       }
     };
 
-    mesaService.onAtualizacaoSolicitacao(handleAtualizacaoSolicitacao);
+    mesaService.onSolicitacaoUpdate(handleAtualizacaoSolicitacao);
 
     return () => {
       mesaService.removeAllListeners();
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
       }
+      mesaService.disconnect();
     };
   }, []);
 
@@ -197,6 +220,12 @@ const CustomerQrCode: React.FC = () => {
                 ? 'Erro ao conectar com o servidor'
                 : 'Processando QR Code...'}
             </p>
+            {!socketError && (
+              <p className='mt-2 text-white text-sm'>
+                Tempo restante: {Math.floor(timeoutSeconds / 60)}:
+                {(timeoutSeconds % 60).toString().padStart(2, '0')}
+              </p>
+            )}
             <Button text='Cancelar' onClick={handleCancel} variant='primary' />
           </div>
         ) : showScanner ? (

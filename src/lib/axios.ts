@@ -42,19 +42,9 @@ api.interceptors.request.use(
 // Interceptor para lidar com erros de autenticação
 api.interceptors.response.use(
   (response) => {
-    console.log('Response:', {
-      status: response.status,
-      data: response.data,
-    });
     return response;
   },
   (error) => {
-    console.error('Response Error:', {
-      status: error.response?.status,
-      data: error.response?.data,
-      message: error.message,
-    });
-
     if (error.response?.status === 401) {
       // Limpa o token e redireciona para o login em caso de erro 401
       Cookies.remove('token');

@@ -12,6 +12,7 @@ import { jwtDecode } from 'jwt-decode';
 import Cookies from 'js-cookie';
 import { api } from '@/lib/axios';
 import { User, UserJwt } from '@/services/api/types';
+import { mesaService } from '@/services/mesa.service';
 
 interface AuthContextData {
   user: User | null;
@@ -116,7 +117,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
           data_criacao: response.usuario.data_criacao,
           data_atualizacao: response.usuario.data_atualizacao,
           id: response.usuario.id,
-          permission_level: decodedToken.permission_level,
+          permission_level: decodedToken.permission_level || 1,
         },
         cliente: decodedToken.hasCliente
           ? {
@@ -150,6 +151,37 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       AuthService.setDefaultHeaderToken('');
       return { success: false, user: null };
     }
+  }, []);
+
+  useEffect(() => {
+    const joinRoom = async () => {
+      console.log('[DEBUG] Verificando se deve conectar ao socket');
+      if (
+        router.pathname.includes('establishment') &&
+        user?.estabelecimento?.num_cnpj &&
+        !mesaService.isConnected()
+      ) {
+        console.log('[DEBUG] Estabelecimento encontrado, conectando ao socket');
+        const roomName = `estabelecimento:${user?.estabelecimento?.num_cnpj}`;
+
+        try {
+          console.log('[DEBUG] Conectando ao socket:', roomName);
+          await mesaService.joinRoom(roomName);
+          console.log('[DEBUG] Conectado ao socket:', roomName);
+        } catch (error) {
+          console.error('[DEBUG] Erro ao conectar ao socket:', error);
+        }
+      }
+    };
+
+    joinRoom();
+  }, [router, user]);
+
+  // useEffect para ficar escutando as mensagens do socket
+  useEffect(() => {
+    mesaService.onSolicitacaoUpdate((solicitacao) => {
+      console.log('[DEBUG] Recebida solicitação:', solicitacao);
+    });
   }, []);
 
   const redirectTo = useCallback(
@@ -253,12 +285,20 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     Cookies.remove('token');
     setUser(null);
     AuthService.setDefaultHeaderToken('');
+    // Desconectar do socket se necessário
+    if (user?.estabelecimento?.num_cnpj) {
+      mesaService.disconnect();
+    }
   };
 
   const clearSession = () => {
     Cookies.remove('token');
     setUser(null);
     AuthService.setDefaultHeaderToken('');
+    // Desconectar do socket se necessário
+    if (user?.estabelecimento?.num_cnpj) {
+      mesaService.disconnect();
+    }
   };
 
   const processLogin = async (token: string) => {

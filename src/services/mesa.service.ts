@@ -1,24 +1,27 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { io, Socket } from 'socket.io-client';
 import Cookies from 'js-cookie';
-export interface MesaSolicitacao {
+
+export interface SolicitacaoMesa {
   id: string;
   num_cnpj: string;
   numMesa: string;
   clienteId: string;
   status: 'pendente' | 'aprovado' | 'rejeitado';
   dataSolicitacao: Date;
+  dataAtualizacao: Date;
 }
 
-type SocketCallback = (solicitacao: MesaSolicitacao) => void;
-type SocketResponse = {
-  error?: string;
-  data?: MesaSolicitacao;
-};
+interface RoomJoinedResponse {
+  room: string;
+  solicitacoes: SolicitacaoMesa[];
+}
 
-class MesaService {
+export class MesaService {
   private socket: Socket | null = null;
   private static instance: MesaService;
-  private listeners: Map<string, SocketCallback[]> = new Map();
+  private listeners: Map<string, ((_solicitacao: SolicitacaoMesa) => void)[]> =
+    new Map();
   private isConnecting: boolean = false;
   private currentRoom: string | null = null;
 
@@ -41,7 +44,7 @@ class MesaService {
         path: '/socket.io',
         transports: ['websocket', 'polling'],
         reconnection: true,
-        reconnectionAttempts: Infinity,
+        reconnectionAttempts: 5,
         reconnectionDelay: 1000,
         reconnectionDelayMax: 5000,
         timeout: 20000,
@@ -53,10 +56,6 @@ class MesaService {
       });
 
       this.setupSocketListeners();
-
-      // Forçar a conexão
-      this.socket.connect();
-
       console.log('[DEBUG] Socket inicializado com sucesso');
     } catch (error) {
       console.error('[DEBUG] Erro ao inicializar socket:', error);
@@ -73,51 +72,52 @@ class MesaService {
     this.socket.on('connect', () => {
       console.log('[DEBUG] Conectado ao servidor Socket.IO');
       this.isConnecting = false;
-
-      if (this.currentRoom) {
-        console.log('[DEBUG] Reconectando à sala:', this.currentRoom);
-        this.joinRoom(this.currentRoom).catch((error) => {
-          console.error('[DEBUG] Erro ao reconectar à sala:', error);
-        });
-      }
     });
 
-    this.socket.on('connect_error', (error) => {
-      console.error('[DEBUG] Erro na conexão Socket.IO:', error);
-      this.isConnecting = false;
-
-      // Tentar reconectar após um erro
-      setTimeout(() => {
-        if (!this.socket?.connected && !this.isConnecting) {
-          console.log('[DEBUG] Tentando reconectar após erro...');
-          this.socket?.connect();
+    // Listener específico para novas solicitações
+    this.socket.on('nova-solicitacao', (solicitacao: SolicitacaoMesa) => {
+      console.log('[DEBUG] Socket recebeu nova solicitação:', solicitacao);
+      const callbacks = this.listeners.get('nova-solicitacao') || [];
+      callbacks.forEach((callback) => {
+        try {
+          callback(solicitacao);
+        } catch (error) {
+          console.error(
+            '[DEBUG] Erro ao executar callback de nova solicitação:',
+            error,
+          );
         }
-      }, 5000);
+      });
     });
 
-    this.socket.on('disconnect', (reason) => {
-      console.log('[DEBUG] Desconectado do servidor Socket.IO:', reason);
-      this.isConnecting = false;
+    // Listener específico para atualizações de solicitações
+    this.socket.on('solicitacao-atualizada', (solicitacao: SolicitacaoMesa) => {
+      console.log(
+        '[DEBUG] Socket recebeu atualização de solicitação:',
+        solicitacao,
+      );
+      const callbacks = this.listeners.get('solicitacao-atualizada') || [];
+      callbacks.forEach((callback) => {
+        try {
+          callback(solicitacao);
+        } catch (error) {
+          console.error(
+            '[DEBUG] Erro ao executar callback de atualização:',
+            error,
+          );
+        }
+      });
+    });
 
-      // Tentar reconectar se não foi uma desconexão intencional
-      if (reason !== 'io client disconnect') {
-        setTimeout(() => {
-          if (!this.socket?.connected && !this.isConnecting) {
-            console.log('[DEBUG] Tentando reconectar após desconexão...');
-            this.socket?.connect();
-          }
-        }, 5000);
+    this.socket.on('room-joined', (response: RoomJoinedResponse) => {
+      console.log('[DEBUG] Entrou na sala:', response);
+      if (response?.room) {
+        this.currentRoom = response.room;
       }
     });
 
-    this.socket.on('reconnect', (attemptNumber) => {
-      console.log(`[DEBUG] Reconectado após ${attemptNumber} tentativas`);
-      this.isConnecting = false;
-    });
-
-    this.socket.on('reconnect_attempt', (attemptNumber) => {
-      console.log(`[DEBUG] Tentativa de reconexão ${attemptNumber}`);
-      this.isConnecting = true;
+    this.socket.on('error', (error) => {
+      console.error('[DEBUG] Erro geral do socket:', error);
     });
   }
 
@@ -128,179 +128,241 @@ class MesaService {
     return MesaService.instance;
   }
 
-  private ensureSocket() {
-    if (!this.socket || !this.socket.connected) {
-      console.log('[DEBUG] Socket não conectado, tentando reconectar...');
+  private ensureSocket(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      if (this.socket?.connected) {
+        console.log('[DEBUG] Socket já está conectado');
+        resolve();
+        return;
+      }
+      console.log('[DEBUG] Socket não está conectado');
+
+      if (this.isConnecting) {
+        this.socket?.once('connect', () => resolve());
+        this.socket?.once('connect_error', (error) => reject(error));
+        return;
+      }
+      console.log('[DEBUG] Iniciando conexão com o socket');
+
+      this.isConnecting = true;
       this.initializeSocket();
-    }
+
+      this.socket?.once('connect', () => {
+        console.log('[DEBUG] Conexão estabelecida com o socket');
+        this.isConnecting = false;
+        resolve();
+      });
+
+      this.socket?.once('connect_error', (error) => {
+        console.log('[DEBUG] Erro ao conectar com o socket');
+        this.isConnecting = false;
+        reject(error);
+      });
+    });
   }
 
-  public async joinRoom(room: string): Promise<void> {
-    console.log('[DEBUG] Tentando entrar na sala:', room);
+  public async joinRoom(roomName: string): Promise<RoomJoinedResponse> {
+    console.log('[DEBUG] Tentando entrar na sala:', roomName);
 
-    if (!this.socket) {
-      console.error('[DEBUG] Socket não inicializado');
-      throw new Error('Socket não inicializado');
-    }
+    try {
+      await this.ensureSocket();
 
-    // Aguardar até que o socket esteja conectado
-    if (!this.socket.connected) {
-      console.log('[DEBUG] Socket não está conectado. Aguardando conexão...');
-      await new Promise<void>((resolve, reject) => {
-        const timeout = setTimeout(() => {
-          reject(new Error('Timeout ao aguardar conexão do socket'));
-        }, 10000);
-
-        this.socket?.on('connect', () => {
-          clearTimeout(timeout);
-          resolve();
-        });
-
-        this.socket?.connect();
-      });
-    }
-
-    const socket = this.socket; // Capturar referência local
-
-    return new Promise((resolve, reject) => {
-      // Configurar listeners antes de emitir o evento
-      const onRoomJoined = (data: { room: string; status: string }) => {
-        console.log('[DEBUG] Evento room-joined recebido:', data);
-        if (data.status === 'ok') {
-          this.currentRoom = room;
-          socket.off('room-joined', onRoomJoined);
-          socket.off('room-join-error', onRoomJoinError);
-          clearTimeout(timeoutId);
-          resolve();
+      return new Promise((resolve, reject) => {
+        if (!this.socket) {
+          console.log('[DEBUG] Socket não inicializado');
+          reject(new Error('Socket não inicializado'));
+          return;
         }
-      };
 
-      const onRoomJoinError = (error: { status: string; message: string }) => {
-        console.error('[DEBUG] Erro ao entrar na sala:', error);
-        socket.off('room-joined', onRoomJoined);
-        socket.off('room-join-error', onRoomJoinError);
-        clearTimeout(timeoutId);
-        reject(new Error(error.message));
-      };
+        // Configurar timeout
+        const timeout = setTimeout(() => {
+          console.log('[DEBUG] Timeout ao tentar entrar na sala');
+          this.socket?.off('room-joined');
+          this.socket?.off('room-join-error');
+          reject(new Error('Timeout ao entrar na sala'));
+        }, 60000); // Aumentado para 60 segundos
 
-      // Configurar timeout para evitar espera infinita
-      const timeoutId = setTimeout(() => {
-        console.error('[DEBUG] Timeout ao tentar entrar na sala');
-        socket.off('room-joined', onRoomJoined);
-        socket.off('room-join-error', onRoomJoinError);
-        reject(new Error('Timeout ao tentar entrar na sala'));
-      }, 10000);
+        // Configurar handlers de resposta
+        const handleRoomJoined = (response: RoomJoinedResponse) => {
+          console.log('[DEBUG] Sala ingressada com sucesso:', response);
+          clearTimeout(timeout);
+          this.currentRoom = roomName;
+          this.socket?.off('room-joined', handleRoomJoined);
+          this.socket?.off('room-join-error', handleError);
+          resolve(response);
+        };
 
-      // Adicionar listeners
-      socket.on('room-joined', onRoomJoined);
-      socket.on('room-join-error', onRoomJoinError);
+        const handleError = (error: { message: string }) => {
+          console.log('[DEBUG] Erro ao entrar na sala:', error.message);
+          clearTimeout(timeout);
+          this.socket?.off('room-joined', handleRoomJoined);
+          this.socket?.off('room-join-error', handleError);
+          reject(new Error(error.message));
+        };
 
-      // Emitir evento para entrar na sala
-      console.log('[DEBUG] Emitindo evento join-room para sala:', room);
-      socket.emit('join-room', room);
-    });
+        // Registrar handlers
+        this.socket.on('room-joined', handleRoomJoined);
+        this.socket.on('room-join-error', handleError);
+
+        // Emitir evento para entrar na sala
+        console.log('[DEBUG] Emitindo evento join-room');
+        this.socket.emit(
+          'join-room',
+          roomName,
+          (
+            error: { message: string } | null,
+            response: RoomJoinedResponse | null,
+          ) => {
+            console.log('[DEBUG] Resposta do evento join-room:', response);
+            if (error) {
+              console.log('[DEBUG] Erro do evento join-room:', error);
+              handleError(error);
+            } else if (response) {
+              console.log('[DEBUG] Resposta do evento join-room:', response);
+              handleRoomJoined(response);
+            }
+          },
+        );
+      });
+    } catch (error) {
+      console.error('[DEBUG] Erro ao entrar na sala:', error);
+      throw error;
+    }
   }
 
   public async solicitarMesa(
     num_cnpj: string,
-    numMesa: string,
+    numMesa: number,
     clienteId: string,
-  ): Promise<SocketResponse> {
-    this.ensureSocket();
-    return new Promise((resolve, reject) => {
-      this.socket?.emit(
-        'solicitar-mesa',
-        { num_cnpj, numMesa, clienteId },
-        (response: SocketResponse) => {
-          if (response.error) {
-            reject(new Error(response.error));
+  ): Promise<SolicitacaoMesa> {
+    try {
+      await this.ensureSocket();
+
+      return new Promise((resolve, reject) => {
+        if (!this.socket) {
+          reject(new Error('Socket não inicializado'));
+          return;
+        }
+
+        // Configurar timeout
+        const timeout = setTimeout(() => {
+          console.log('[DEBUG] Timeout ao solicitar mesa');
+          reject(new Error('Timeout ao solicitar mesa'));
+        }, 500000); // 5 minutos
+
+        // Configurar handlers de resposta
+        const handleSolicitacaoRecebida = (response: {
+          status: string;
+          data?: SolicitacaoMesa;
+          message?: string;
+        }) => {
+          clearTimeout(timeout);
+          this.socket?.off('solicitacao-recebida', handleSolicitacaoRecebida);
+
+          if (response.status === 'ok' && response.data) {
+            resolve(response.data);
           } else {
-            resolve(response);
+            reject(new Error(response.message || 'Erro ao solicitar mesa'));
           }
-        },
-      );
-    });
-  }
+        };
 
-  public async aprovarSolicitacao(
-    solicitacaoId: string,
-  ): Promise<SocketResponse> {
-    this.ensureSocket();
-    return new Promise((resolve, reject) => {
-      this.socket?.emit(
-        'aprovar-solicitacao',
-        { solicitacaoId },
-        (response: SocketResponse) => {
-          if (response.error) {
-            reject(new Error(response.error));
-          } else {
-            resolve(response);
-          }
-        },
-      );
-    });
-  }
+        // Registrar handler
+        this.socket.on('solicitacao-recebida', handleSolicitacaoRecebida);
 
-  public async rejeitarSolicitacao(
-    solicitacaoId: string,
-  ): Promise<SocketResponse> {
-    this.ensureSocket();
-    return new Promise((resolve, reject) => {
-      this.socket?.emit(
-        'rejeitar-solicitacao',
-        { solicitacaoId },
-        (response: SocketResponse) => {
-          if (response.error) {
-            reject(new Error(response.error));
-          } else {
-            resolve(response);
-          }
-        },
-      );
-    });
-  }
-
-  public onNovaSolicitacao(callback: SocketCallback): void {
-    this.ensureSocket();
-    const eventName = 'nova-solicitacao';
-
-    if (!this.listeners.has(eventName)) {
-      this.listeners.set(eventName, []);
+        // Emitir evento
+        this.socket.emit('nova-solicitacao', { num_cnpj, numMesa, clienteId });
+      });
+    } catch (error) {
+      console.error('Erro ao solicitar mesa:', error);
+      throw error;
     }
-
-    this.listeners.get(eventName)?.push(callback);
-    this.socket?.on(eventName, callback);
   }
 
-  public onSolicitacaoAtualizada(callback: SocketCallback): void {
-    this.ensureSocket();
-    const eventName = 'solicitacao-atualizada';
+  public async aprovarSolicitacao(id: string): Promise<SolicitacaoMesa> {
+    try {
+      await this.ensureSocket();
 
-    if (!this.listeners.has(eventName)) {
-      this.listeners.set(eventName, []);
+      return new Promise((resolve, reject) => {
+        if (!this.socket) {
+          reject(new Error('Socket não inicializado'));
+          return;
+        }
+
+        this.socket.emit(
+          'aprovar-solicitacao',
+          { id },
+          (response: { error?: string; solicitacao?: SolicitacaoMesa }) => {
+            if (response.error) {
+              reject(new Error(response.error));
+            } else if (response.solicitacao) {
+              resolve(response.solicitacao);
+            } else {
+              reject(new Error('Resposta inválida do servidor'));
+            }
+          },
+        );
+      });
+    } catch (error) {
+      console.error('Erro ao aprovar solicitação:', error);
+      throw error;
     }
-
-    this.listeners.get(eventName)?.push(callback);
-    this.socket?.on(eventName, callback);
   }
 
-  public onAtualizacaoSolicitacao(callback: SocketCallback): void {
-    this.ensureSocket();
-    const eventName = 'atualizacao-solicitacao';
+  public async rejeitarSolicitacao(id: string): Promise<SolicitacaoMesa> {
+    try {
+      await this.ensureSocket();
 
-    if (!this.listeners.has(eventName)) {
-      this.listeners.set(eventName, []);
+      return new Promise((resolve, reject) => {
+        if (!this.socket) {
+          reject(new Error('Socket não inicializado'));
+          return;
+        }
+
+        this.socket.emit(
+          'rejeitar-solicitacao',
+          { id },
+          (response: { error?: string; solicitacao?: SolicitacaoMesa }) => {
+            if (response.error) {
+              reject(new Error(response.error));
+            } else if (response.solicitacao) {
+              resolve(response.solicitacao);
+            } else {
+              reject(new Error('Resposta inválida do servidor'));
+            }
+          },
+        );
+      });
+    } catch (error) {
+      console.error('Erro ao rejeitar solicitação:', error);
+      throw error;
     }
-
-    this.listeners.get(eventName)?.push(callback);
-    this.socket?.on(eventName, callback);
   }
 
-  public removeAllListeners(): void {
-    if (this.socket) {
-      this.socket.removeAllListeners();
-    }
+  public onNovaSolicitacao(callback: (solicitacao: SolicitacaoMesa) => void) {
+    console.log('[DEBUG] Registrando listener para novas solicitações');
+    const currentListeners = this.listeners.get('nova-solicitacao') || [];
+    this.listeners.set('nova-solicitacao', [...currentListeners, callback]);
+  }
+
+  public onSolicitacaoUpdate(callback: (solicitacao: SolicitacaoMesa) => void) {
+    console.log(
+      '[DEBUG] Registrando listener para atualizações de solicitações',
+    );
+    const currentListeners = this.listeners.get('nova-solicitacao') || [];
+    console.log('[DEBUG] Current listeners:', currentListeners);
+    this.listeners.set('solicitacao-atualizada', [
+      ...currentListeners,
+      callback,
+    ]);
+  }
+
+  public removeAllListeners() {
+    console.log('[DEBUG] Removendo todos os listeners');
     this.listeners.clear();
+    if (this.socket) {
+      this.socket.removeAllListeners('nova-solicitacao');
+      this.socket.removeAllListeners('solicitacao-atualizada');
+    }
   }
 
   public disconnect(): void {
@@ -308,6 +370,10 @@ class MesaService {
     this.socket?.disconnect();
     this.socket = null;
     this.currentRoom = null;
+  }
+
+  public isConnected(): boolean {
+    return this.socket?.connected || false;
   }
 }
 

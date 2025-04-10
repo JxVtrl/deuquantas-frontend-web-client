@@ -1,16 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  transpilePackages: ['swiper'],
-  images: {
-    domains: ['localhost'],
-  },
   reactStrictMode: true,
-  webpack: (config) => {
-    config.resolve.alias = {
-      ...config.resolve.alias,
-    };
-    return config;
+  output: 'standalone',
+  swcMinify: true,
+  experimental: {
+    turbopack: true,
   },
 };
 
-export default nextConfig;
+module.exports = nextConfig;
