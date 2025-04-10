@@ -6,6 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import QrCodeInput from '@/components/InputQrCode';
 import { toast } from 'react-hot-toast';
 import { MesaService } from '@/services/mesa.service';
+import { ComandaService } from '@/services/comanda.service';
 import LoadingLottie from '@/components/LoadingLottie';
 import Button from '@/components/Button';
 import dynamic from 'next/dynamic';
@@ -39,15 +40,33 @@ const CustomerQrCode: React.FC = () => {
     let countdownInterval: NodeJS.Timeout;
 
     const verificarStatusSolicitacao = async () => {
-      if (!solicitacaoId) return;
+      if (!solicitacaoId || !user?.cliente?.num_cpf) return;
 
       try {
         const solicitacao =
           await MesaService.verificarStatusSolicitacao(solicitacaoId);
 
+        console.log('SOLICITACAO', JSON.stringify(solicitacao, null, 2));
+
         if (solicitacao.status === 'aprovado') {
           toast.success('Solicitação aprovada!');
-          router.push(`/comanda/${solicitacao.numMesa}`);
+
+          // Buscar a comanda ativa após a aprovação
+          const comanda = await ComandaService.getComandaAtivaByCpf(
+            user.cliente.num_cpf,
+          );
+
+          console.log('COMANDA ENCONTRADA', JSON.stringify(comanda, null, 2));
+
+          if (comanda?.id) {
+            router.push(`/comanda/${comanda.id}`);
+          } else {
+            toast.error('Erro ao buscar comanda ativa');
+            setError('Erro ao buscar comanda. Tente novamente.');
+            setShowScanner(true);
+            setSolicitacaoId(null);
+            setSuccessMessage(null);
+          }
         } else if (solicitacao.status === 'rejeitado') {
           toast.error('Solicitação rejeitada pelo estabelecimento');
           setError('Solicitação rejeitada. Tente novamente.');
@@ -98,7 +117,7 @@ const CustomerQrCode: React.FC = () => {
         clearInterval(countdownInterval);
       };
     }
-  }, [solicitacaoId, router]);
+  }, [solicitacaoId, router, user]);
 
   const processarQrCode = async (qrCode: string) => {
     try {

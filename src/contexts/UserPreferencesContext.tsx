@@ -1,15 +1,12 @@
 import React, {
   createContext,
   useContext,
-  useEffect,
   useState,
   //useEffect
 } from 'react';
 // import { useAuth } from './AuthContext';
 import { UserPreferences } from '@/services/api/types';
 import { api } from '@/lib/axios';
-import { API_URL } from '@/services/comanda.service';
-import { useAuth } from './AuthContext';
 
 export type AvailableLanguages = 'pt' | 'en';
 
@@ -26,33 +23,10 @@ const UserPreferencesContext = createContext<UserPreferencesContextType>(
 export const UserPreferencesProvider: React.FC<{
   children: React.ReactNode;
 }> = ({ children }) => {
-  const { user } = useAuth();
   const [preferences, setPreferences] = useState<UserPreferences>({
     isLeftHanded: false,
     language: 'pt',
   });
-
-  useEffect(() => {
-    if (true) {
-      return;
-    }
-
-    if (user?.usuario?.id) {
-      loadPreferences();
-    }
-  }, [user?.usuario?.id]);
-
-  const loadPreferences = async () => {
-    try {
-      const response = await api.get(`${API_URL}/preferencias`);
-      setPreferences({
-        isLeftHanded: response.data.isLeftHanded,
-        language: response.data.language,
-      });
-    } catch (error) {
-      console.error('Erro ao carregar preferências:', error);
-    }
-  };
 
   const updatePreferences = async (
     newPreferences: Partial<UserPreferences>,
