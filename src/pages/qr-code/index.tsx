@@ -146,7 +146,7 @@ const CustomerQrCode: React.FC = () => {
     }
     // Desconectar do socket
     mesaService.disconnect();
-    router.push('/customer/home');
+    router.push('/home');
   };
 
   useEffect(() => {
@@ -166,7 +166,7 @@ const CustomerQrCode: React.FC = () => {
         } catch (error) {
           console.error(error);
           toast.error('Erro ao solicitar mesa');
-          router.push('/customer/home');
+          router.push('//home');
         } finally {
           setIsLoading(false);
         }
@@ -185,7 +185,7 @@ const CustomerQrCode: React.FC = () => {
       if (solicitacao.status === 'aprovado') {
         console.log('[DEBUG] Solicitação aprovada');
         toast.success('Sua solicitação foi aprovada!');
-        router.push(`/customer/comanda/${solicitacao.numMesa}`);
+        router.push(`/comanda/${solicitacao.numMesa}`);
       } else if (solicitacao.status === 'rejeitado') {
         console.log('[DEBUG] Solicitação rejeitada');
         toast.error('Sua solicitação foi rejeitada');

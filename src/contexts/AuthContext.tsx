@@ -147,7 +147,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         }
 
         // Determina a rota baseada no tipo de usuário
-        const route = !!user.cliente ? '/customer/home' : '/login';
+        const route = !!user.cliente ? '/home' : '/login';
 
         console.log('Rota de destino:', route);
         console.log('Rota atual:', router.pathname);

@@ -111,7 +111,7 @@ export class RegisterService {
       await AuthService.register(dataToSend as RegisterData);
 
       showSuccess('Cadastro realizado com sucesso. Bem-vindo!');
-      window.location.href = '/customer/home';
+      window.location.href = '/home';
     } catch (error) {
       console.error('Erro no processo de registro:', error);
       const errorMessage = ErrorService.handleError(

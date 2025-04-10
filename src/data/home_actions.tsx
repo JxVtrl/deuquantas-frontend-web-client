@@ -16,26 +16,26 @@ export const customerActions: ActionItem[] = [
   {
     icon: ScanIcon,
     label: 'Scan QR',
-    href: '/customer/qr-code',
+    href: '/qr-code',
   },
   {
     icon: ConsumptionIcon,
     label: 'Consumo',
-    href: '/customer/home/consumption',
+    href: '/home/consumption',
   },
   {
     icon: FavoriteIcon,
     label: 'Favoritos',
-    href: '/customer/home/favorites',
+    href: '/home/favorites',
   },
   {
     icon: OrdersIcon,
     label: 'Pedidos',
-    href: '/customer/home/orders',
+    href: '/home/orders',
   },
   {
     icon: LocationIcon,
     label: 'Locais',
-    href: '/customer/home/locations',
+    href: '/home/locations',
   },
 ];

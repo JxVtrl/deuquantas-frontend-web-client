@@ -13,7 +13,7 @@ const Logo: React.FC<LogoProps> = ({ variant = 'light', size = 'small' }) => {
 
   return (
     <Link
-      href={'/customer/home'}
+      href={'/home'}
       className='flex items-center justify-center  transition-all duration-300'
       style={{ cursor: 'pointer', zIndex: 1 }}
     >
