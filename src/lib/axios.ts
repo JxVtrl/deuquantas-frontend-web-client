@@ -10,8 +10,11 @@ export const api = axios.create({
   baseURL,
   headers: {
     'Content-Type': 'application/json',
+    Accept: 'application/json',
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Credentials': 'true',
   },
-  withCredentials: true, // Importante para CORS
+  withCredentials: true,
 });
 
 // Interceptor para adicionar o token de autenticação em todas as requisições
