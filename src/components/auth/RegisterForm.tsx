@@ -525,17 +525,19 @@ const RegisterForm: React.FC = () => {
             </Button>
           )}
 
-          <div className='mt-[12px] text-end flex flex-col gap-[12px]'>
-            <p className='text-[#272727] text-[12px] leading-[120%] font-[500]'>
-              Já tem uma conta?{' '}
-              <span
-                className='underline cursor-pointer font-[700]'
-                onClick={toggleForm}
-              >
-                Faça Login
-              </span>
-            </p>
-          </div>
+          {currentStep === 0 && (
+            <div className='mt-[12px] text-end flex flex-col gap-[12px]'>
+              <p className='text-[#272727] text-[12px] leading-[120%] font-[500]'>
+                Já tem uma conta?{' '}
+                <span
+                  className='underline cursor-pointer font-[700]'
+                  onClick={toggleForm}
+                >
+                  Faça Login
+                </span>
+              </p>
+            </div>
+          )}
         </div>
       </form>
     </div>

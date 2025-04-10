@@ -20,13 +20,13 @@ const HeaderMenu: React.FC = () => {
     {
       label: 'Perfil',
       onClick: () => {
-        router.push('/customer/profile');
+        router.push('/profile');
       },
     },
     {
       label: 'Configurações',
       onClick: () => {
-        router.push('/customer/configuracao');
+        router.push('/configuracao');
       },
     },
     {

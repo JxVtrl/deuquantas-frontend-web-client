@@ -6,16 +6,16 @@ export const customerBottomNavigation = [
   {
     icon: HomeIcon,
     label: 'Início',
-    href: '/customer/home',
+    href: '/home',
   },
   {
     icon: MoneyIcon,
     label: 'Conta',
-    href: '/customer/account',
+    href: '/account',
   },
   {
     icon: FavoriteIcon,
     label: 'Favoritos',
-    href: '/customer/favorites',
+    href: '/favorites',
   },
 ];

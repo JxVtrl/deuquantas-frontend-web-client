@@ -40,13 +40,7 @@ export default function AuthPage() {
   const { login, register } = useAuth();
 
   return (
-    <AuthFormProvider
-      login={login}
-      register={register}
-      onSuccess={() => {
-        // Não precisa fazer nada aqui, o redirecionamento será feito pelo AuthContext
-      }}
-    >
+    <AuthFormProvider login={login} register={register} onSuccess={() => null}>
       <AuthPageContent />
     </AuthFormProvider>
   );
