@@ -1,16 +1,32 @@
 import { withAuthCustomer } from '@/hoc/withAuth';
 import React, { useState, useEffect, useRef } from 'react';
 import { CustomerLayout } from '@/layout';
-import { Scanner } from '@yudiel/react-qr-scanner';
 import { useRouter } from 'next/router';
 import { ComandaService } from '@/services/comanda.service';
 import { useAuth } from '@/contexts/AuthContext';
-import { ScanQrCodeIcon } from '@/components/Icons';
 import QrCodeInput from '@/components/InputQrCode';
 import { toast } from 'react-hot-toast';
 import { mesaService, SolicitacaoMesa } from '@/services/mesa.service';
 import LoadingLottie from '@/components/LoadingLottie';
 import Button from '@/components/Button';
+import dynamic from 'next/dynamic';
+
+const QrCodeScanner = dynamic(() => import('@/components/QrCodeScanner'), {
+  ssr: false,
+  loading: () => (
+    <div
+      style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
+      }}
+    >
+      <LoadingLottie />
+      <p style={{ marginTop: '1rem' }}>Carregando câmera...</p>
+    </div>
+  ),
+});
 
 /**
  * Componente para escaneamento de QR Code
@@ -25,6 +41,7 @@ const CustomerQrCode: React.FC = () => {
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [socketError, setSocketError] = useState(false);
   const [timeoutSeconds, setTimeoutSeconds] = useState<number>(300); // 5 minutos em segundos
+  const [mounted, setMounted] = useState(false);
 
   const processarQrCode = async (qrCode: string) => {
     try {
@@ -189,39 +206,80 @@ const CustomerQrCode: React.FC = () => {
     };
   }, []);
 
+  useEffect(() => {
+    setMounted(true);
+    return () => setMounted(false);
+  }, []);
+
+  const handleScanError = (errorMessage: string) => {
+    setError(errorMessage);
+  };
+
+  if (!mounted) {
+    return (
+      <CustomerLayout>
+        <div className='flex items-center justify-center min-h-screen'>
+          <LoadingLottie />
+        </div>
+      </CustomerLayout>
+    );
+  }
+
   return (
     <CustomerLayout>
-      <style jsx global>{`
-        .qr-scanner svg {
-          display: none !important;
-        }
-        #scan-qr-code-icon {
-          display: block !important;
-        }
-      `}</style>
-      <div>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100vh',
+        }}
+      >
         {error && (
-          <div className='fixed top-2 left-2 right-2 z-50 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded'>
-            <span className='block sm:inline'>{error}</span>
+          <div
+            style={{
+              backgroundColor: '#fee2e2',
+              border: '1px solid #f87171',
+              color: '#b91c1c',
+              padding: '0.75rem 1rem',
+              borderRadius: '0.375rem',
+            }}
+          >
+            <span>{error}</span>
           </div>
         )}
 
         {successMessage && (
-          <div className='fixed top-2 left-2 right-2 z-50 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded'>
-            <span className='block sm:inline'>{successMessage}</span>
+          <div
+            style={{
+              backgroundColor: '#dcfce7',
+              border: '1px solid #22c55e',
+              color: '#16a34a',
+              padding: '0.75rem 1rem',
+              borderRadius: '0.375rem',
+            }}
+          >
+            <span>{successMessage}</span>
           </div>
         )}
 
         {isLoading ? (
-          <div className='fixed inset-0 z-50 flex flex-col justify-center items-center bg-black bg-opacity-50'>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              height: '100vh',
+            }}
+          >
             <LoadingLottie />
-            <p className='mt-4 text-white text-lg'>
+            <p style={{ marginTop: '1rem' }}>
               {socketError
                 ? 'Erro ao conectar com o servidor'
                 : 'Processando QR Code...'}
             </p>
             {!socketError && (
-              <p className='mt-2 text-white text-sm'>
+              <p style={{ marginTop: '1rem' }}>
                 Tempo restante: {Math.floor(timeoutSeconds / 60)}:
                 {(timeoutSeconds % 60).toString().padStart(2, '0')}
               </p>
@@ -230,46 +288,32 @@ const CustomerQrCode: React.FC = () => {
           </div>
         ) : showScanner ? (
           <>
-            <div className='qr-scanner'>
-              <Scanner
-                constraints={{}}
-                styles={{
-                  container: {
-                    position: 'fixed',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    padding: 0,
-                    margin: 0,
-                    zIndex: -1,
-                  },
-                  video: {
-                    width: '100vw',
-                    height: '100vh',
-                    objectFit: 'cover',
-                  },
-                }}
-                onError={(err) => {
-                  console.log('Erro ao escanear QR Code', err);
-                  setError('Erro ao escanear QR Code. Tente novamente.');
-                }}
-                onScan={(result) => {
-                  if (result && result.length > 0) {
-                    processarQrCode(result[0].rawValue);
-                  }
-                }}
-              />
-              <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[9999999]'>
-                <ScanQrCodeIcon />
-                <QrCodeInput onScan={processarQrCode} />
-              </div>
+            <QrCodeScanner
+              onResult={processarQrCode}
+              onError={handleScanError}
+            />
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                height: '100vh',
+              }}
+            >
+              <QrCodeInput onScan={processarQrCode} />
             </div>
           </>
         ) : (
-          <div className='fixed inset-0 z-50 flex flex-col justify-center items-center bg-black bg-opacity-50'>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              height: '100vh',
+            }}
+          >
             <LoadingLottie />
-            <p className='mt-4 text-white text-lg'>
+            <p style={{ marginTop: '1rem' }}>
               Aguardando resposta do estabelecimento...
             </p>
             <Button text='Cancelar' onClick={handleCancel} variant='primary' />

@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Html5Qrcode } from 'html5-qrcode';
-import styles from './QrCodeScanner.module.scss';
 
 interface QrCodeScannerProps {
   onResult: (qrCode: string) => void | Promise<void>;
@@ -75,21 +74,51 @@ const QrCodeScanner: React.FC<QrCodeScannerProps> = ({ onResult, onError }) => {
   }
 
   return (
-    <div className={styles.container}>
-      <div id='qr-reader' ref={containerRef} className={styles.reader}>
+    <div style={{ width: '100%', height: '100%' }}>
+      <div
+        id='qr-reader'
+        ref={containerRef}
+        style={{ width: '100%', height: '100%' }}
+      >
         {isStarting && (
-          <div className={styles.loading}>
+          <div
+            style={{
+              width: '100%',
+              height: '100%',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+          >
             <span>Iniciando câmera...</span>
           </div>
         )}
         {!hasPermission && !isStarting && (
-          <div className={styles.error}>
+          <div
+            style={{
+              width: '100%',
+              height: '100%',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+          >
             <span>Permissão da câmera negada</span>
           </div>
         )}
       </div>
-      <div className={styles.overlay}>
-        <div className={styles.frame} />
+      <div
+        style={{
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        <div
+          style={{ width: '100%', height: '100%', border: '1px solid red' }}
+        />
       </div>
     </div>
   );
