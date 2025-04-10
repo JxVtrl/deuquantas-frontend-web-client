@@ -1,1 +1,0 @@
-export { ConfirmCard } from './ConfirmCard';

@@ -1,24 +1,35 @@
 import React from 'react';
+import { useForm } from 'react-hook-form';
 import Button from '../Button';
+import { useAuthFormContext } from '@/contexts/AuthFormContext';
 
-interface LoginFormProps {
+interface LoginFormData {
   email: string;
-  senha: string;
-  loading: boolean;
-  error?: string;
-  onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onSubmit: (e: React.FormEvent) => void;
+  password: string;
 }
 
-export function LoginForm({
-  email,
-  senha,
-  loading,
-  error,
-  onInputChange,
-  onSubmit,
-}: LoginFormProps) {
-  const list_of_inputs = [
+export function LoginForm() {
+  const {
+    loading,
+    error,
+    handleSubmit: onSubmit,
+    toggleForm,
+  } = useAuthFormContext();
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<LoginFormData>({
+    mode: 'onChange',
+  });
+
+  const list_of_inputs: Array<{
+    id: keyof LoginFormData;
+    type: string;
+    label: string;
+    placeholder: string;
+  }> = [
     {
       id: 'email',
       type: 'email',
@@ -26,20 +37,25 @@ export function LoginForm({
       placeholder: 'your-email@email.com',
     },
     {
-      id: 'senha',
+      id: 'password',
       type: 'password',
       label: 'Senha',
       placeholder: '••••••••••',
     },
   ];
 
+  const getErrorMessage = (field: keyof LoginFormData) => {
+    if (errors[field]) {
+      return errors[field]?.message;
+    }
+    if (error && field === 'email') {
+      return 'E-mail ou senha incorretos. Verifique suas credenciais.';
+    }
+    return '';
+  };
+
   return (
-    <form onSubmit={onSubmit}>
-      {error && (
-        <div className='bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4'>
-          {error}
-        </div>
-      )}
+    <form onSubmit={handleSubmit(onSubmit)}>
       <div className='flex flex-col gap-[12px] mb-[32px]'>
         {list_of_inputs.map((input) => (
           <div key={input.id}>
@@ -50,31 +66,57 @@ export function LoginForm({
               {input.label}
             </label>
             <input
+              {...register(input.id, {
+                required: 'Este campo é obrigatório',
+                ...(input.id === 'email' && {
+                  pattern: {
+                    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                    message: 'Digite um e-mail válido',
+                  },
+                }),
+              })}
               id={input.id}
               type={input.type}
-              value={input.id === 'email' ? email : senha}
-              onChange={onInputChange}
-              className='w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500
+              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500
                 placeholder:text-[#A1A1AA] placeholder:text-[14px] placeholder:leading-[140%] placeholder:font-[400]
-              '
-              required
+                ${errors[input.id] ? 'border-red-500' : 'border-gray-300'}
+              `}
               placeholder={input.placeholder}
             />
+            {getErrorMessage(input.id) && (
+              <span className='text-red-500 text-xs mt-1'>
+                {getErrorMessage(input.id)}
+              </span>
+            )}
           </div>
         ))}
       </div>
 
       <div className='flex flex-col gap-[12px]'>
         <Button
-          disabled={loading}
+          disabled={loading || isSubmitting}
           variant='primary'
-          text={loading ? 'Entrando...' : 'Entrar'}
+          text={loading || isSubmitting ? 'Entrando...' : 'Entrar'}
+          type='submit'
         />
         <Button
-          disabled={loading}
+          disabled={loading || isSubmitting}
           variant='secondary'
-          text={loading ? 'Entrando...' : 'Entrar com Google'}
+          text={loading || isSubmitting ? 'Entrando...' : 'Entrar com Google'}
+          type='button'
         />
+      </div>
+
+      <div className='mt-[12px] text-end flex flex-col gap-[12px]'>
+        <p className='text-[#272727] text-[12px] leading-[120%] font-[500]'>
+          Não tem uma conta?{' '}
+          <span
+            className='underline cursor-pointer font-[700]'
+            onClick={toggleForm}
+          >
+            Cadastrar
+          </span>
+        </p>
       </div>
     </form>
   );

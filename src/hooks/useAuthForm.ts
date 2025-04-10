@@ -1,119 +1,70 @@
-import { useState, FormEvent, ChangeEvent } from 'react';
+import { RegisterData, LoginData } from '@/services/auth.service';
+import Cookies from 'js-cookie';
+import { useState } from 'react';
+import axios from 'axios';
 
-interface AuthFormData {
-  email: string;
-  senha: string;
-  nome: string;
-  telefone: string;
-  confirmSenha: string;
-}
-
-interface LoginCredentials {
+interface LoginFormData {
   email: string;
   password: string;
-}
-
-interface RegisterCredentials {
-  nome: string;
-  email: string;
-  password: string;
-  telefone?: string;
 }
 
 interface UseAuthFormProps {
-  login: (credentials: LoginCredentials) => Promise<void>;
-  register: (credentials: RegisterCredentials) => Promise<void>;
-  onSuccess: () => void;
+  login?: (credentials: LoginData) => Promise<void>;
+  register?: (credentials: RegisterData) => Promise<void>;
+  onSuccess?: () => void;
 }
 
-export function useAuthForm({ login, register, onSuccess }: UseAuthFormProps) {
-  const [isLogin, setIsLogin] = useState(true);
-  const [formData, setFormData] = useState<AuthFormData>({
-    email: '',
-    senha: '',
-    nome: '',
-    telefone: '',
-    confirmSenha: '',
-  });
-  const [error, setError] = useState('');
+export function useAuthForm({
+  login,
+  register,
+  onSuccess,
+}: UseAuthFormProps = {}) {
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [isLogin, setIsLogin] = useState(true);
 
-  console.log('useAuthForm render - isLogin:', isLogin);
-
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { id, value } = e.target;
-    setFormData((prev) => ({ ...prev, [id]: value }));
+  const toggleForm = () => {
+    setIsLogin((prev) => !prev);
+    setError(null);
   };
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    setError('');
-
-    if (!isLogin) {
-      if (formData.senha !== formData.confirmSenha) {
-        setError('As senhas não coincidem.');
-        return;
-      }
-
-      if (formData.senha.length < 6) {
-        setError('A senha deve ter pelo menos 6 caracteres.');
-        return;
-      }
-    }
+  const handleSubmit = async (data: LoginFormData | RegisterData) => {
+    if (!login || !register || !onSuccess) return;
 
     setLoading(true);
+    setError(null);
+
+    Cookies.remove('token');
 
     try {
-      if (isLogin) {
-        await login({
-          email: formData.email,
-          password: formData.senha,
-        });
-      } else {
-        await register({
-          nome: formData.nome,
-          email: formData.email,
-          password: formData.senha,
-          telefone: formData.telefone || undefined,
-        });
+      if ('password' in data) {
+        await login({ email: data.email, password: data.password });
+      } else if ('name' in data) {
+        await register(data);
       }
       onSuccess();
-    } catch (err: unknown) {
-      console.error('Erro:', err);
-      if (err && typeof err === 'object' && 'response' in err) {
-        const axiosError = err as {
-          response?: { data?: { message?: string } };
-        };
-        setError(
-          axiosError.response?.data?.message ||
-            `Ocorreu um erro ao ${isLogin ? 'fazer login' : 'criar a conta'}.`,
-        );
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        if (err.response?.status === 401) {
+          setError('E-mail ou senha incorretos. Verifique suas credenciais.');
+        } else {
+          setError(
+            err.response?.data?.message || 'Erro ao processar a requisição',
+          );
+        }
       } else {
-        setError(
-          `Ocorreu um erro ao ${isLogin ? 'fazer login' : 'criar a conta'}.`,
-        );
+        setError('Erro ao processar a requisição');
       }
     } finally {
       setLoading(false);
     }
   };
 
-  const toggleForm = () => {
-    console.log('toggleForm chamado no hook - estado atual:', isLogin);
-    setIsLogin((prev) => {
-      console.log('Alterando isLogin de', prev, 'para', !prev);
-      return !prev;
-    });
-    setError('');
-  };
-
   return {
-    isLogin,
-    formData,
     loading,
     error,
-    handleInputChange,
     handleSubmit,
+    isLogin,
     toggleForm,
   };
 }

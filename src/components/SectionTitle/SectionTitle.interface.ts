@@ -1,3 +1,3 @@
 export interface SectionTitleProps {
-    title?: string | React.ReactNode;
+  title?: string | React.ReactNode;
 }

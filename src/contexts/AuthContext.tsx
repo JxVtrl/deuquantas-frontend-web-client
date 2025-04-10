@@ -4,37 +4,24 @@ import React, {
   useContext,
   useState,
   useEffect,
+  useCallback,
 } from 'react';
 import { useRouter } from 'next/router';
-import {
-  AuthService,
-  LoginCredentials,
-  RegisterData,
-} from '@/services/auth.service';
+import { RegisterData, LoginData, AuthService } from '@/services/auth.service';
 import { jwtDecode } from 'jwt-decode';
-import { PermissionLevel, User } from '../../services/api/types';
-import { setDefaultHeaderToken } from '../../services/api';
-import { saveUserPreferences, viewUserPreferences } from '../../services/user';
-import axios from 'axios';
-
-export type AvailableLanguages = 'pt' | 'en';
-export type AvailableThemes = 'dark' | 'light' | 'system';
+import Cookies from 'js-cookie';
+import { api } from '@/lib/axios';
+import { User, UserJwt } from '@/services/api/types';
 
 interface AuthContextData {
   user: User | null;
   loading: boolean;
-  login: (credentials: LoginCredentials) => Promise<void>;
-  register: (userData: RegisterData) => Promise<void>;
+  login: (data: LoginData) => Promise<void>;
+  register: (data: RegisterData) => Promise<void>;
   logout: () => void;
   isAuthenticated: boolean;
-  isAdmin: boolean;
   processLogin: (token: string) => void;
-  storeUserPreferences: (
-    theme: AvailableThemes,
-    language: AvailableLanguages,
-  ) => void;
   clearSession: () => void;
-  getUserPreferences: () => void;
 }
 
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
@@ -45,106 +32,204 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [theme, setTheme] = useState<AvailableThemes>('dark');
-  const [language, setLanguage] = useState<AvailableLanguages>('pt');
   const router = useRouter();
 
-  useEffect(() => {
-    // Verificar se o usuário está autenticado ao carregar a página
-    const token = AuthService.getAuthToken();
-    console.log('Token recuperado:', token);
-    if (token) {
-      try {
-        const decodedToken = jwtDecode<User>(token);
-        setUser(decodedToken);
-        AuthService.setAuthToken(token);
-        // router.push('/customer/home');
-      } catch (error) {
-        console.error('Token inválido:', error);
-        AuthService.removeAuthToken();
-      }
-    }
-    setLoading(false);
-  }, []);
-
-  const isAdmin = user?.permission_level === PermissionLevel.Admin;
-
-  const login = async (credentials: LoginCredentials) => {
+  const processToken = useCallback(async (token: string) => {
     try {
-      setLoading(true);
-      const response = await AuthService.login(credentials);
-      const access_token = response?.access_token;
-
-      if (!access_token || typeof access_token !== 'string') {
-        throw new Error('Token inválido ou não fornecido pela API.');
+      console.log('Processando token:', token);
+      if (!token) {
+        throw new Error('Token não fornecido');
       }
 
-      AuthService.setAuthToken(access_token);
-      const decodedToken = jwtDecode<User>(access_token);
-
+      // Remove "Bearer " se existir
+      const cleanToken = token.replace('Bearer ', '');
+      const decodedToken = jwtDecode<UserJwt>(cleanToken);
       console.log('Token decodificado:', decodedToken);
 
-      setUser(decodedToken);
+      // Salva o token no cookie
+      Cookies.set('token', cleanToken, {
+        expires: 7, // expira em 7 dias
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+      });
 
-      router.push('/customer/home');
+      // Define o token no cabeçalho padrão
+      AuthService.setDefaultHeaderToken(`Bearer ${cleanToken}`);
+
+      let response;
+
+      // Verificar se é cliente ou estabelecimento
+      if (decodedToken.hasCliente) {
+        console.log('Usuário é cliente');
+        try {
+          const clienteResponse = await api.get(
+            `/clientes/usuario/${decodedToken.sub}`,
+          );
+          if (!clienteResponse.data.success) {
+            throw new Error('Erro ao buscar dados do cliente');
+          }
+          response = clienteResponse.data.data;
+          console.log('Dados do cliente:', response);
+        } catch (error) {
+          console.error('Erro ao buscar cliente:', error);
+          throw new Error('Erro ao buscar dados do cliente');
+        }
+      } else if (decodedToken.hasEstabelecimento) {
+        console.log('Usuário é estabelecimento');
+        throw new Error('Usuário é estabelecimento');
+      }
+
+      if (!response) {
+        throw new Error('Dados do usuário não encontrados');
+      }
+
+      const usr: User = {
+        endereco: {
+          cep: response.cep,
+          endereco: response.endereco,
+          numero: response.numero,
+          complemento: response.complemento,
+          bairro: response.bairro,
+          cidade: response.cidade,
+          estado: response.estado,
+        },
+        usuario: {
+          name: response.usuario.name,
+          email: response.usuario.email,
+          is_admin: response.usuario.is_admin,
+          is_ativo: response.usuario.is_ativo,
+          data_criacao: response.usuario.data_criacao,
+          data_atualizacao: response.usuario.data_atualizacao,
+          id: response.usuario.id,
+          permission_level: decodedToken.permission_level || 1,
+        },
+        cliente: decodedToken.hasCliente
+          ? {
+              num_cpf: response.num_cpf,
+              num_celular: response.num_celular,
+              data_nascimento: response.data_nascimento,
+            }
+          : undefined,
+      };
+
+      console.log('Usuário processado:', usr);
+
+      setUser(usr);
+      return { success: true, user: usr };
     } catch (error) {
-      console.error('Erro ao fazer login:', error);
+      console.error('Erro no processamento do token:', error);
+      Cookies.remove('token');
+      setUser(null);
+      AuthService.setDefaultHeaderToken('');
+      return { success: false, user: null };
+    }
+  }, []);
+
+  const redirectTo = useCallback(
+    (user: User | null) => {
+      try {
+        console.log('Usuário no redirectTo:', user);
+        console.log('É cliente?', !!user?.cliente);
+        console.log('Permission level:', user?.usuario?.permission_level);
+
+        // Se não houver usuário, redireciona para login
+        if (!user) {
+          console.warn('Usuário não autenticado, redirecionando para login');
+          router.replace('/login');
+          return;
+        }
+
+        // Verifica se o usuário está ativo
+        if (!user.usuario.is_ativo) {
+          console.warn('Usuário inativo, redirecionando para login');
+          router.replace('/login');
+          return;
+        }
+
+        // Determina a rota baseada no tipo de usuário
+        const route = !!user.cliente ? '/customer/home' : '/login';
+
+        console.log('Rota de destino:', route);
+        console.log('Rota atual:', router.pathname);
+
+        // Verifica se a rota atual é diferente da rota de destino
+        if (router.pathname !== route) {
+          router.replace(route);
+        }
+      } catch (error) {
+        console.error('Erro durante redirecionamento:', error);
+        router.replace('/login');
+      }
+    },
+    [router],
+  );
+
+  useEffect(() => {
+    let mounted = true;
+
+    const initializeAuth = async () => {
+      try {
+        const token = Cookies.get('token');
+
+        if (token && mounted) {
+          const { success, user: processedUser } = await processToken(token);
+          if (success && processedUser) {
+            redirectTo(processedUser);
+          }
+        }
+      } finally {
+        if (mounted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    initializeAuth();
+
+    return () => {
+      mounted = false;
+    };
+  }, [processToken]);
+
+  const isAuthenticated = !!user;
+
+  const login = async (data: LoginData) => {
+    try {
+      const response = await AuthService.login(data);
+      const token = response.token;
+      const { success, user: processedUser } = await processToken(token);
+
+      console.log('Login:', { success, processedUser });
+      if (success && processedUser) {
+        redirectTo(processedUser);
+      }
+    } catch (error) {
       throw error;
-    } finally {
-      setLoading(false);
     }
   };
 
-  const register = async (userData: RegisterData) => {
+  const register = async (data: RegisterData) => {
     try {
-      setLoading(true);
-      // Registrando o usuário no backend real
-      await AuthService.register(userData);
-
-      // Após o registro bem-sucedido, redirecionar para a página de login
-      router.push('/auth/login?registered=true');
+      await AuthService.register(data);
     } catch (error) {
-      console.error('Erro ao registrar:', error);
       throw error;
-    } finally {
-      setLoading(false);
     }
   };
 
   const logout = () => {
-    AuthService.removeAuthToken();
+    Cookies.remove('token');
     setUser(null);
-    router.push('/auth/login');
-  };
-
-  const storeUserPreferences = (
-    theme: AvailableThemes,
-    language: AvailableLanguages,
-  ) => {
-    setTheme(theme);
-    setLanguage(language);
-  };
-
-  const getUserPreferences = async () => {
-    try {
-      const userPreferences = await viewUserPreferences();
-      storeUserPreferences(userPreferences.theme, userPreferences.language);
-    } catch (err: unknown) {
-      console.warn('Error getting user preferences.');
-      if (axios.isAxiosError(err) && err.response?.status === 404) {
-        try {
-          const userPreferences = await saveUserPreferences(theme, language);
-          storeUserPreferences(userPreferences.theme, userPreferences.language);
-        } catch {
-          console.warn('Error saving user preferences.');
-        }
-      }
-    }
+    AuthService.setDefaultHeaderToken('');
   };
 
   const clearSession = () => {
+    Cookies.remove('token');
     setUser(null);
-    router.push('/auth/login');
+    AuthService.setDefaultHeaderToken('');
+  };
+
+  const processLogin = async (token: string) => {
+    await processToken(token);
   };
 
   return (
@@ -155,69 +240,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         login,
         register,
         logout,
-        isAuthenticated: !!user,
-        isAdmin,
-        processLogin: async (token: string) => {
-          if (typeof window === 'undefined') {
-            // Evita que o código execute no lado do servidor
-            return;
-          }
-
-          try {
-            if (!token || typeof token !== 'string') {
-              console.error('Token inválido recebido:', token);
-              return;
-            }
-
-            // Definir uma interface para o token decodificado
-            interface DecodedToken {
-              sub: number;
-              nome?: string;
-              email?: string;
-              isAdmin?: boolean;
-              permission_level?: number;
-              exp: number;
-              iat: number;
-            }
-
-            const decodedToken = jwtDecode<DecodedToken>(token);
-            console.log('Token decodificado:', decodedToken);
-
-            // Mapear os campos do token para a interface User
-            const user: User = {
-              id: decodedToken.sub,
-              name: decodedToken.nome || '',
-              givenName: decodedToken.nome || '',
-              email: decodedToken.email || '',
-              permission_level:
-                decodedToken.permission_level ||
-                (decodedToken.isAdmin
-                  ? PermissionLevel.Admin
-                  : PermissionLevel.Customer),
-            };
-
-            console.log('Usuário mapeado:', user);
-
-            setDefaultHeaderToken(token);
-            setUser(user);
-            // Usar apenas o token auth_token
-            AuthService.setAuthToken(token);
-
-            await getUserPreferences();
-
-            const pageBeforeLogin = router.query.state;
-            if (pageBeforeLogin) {
-              router.back();
-            } else {
-              router.replace('/customer/home');
-            }
-          } catch (error) {
-            console.error('Erro durante o processamento do login:', error);
-            setUser(null);
-          }
-        },
-        storeUserPreferences,
-        getUserPreferences,
+        isAuthenticated,
+        processLogin,
         clearSession,
       }}
     >

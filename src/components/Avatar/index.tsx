@@ -2,15 +2,21 @@ import React from 'react';
 import {
   Avatar as AvatarLayout,
   AvatarFallback,
-  AvatarImage,
+  // AvatarImage,
 } from '@/components/ui/avatar';
 import { AvatarProps } from '@radix-ui/react-avatar';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Avatar: React.FC<AvatarProps> = (props) => {
+  const { user } = useAuth();
+  const firstLetter = user?.usuario?.name?.charAt(0).toUpperCase() || 'DQ';
+
   return (
     <AvatarLayout {...props}>
-      <AvatarImage src='https://github.com/shadcn.png' />
-      <AvatarFallback>CN</AvatarFallback>
+      {/* <AvatarImage src={avatarUrl} /> */}
+      <AvatarFallback className='font-[700] text-[12px] leading-[12px]'>
+        {firstLetter}
+      </AvatarFallback>
     </AvatarLayout>
   );
 };

@@ -1,97 +1,91 @@
-import axios from 'axios';
+import { api } from '@/lib/axios';
+import Cookies from 'js-cookie';
+import { ErrorService } from './error.service';
+import { User } from './api/types';
 
-// Ajustando a URL da API para usar o proxy CORS
-const API_URL = '/api/proxy';
-
-// Removendo as configurações de CORS que não funcionam no cliente
-
-export interface LoginCredentials {
+export interface LoginData {
   email: string;
   password: string;
 }
 
 export interface RegisterData {
+  name: string;
   email: string;
-  nome: string;
   password: string;
-  telefone?: string;
+  num_celular: string;
+  num_cpf: string;
+  cep: string;
+  endereco: string;
+  numero: string;
+  complemento?: string;
+  bairro: string;
+  cidade: string;
+  estado: string;
 }
 
-export interface AuthResponse {
-  access_token: string;
-}
-
-export interface UserResponse {
-  id: string;
-  email: string;
-  nome: string;
-  telefone?: string;
-  isAdmin: boolean;
-  isAtivo: boolean;
-  dataCriacao: string;
-  dataAtualizacao: string;
+interface AuthApiResponse {
+  token: string;
+  user: User;
+  success: boolean;
+  message?: string;
 }
 
 export class AuthService {
-  static async login(credentials: LoginCredentials): Promise<AuthResponse> {
+  static async login(data: LoginData) {
     try {
-      // Adaptando os dados para o formato esperado pelo backend
-      const loginData = {
-        email: credentials.email,
-        password: credentials.password,
-      };
+      const response = await api.post<AuthApiResponse>('/auth/login', data);
 
-      const response = await axios.post(`${API_URL}/auth/login`, loginData);
-      return response.data;
+      if (!response.data.success) {
+        throw new Error(response.data.message || 'Erro ao fazer login');
+      }
+
+      // Salvar o token nos cookies
+      Cookies.set('token', response.data.token);
+
+      // Configurar o token no header das requisições
+      this.setDefaultHeaderToken(response.data.token);
+
+      return {
+        user: response.data.user,
+        token: response.data.token,
+      };
     } catch (error) {
-      console.error('Erro ao fazer login:', error);
-      throw error;
-    }
-  }
-
-  static async register(userData: RegisterData): Promise<UserResponse> {
-    try {
-      // Enviar os dados para o endpoint de registro real
-      const registerData = {
-        email: userData.email,
-        nome: userData.nome,
-        password: userData.password,
-        telefone: userData.telefone || '',
-      };
-
-      const response = await axios.post(
-        `${API_URL}/auth/register`,
-        registerData,
+      console.error('Erro no login:', error);
+      const errorMessage = ErrorService.handleError(
+        error,
+        'Erro ao fazer login. Verifique suas credenciais.',
       );
+      throw new Error(errorMessage);
+    }
+  }
+
+  static async register(data: RegisterData) {
+    try {
+      const response = await api.post('/auth/register', data);
       return response.data;
     } catch (error) {
-      console.error('Erro ao registrar:', error);
-      throw error;
+      console.error('Erro no registro:', error);
+      const errorMessage = ErrorService.handleError(
+        error,
+        'Erro ao realizar o cadastro.',
+      );
+      throw new Error(errorMessage);
     }
   }
 
-  static setAuthToken(token: string): void {
-    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('auth_token', token);
-    }
+  static setDefaultHeaderToken(token: string) {
+    api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
   }
 
-  static getAuthToken(): string | null {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('auth_token');
-    }
-    return null;
-  }
+  logout(): void {
+    console.log('=== INÍCIO DO PROCESSO DE LOGOUT ===');
+    // Remove o token dos cookies
+    Cookies.remove('token');
+    console.log('Token removido dos cookies');
 
-  static removeAuthToken(): void {
-    delete axios.defaults.headers.common['Authorization'];
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('auth_token');
-    }
-  }
-
-  static isAuthenticated(): boolean {
-    return !!this.getAuthToken();
+    // Remove o token do header das requisições
+    delete api.defaults.headers.common['Authorization'];
+    console.log('Token removido do header das requisições');
+    console.log('=== FIM DO PROCESSO DE LOGOUT ===');
   }
 }

@@ -5,6 +5,7 @@ interface ButtonProps {
   onClick?: (e: React.FormEvent<Element>) => void | (() => void);
   disabled?: boolean;
   text: string;
+  type?: 'button' | 'submit' | 'reset';
 }
 
 const Button: React.FC<ButtonProps> = ({
@@ -12,6 +13,7 @@ const Button: React.FC<ButtonProps> = ({
   onClick,
   disabled,
   text,
+  type = 'button',
 }) => {
   const sharedClasses =
     'p-[12px] h-[40px] rounded-md hover:bg-[#272727]/80 focus:outline-none focus:ring-2 focus:ring-[#272727]';
@@ -32,6 +34,7 @@ const Button: React.FC<ButtonProps> = ({
       className={`${buttonClasses[variant]}`}
       onClick={handleClick}
       disabled={disabled}
+      type={type}
     >
       <p className='text-[14px] leading-[120%] font-[500]'>{text}</p>
     </button>

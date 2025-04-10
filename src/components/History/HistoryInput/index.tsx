@@ -4,13 +4,11 @@ import React from 'react';
 
 export const HistoryInput: React.FC<{
   value: string;
-  onChange: React.Dispatch<React.SetStateAction<string>>
-}> = ({
-  value,
-  onChange,
-}) => {
+  onChange: React.Dispatch<React.SetStateAction<string>>;
+}> = ({ value, onChange }) => {
   return (
-    <div className='
+    <div
+      className='
       flex
       items-center
       gap-[8px]
@@ -18,7 +16,8 @@ export const HistoryInput: React.FC<{
       bg-[#F1DFCE]
       rounded-[100px]
       h-[48px]
-    '>
+    '
+    >
       <Image
         src='/icons/magnifying.svg'
         width={15}
@@ -38,6 +37,6 @@ export const HistoryInput: React.FC<{
         value={value}
         onChange={(e) => onChange(e.target.value)}
       />
-      </div>
+    </div>
   );
-}
+};

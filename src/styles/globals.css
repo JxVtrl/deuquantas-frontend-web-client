@@ -65,6 +65,7 @@ body {
 }
 
 main {
+  height: 100vh;
   width: 100%;
 }
 
@@ -89,7 +90,6 @@ h5,
 h6 {
   color: #222;
   line-height: 1.2;
-  margin-bottom: 0.5rem;
   font-weight: bold;
 }
 
@@ -119,19 +119,15 @@ h6 {
 
 /* Parágrafos */
 p {
-  margin-bottom: 1rem;
 }
 
 /* Listas */
 ul,
 ol {
-  margin-bottom: 1rem;
-  padding-left: 1.5rem;
 }
 
 ul li,
 ol li {
-  margin-bottom: 0.5rem;
 }
 
 /* Botões */
@@ -143,13 +139,8 @@ button {
   border: none;
   border-radius: 0.25rem;
   color: black;
-  background-color: #0070f3;
   cursor: pointer;
   transition: background-color 0.2s ease;
-}
-
-button:hover {
-  background-color: #0056c7;
 }
 
 button:disabled {

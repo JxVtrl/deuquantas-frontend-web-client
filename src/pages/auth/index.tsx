@@ -1,26 +1,53 @@
 import React from 'react';
-import { useRouter } from 'next/router';
-import { useAuth } from '../../contexts/AuthContext';
-import { AuthContainer } from '../../components/auth/AuthContainer';
-import { useAuthForm } from '../../hooks/useAuthForm';
+import { AnimatePresence, motion } from 'framer-motion';
+import { useAuth } from '@/contexts/AuthContext';
+import { LoginForm } from '@/components/auth/LoginForm';
+import RegisterForm from '@/components/auth/RegisterForm';
+import { AuthFormProvider } from '@/contexts/AuthFormContext';
+import { useAuthFormContext } from '@/contexts/AuthFormContext';
+import Logo from '@/components/Logo';
 
-export default function AuthPage() {
-  const router = useRouter();
-  const { login, register } = useAuth();
-  const { formData, loading, error, handleInputChange, handleSubmit } =
-    useAuthForm({
-      login,
-      register,
-      onSuccess: () => router.push('/dashboard'),
-    });
+function AuthPageContent() {
+  const { isLogin } = useAuthFormContext();
 
   return (
-    <AuthContainer
-      loading={loading}
-      error={error}
-      formData={formData}
-      onInputChange={handleInputChange}
-      onSubmit={handleSubmit}
-    />
+    <div
+      style={{ backgroundColor: '#FFCC00' }}
+      className='min-h-screen flex items-center justify-center p-4 transition-all duration-300'
+    >
+      <div className='w-[75vw] max-w-[314px] flex flex-col items-end gap-4'>
+        <Logo variant={'dark'} size='large' />
+
+        <AnimatePresence mode='wait'>
+          <motion.div
+            key={isLogin ? 'login' : 'register'}
+            initial={{ opacity: 0, rotateY: 90 }}
+            animate={{ opacity: 1, rotateY: 0 }}
+            exit={{ opacity: 0, rotateY: -90 }}
+            transition={{ duration: 0.5, ease: 'easeInOut' }}
+            style={{ transformStyle: 'preserve-3d' }}
+            className='bg-[#F0F0F0] w-full rounded-lg shadow-[0px_1px_2px_0px_#0000000D] py-[20px] px-[24px] mx-auto h-fit'
+          >
+            {isLogin ? <LoginForm /> : <RegisterForm />}
+          </motion.div>
+        </AnimatePresence>
+      </div>
+    </div>
+  );
+}
+
+export default function AuthPage() {
+  const { login, register } = useAuth();
+
+  return (
+    <AuthFormProvider
+      login={login}
+      register={register}
+      onSuccess={() => {
+        // Não precisa fazer nada aqui, o redirecionamento será feito pelo AuthContext
+      }}
+    >
+      <AuthPageContent />
+    </AuthFormProvider>
   );
 }

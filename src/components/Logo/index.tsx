@@ -2,18 +2,26 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 
-const Logo: React.FC = () => {
+type LogoProps = {
+  variant?: 'light' | 'dark';
+  size?: 'small' | 'medium' | 'large';
+};
+
+const Logo: React.FC<LogoProps> = ({ variant = 'light', size = 'small' }) => {
+  const width = size === 'small' ? 56 : size === 'medium' ? 100 : 202;
+  const height = size === 'small' ? 24 : size === 'medium' ? 40 : 86;
+
   return (
     <Link
-      href='/customer/home'
-      className='flex items-center justify-center'
+      href={'/customer/home'}
+      className='flex items-center justify-center  transition-all duration-300'
       style={{ cursor: 'pointer', zIndex: 1 }}
     >
       <Image
-        src='/brand/logo.svg'
+        src={variant === 'light' ? '/brand/logo.svg' : '/brand/logo-dark.svg'}
         alt='Logo DeuQuantas'
-        width={56}
-        height={24}
+        width={width}
+        height={height}
         quality={100}
         priority
       />

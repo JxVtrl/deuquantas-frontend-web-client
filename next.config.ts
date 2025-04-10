@@ -10,6 +10,17 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: false,
   },
+  devIndicators: false,
+  async rewrites() {
+    return [
+      {
+        source: '/api/proxy/:path*',
+        destination: isDocker
+          ? 'http://backend:3010/:path*'
+          : 'http://localhost:3010/:path*',
+      },
+    ];
+  },
 };
 
 export default nextConfig;
