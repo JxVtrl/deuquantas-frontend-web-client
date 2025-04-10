@@ -14,9 +14,9 @@ import {
   BarChart4,
   Users,
   Shield,
-  Check,
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+import { motion } from 'framer-motion';
 
 export default function Home() {
   // Smooth scroll for anchor links
@@ -88,92 +88,185 @@ export default function Home() {
 
           <div className='flex items-center gap-4'>
             <Link
-              href={`${process.env.NODE_ENV === 'development' ? 'http://localhost:3000/login' : 'https://deuquantas.com.br/login'}`}
+              href={`${process.env.NODE_ENV === 'development' ? 'http://localhost:3000/register' : 'https://deuquantas.com.br/register'}`}
             >
               <Button
                 className='bg-brand-yellow hover:bg-brand-yellow/90'
                 variant='default'
               >
-                Entrar
+                Cadastrar
               </Button>
-            </Link>
-            <Link
-              href={`${process.env.NODE_ENV === 'development' ? 'http://localhost:3000/register' : 'https://deuquantas.com.br/register'}`}
-            >
-              <Button variant='outline'>Cadastrar</Button>
             </Link>
           </div>
         </div>
       </header>
 
-      <main className='relative flex flex-col min-h-screen'>
+      <main className='relative flex  flex-col min-h-screen'>
         {/* Hero Section */}
         <section
-          className='min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-b from-white to-brand-gray dark:from-brand-dark dark:to-gray-900 pt-20'
+          className='min-h-[calc(140vh)] flex flex-col justify-center 
+            relative overflow-hidden bg-gradient-to-b from-white to-brand-gray 
+            dark:from-brand-dark dark:to-gray-900 
+            pt-16 sm:pt-20 pb-12 sm:pb-16 px-4 sm:px-6'
           id='início'
         >
-          <div className='absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-white via-white to-transparent dark:from-brand-dark dark:via-brand-dark dark:to-transparent opacity-70 z-0'></div>
+          {/* Background Gradient */}
+          <div
+            className='absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] 
+            from-white via-white to-transparent dark:from-brand-dark dark:via-brand-dark 
+            dark:to-transparent opacity-70 z-0'
+          />
 
-          <div className='container max-w-7xl mx-auto px-4 sm:px-6 relative z-10 flex flex-col items-center text-center'>
-            <h2 className='text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-6 tracking-tight dark:text-white'>
-              SUA MESA VALE OURO, NÃO A DEIXE PARADA
-            </h2>
-            <p className='text-xl md:text-2xl text-neutral-600 dark:text-neutral-300 max-w-3xl mb-10'>
-              Com o DeuQuantas, seus clientes pagam direto do celular. Você gira
-              mesas mais rápido, fatura mais e ainda vira referência em
-              atendimento moderno.
-            </p>
+          <div className='container max-w-7xl mx-auto relative z-10'>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{
+                opacity: 1,
+                y: 0,
+                transition: {
+                  type: 'spring',
+                  duration: 1,
+                  bounce: 0.3,
+                },
+              }}
+              viewport={{ once: true }}
+              className='flex flex-col items-center text-center'
+            >
+              {/* Título Principal */}
+              <h1
+                className='text-3xl pt-30  md:text-4xl lg:text-4xl xl:text-5xl
+                font-bold tracking-tight text-neutral-900 dark:text-white
+                leading-[1.2] sm:leading-[1.2] mb-6 sm:mb-8 max-w-[18ch]'
+              >
+                <span className='inline-block mb-2'>SUA MESA</span>
+                <br className='hidden sm:block' />
+                <span className='inline-block mb-2'>VALE OURO.</span>
+                <br className='hidden sm:block' />
+                <span className='inline-block'>NÃO A DEIXE PARADA.</span>
+              </h1>
 
-            {/* 
-              Quero adicionaro seguinte abaixo ✅ Sem fila pra pagar ✅ Sem
-              chamar garçom ✅ Sem confusão na conta
-            */}
+              {/* Subtítulo */}
+              <p
+                className='text-base sm:text-lg md:text-xl text-neutral-600 
+                dark:text-neutral-300 max-w-2xl mx-auto mb-12 sm:mb-16
+                leading-relaxed px-4'
+              >
+                Com o DeuQuantas, seus clientes pagam direto do celular.
+                <br className='hidden sm:block' />
+                Você gira mesas mais rápido, fatura mais e ainda vira referência
+                em atendimento moderno.
+              </p>
 
-            <div className='w-full max-w-xl mb-24'>
-              <div className='flex flex-col sm:flex-row items-center gap-3'>
-                <div className='w-12 h-12 rounded-full flex items-center justify-center text-brand-yellow'>
-                  <Check size={24} />
+              {/* Benefits Cards */}
+              <div className='w-full max-w-5xl mx-auto mb-12 sm:mb-16'>
+                <div className='grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 px-4 sm:px-0'>
+                  {[
+                    {
+                      icon: Clock,
+                      text: 'Sem fila pra pagar',
+                      description: 'Pagamento rápido e sem espera',
+                    },
+                    {
+                      icon: Users,
+                      text: 'Sem chamar garçom',
+                      description: 'Autonomia total para os clientes',
+                    },
+                    {
+                      icon: CreditCard,
+                      text: 'Sem confusão na conta',
+                      description: 'Divisão automática e transparente',
+                    },
+                  ].map((benefit, index) => (
+                    <motion.div
+                      key={benefit.text}
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{
+                        opacity: 1,
+                        y: 0,
+                        transition: {
+                          type: 'spring',
+                          duration: 0.8,
+                          delay: index * 0.2,
+                          bounce: 0.3,
+                        },
+                      }}
+                      viewport={{ once: true }}
+                      className='group relative overflow-hidden rounded-xl 
+                        bg-white/80 dark:bg-neutral-800/80 backdrop-blur-sm
+                        shadow-lg hover:shadow-xl
+                        border border-neutral-200/30 dark:border-neutral-700/30
+                        transition-all duration-300
+                        p-4 sm:p-6'
+                    >
+                      {/* Icon Container */}
+                      <div className='flex items-center gap-4'>
+                        <div
+                          className='w-10 h-10 sm:w-12 sm:h-12 rounded-full 
+                          bg-gradient-to-br from-brand-yellow to-brand-yellow/70
+                          flex items-center justify-center shrink-0
+                          transform group-hover:scale-110 group-hover:rotate-3
+                          transition-all duration-300'
+                        >
+                          <benefit.icon className='w-5 h-5 sm:w-6 sm:h-6 text-brand-dark' />
+                        </div>
+
+                        <div>
+                          <h3
+                            className='text-base sm:text-lg font-semibold 
+                            text-neutral-800 dark:text-white
+                            group-hover:text-brand-yellow transition-colors'
+                          >
+                            {benefit.text}
+                          </h3>
+                          <p
+                            className='text-sm text-neutral-600 dark:text-neutral-300 
+                            mt-1 leading-relaxed hidden sm:block'
+                          >
+                            {benefit.description}
+                          </p>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
                 </div>
-                <p className='text-lg  mt-3 text-neutral-600 text-nowrap  dark:text-neutral-300'>
-                  Sem fila pra pagar
-                </p>
-                <div className='w-12 ml-3 h-12 rounded-full flex items-center justify-center  text-brand-yellow'>
-                  <Check size={24} />
-                </div>
-                <p className='text-lg  mt-3 text-nowrap dark:text-neutral-300'>
-                  Sem chamar garçom
-                </p>
-                <div className='w-12 ml-3 h-12 rounded-full flex items-center justify-center text-brand-yellow'>
-                  <Check size={24} />
-                </div>
-                <p className='text-lg  mt-3 text-nowrap dark:text-neutral-300'>
-                  Sem confusão na conta
-                </p>
               </div>
-            </div>
 
-            <div className='w-full max-w-xl mb-24'>
-              <form className='flex flex-col sm:flex-row items-center gap-3'>
-                <div className='w-full sm:min-w-[320px]'>
-                  <Input
-                    variant='underline'
-                    placeholder='Seu email para entrar na lista de espera'
-                    className='h-12 text-lg bg-transparent'
-                  />
-                </div>
-                <Button
-                  type='submit'
-                  className='bg-brand-yellow hover:bg-brand-yellow/90 text-brand-dark font-medium text-sm rounded-full px-8 py-6 w-full sm:w-auto whitespace-nowrap'
-                >
-                  Quero testar no meu restaurante
-                </Button>
-              </form>
-            </div>
+              {/* CTA Form */}
+              <div className='w-full max-w-xl mx-auto px-4 sm:px-0'>
+                <form className='flex flex-col sm:flex-row gap-4'>
+                  <div className='flex-1'>
+                    <Input
+                      variant='underline'
+                      placeholder='Seu email para lista de espera'
+                      type='email'
+                      required
+                      className='h-12 text-base sm:text-lg bg-transparent
+                        placeholder:text-neutral-500 dark:placeholder:text-neutral-400'
+                    />
+                  </div>
+                  <Button
+                    type='submit'
+                    className='w-full sm:w-auto bg-brand-yellow hover:bg-brand-yellow/90 
+                      text-brand-dark font-medium text-base whitespace-nowrap
+                      px-6 py-3 rounded-full transform hover:scale-105
+                      transition-all duration-300 shadow-lg hover:shadow-xl'
+                  >
+                    Quero testar
+                  </Button>
+                </form>
+              </div>
+            </motion.div>
           </div>
 
-          {/* Decorative elements */}
-          <div className='absolute -bottom-20 -left-20 w-64 h-64 bg-brand-yellow/10 rounded-full blur-3xl'></div>
-          <div className='absolute top-40 -right-20 w-80 h-80 bg-brand-yellow/5 rounded-full blur-3xl'></div>
+          {/* Decorative Elements */}
+          <div
+            className='absolute -bottom-20 -left-20 w-48 h-48 sm:w-64 sm:h-64 
+            bg-brand-yellow/10 rounded-full blur-3xl opacity-75'
+          />
+          <div
+            className='absolute top-40 -right-20 w-56 h-56 sm:w-80 sm:h-80 
+            bg-brand-yellow/5 rounded-full blur-3xl opacity-75'
+          />
         </section>
 
         {/* Features Section */}
@@ -308,7 +401,7 @@ export default function Home() {
 
         {/* Process Section */}
         <section
-          className='py-24 bg-white dark:bg-neutral-900'
+          className='py-24 bg-white dark:bg-neutral-800'
           id='como-funciona'
         >
           <div className='container max-w-7xl mx-auto px-4 sm:px-6'>
@@ -325,59 +418,56 @@ export default function Home() {
               </p>
             </div>
 
-            <div className='grid md:grid-cols-2 lg:grid-cols-3 gap-10 mb-16'>
+            <div className='grid md:grid-cols-3 gap-10 mb-12'>
               {[
                 {
-                  number: '1',
-                  title: 'Escaneie o QR Code',
-                  description:
-                    'Cliente escaneia o QR Code na mesa e faz login no sistema.',
+                  icon: QrCode,
+                  title: 'Escaneie e Comece',
+                  description: 'Nada de baixar app. É instantâneo.',
                 },
                 {
-                  number: '2',
-                  title: 'Verificação',
-                  description:
-                    'O sistema verifica cadastro e método de pagamento, garantindo segurança.',
+                  icon: BarChart4,
+                  title: 'Acompanhe em Tempo Real',
+                  description: 'Mais transparência e controle.',
                 },
                 {
-                  number: '3',
-                  title: 'Acesso ao Cardápio',
-                  description:
-                    'Cliente acessa o cardápio digital e faz pedidos pelo aplicativo.',
+                  icon: CreditCard,
+                  title: 'Pague sem Complicação',
+                  description: 'Divida e pague direto pelo celular.',
                 },
-                {
-                  number: '4',
-                  title: 'Processamento do Pedido',
-                  description:
-                    'Sistema direciona pedidos automaticamente para cozinha/bar.',
-                },
-                {
-                  number: '5',
-                  title: 'Acompanhamento',
-                  description:
-                    'Cliente acompanha consumo em tempo real e pode solicitar a conta.',
-                },
-                {
-                  number: '6',
-                  title: 'Pagamento Seguro',
-                  description:
-                    'Cliente autoriza o pagamento e pode personalizar a gorjeta.',
-                },
-              ].map((step, index) => (
-                <div
-                  key={index}
-                  className='bg-white dark:bg-neutral-800 p-8 rounded-xl relative'
+              ].map((feature, index) => (
+                <motion.div
+                  key={feature.title}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{
+                    opacity: 1,
+                    y: 0,
+                    transition: {
+                      type: 'spring',
+                      duration: 1,
+                      delay: index * 0.2,
+                    },
+                  }}
+                  viewport={{ once: true, margin: '-50px' }}
+                  className='text-center'
                 >
-                  <div className='text-4xl font-bold text-brand-yellow mb-4'>
-                    {step.number}
+                  <div className='mb-6 inline-block'>
+                    <div
+                      className='w-16 h-16 rounded-full 
+                      bg-brand-yellow/10 
+                      flex items-center justify-center
+                      transform transition-all duration-300'
+                    >
+                      <feature.icon className='w-8 h-8 text-brand-yellow' />
+                    </div>
                   </div>
-                  <h3 className='text-xl font-semibold mb-2 dark:text-white'>
-                    {step.title}
-                  </h3>
+                  <h4 className='text-xl font-bold mb-4 dark:text-white'>
+                    {feature.title}
+                  </h4>
                   <p className='text-neutral-600 dark:text-neutral-300'>
-                    {step.description}
+                    {feature.description}
                   </p>
-                </div>
+                </motion.div>
               ))}
             </div>
 
@@ -414,29 +504,24 @@ export default function Home() {
 
               <form className='space-y-6'>
                 <Input
-                  variant='underline'
                   placeholder='Nome do restaurante'
-                  className='h-12 text-lg bg-transparent'
+                  className='h-12 text-md bg-transparent'
                 />
                 <Input
-                  variant='underline'
                   placeholder='Seu nome'
-                  className='h-12 text-lg bg-transparent'
+                  className='h-12 text-md bg-transparent'
                 />
                 <Input
-                  variant='underline'
                   placeholder='WhatsApp'
-                  className='h-12 text-lg bg-transparent'
+                  className='h-12 text-md bg-transparent'
                 />
                 <Input
-                  variant='underline'
                   placeholder='E-mail'
-                  className='h-12 text-lg bg-transparent'
+                  className='h-12 text-md bg-transparent'
                 />
                 <Input
-                  variant='underline'
                   placeholder='Cidade/Estado'
-                  className='h-12 text-lg bg-transparent'
+                  className='h-12 text-md bg-transparent'
                 />
 
                 <Button
@@ -571,7 +656,7 @@ export default function Home() {
               </div>
             </div>
 
-            <div className='border-t border-white/10 dark:border-white/5 mt-12 pt-8 text-center text-neutral-500 dark:text-neutral-600 text-sm'>
+            <div className='border-t pb-5 border-white/10 dark:border-white/5 mt-12 pt-8 text-center text-neutral-500 dark:text-neutral-600 text-sm'>
               <p>
                 &copy; {new Date().getFullYear()} Deu Quantas? Todos os direitos
                 reservados.
