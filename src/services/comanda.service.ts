@@ -106,21 +106,6 @@ export const ComandaService = {
     }
   },
 
-  async verificarDisponibilidadeMesa(
-    num_cnpj: string,
-    numMesa: string,
-  ): Promise<boolean> {
-    try {
-      const response = await axios.get(
-        `${API_URL}/qr-code/mesa/${num_cnpj}/${numMesa}/disponibilidade`,
-      );
-      return response.data.disponivel;
-    } catch (error) {
-      console.error('Erro ao verificar disponibilidade da mesa:', error);
-      throw error;
-    }
-  },
-
   /**
    * Obtém a comanda ativa de um cliente
    * @param clienteId ID do cliente (CPF)
