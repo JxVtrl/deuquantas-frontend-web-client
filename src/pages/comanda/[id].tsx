@@ -10,17 +10,28 @@ interface ComandaItem {
   id: string;
   quantidade: number;
   valor_total: number;
-  produto: {
+  item: {
     nome: string;
+    descricao: string;
+    preco: number;
   };
+}
+
+interface Conta {
+  id: string;
+  valConta: number;
+  datConta: string;
+  codFormaPg: number;
+  horPagto?: string;
 }
 
 interface Comanda {
   id: string;
-  numMesa: number;
+  numMesa: string;
   data_criacao: string;
   status: string;
   itens: ComandaItem[];
+  conta?: Conta;
   valor_total: number;
 }
 
@@ -106,28 +117,58 @@ const ComandaPage = () => {
           <div className='mt-6'>
             <h2 className='text-xl font-semibold mb-4'>Itens</h2>
             <div className='space-y-4'>
-              {/* {comanda.itens.map((item) => (
+              {comanda.itens.map((item) => (
                 <div
                   key={item.id}
                   className='flex justify-between items-center border-b pb-2'
                 >
                   <div>
-                    <p className='font-medium'>{item.produto.nome}</p>
+                    <p className='font-medium'>{item.item.nome}</p>
                     <p className='text-sm text-gray-600'>
-                      {item.quantidade}x {currencyFormatter(item.valor_total)}
+                      {item.quantidade}x {currencyFormatter(item.item.preco)}
                     </p>
                   </div>
                   <p className='font-semibold'>
                     {currencyFormatter(item.valor_total)}
                   </p>
                 </div>
-              ))} */}
+              ))}
             </div>
           </div>
 
-          <div className='flex justify-between items-center text-xl font-bold'>
-            <span>Total</span>
-            <span>{currencyFormatter(comanda.valor_total)}</span>
+          <div className='mt-6'>
+            {comanda.conta ? (
+              <div className='bg-gray-50 p-4 rounded-lg'>
+                <h2 className='text-xl font-semibold mb-4'>Conta</h2>
+                <div className='space-y-2'>
+                  <div className='flex justify-between'>
+                    <span className='text-gray-600'>Valor Total:</span>
+                    <span className='font-semibold'>
+                      {currencyFormatter(comanda.conta.valConta)}
+                    </span>
+                  </div>
+                  <div className='flex justify-between'>
+                    <span className='text-gray-600'>Data:</span>
+                    <span>{timeFormatter(comanda.conta.datConta)}</span>
+                  </div>
+                  {comanda.conta.horPagto && (
+                    <div className='flex justify-between'>
+                      <span className='text-gray-600'>Hora do Pagamento:</span>
+                      <span>{timeFormatter(comanda.conta.horPagto)}</span>
+                    </div>
+                  )}
+                  <div className='flex justify-between'>
+                    <span className='text-gray-600'>Forma de Pagamento:</span>
+                    <span>Código: {comanda.conta.codFormaPg}</span>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className='flex justify-between items-center text-xl font-bold mt-4'>
+                <span>Total</span>
+                <span>{currencyFormatter(comanda.valor_total)}</span>
+              </div>
+            )}
           </div>
         </div>
       </div>
