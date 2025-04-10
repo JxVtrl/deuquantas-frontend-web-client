@@ -5,11 +5,11 @@ import loadingAnimation from '../../../public/lotties/loading.json';
 const LoadingLottie: React.FC = () => {
   return (
     <div className='flex flex-col items-center justify-center gap-4'>
-      <Lottie
+      {/* <Lottie
         animationData={loadingAnimation}
         loop={true}
         style={{ width: 200, height: 200 }}
-      />
+      /> */}
     </div>
   );
 };
