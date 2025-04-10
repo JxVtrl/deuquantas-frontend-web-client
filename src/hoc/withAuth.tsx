@@ -6,10 +6,6 @@ export function withAuthAdmin(Component: React.FC) {
   return withAuth(Component, 'admin');
 }
 
-export function withAuthEstablishment(Component: React.FC) {
-  return withAuth(Component, 'establishment');
-}
-
 export function withAuthCustomer(Component: React.FC) {
   return withAuth(Component, 'customer');
 }

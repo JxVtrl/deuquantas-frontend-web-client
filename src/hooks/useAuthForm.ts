@@ -22,23 +22,9 @@ export function useAuthForm({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isLogin, setIsLogin] = useState(true);
-  const [isRegisterAsEstablishment, setIsRegisterAsEstablishment] =
-    useState(false);
 
   const toggleForm = () => {
     setIsLogin((prev) => !prev);
-    setIsRegisterAsEstablishment(false);
-    setError(null);
-  };
-
-  const setRegisterType = (type: 'cliente' | 'estabelecimento') => {
-    setIsRegisterAsEstablishment(type === 'estabelecimento');
-    setError(null);
-  };
-
-  const toggleRegisterAsEstablishment = () => {
-    setIsRegisterAsEstablishment((prev) => !prev);
-    setIsLogin(false);
     setError(null);
   };
 
@@ -79,9 +65,6 @@ export function useAuthForm({
     error,
     handleSubmit,
     isLogin,
-    isRegisterAsEstablishment,
     toggleForm,
-    toggleRegisterAsEstablishment,
-    setRegisterType,
   };
 }

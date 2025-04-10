@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
 import { LoginForm } from '@/components/auth/LoginForm';
@@ -8,24 +8,15 @@ import { useAuthFormContext } from '@/contexts/AuthFormContext';
 import Logo from '@/components/Logo';
 
 function AuthPageContent() {
-  const { isLogin, isRegisterAsEstablishment } = useAuthFormContext();
-  const [backgroundColor, setBackgroundColor] = useState<string>('#FFCC00');
-
-  useEffect(() => {
-    setBackgroundColor(isRegisterAsEstablishment ? '#000000' : '#FFCC00');
-  }, [isRegisterAsEstablishment]);
+  const { isLogin } = useAuthFormContext();
 
   return (
     <div
-      style={{ backgroundColor }}
+      style={{ backgroundColor: '#FFCC00' }}
       className='min-h-screen flex items-center justify-center p-4 transition-all duration-300'
     >
       <div className='w-[75vw] max-w-[314px] flex flex-col items-end gap-4'>
-        <Logo
-          isEstablishment={isRegisterAsEstablishment}
-          variant={isRegisterAsEstablishment ? 'light' : 'dark'}
-          size='large'
-        />
+        <Logo variant={'dark'} size='large' />
 
         <AnimatePresence mode='wait'>
           <motion.div

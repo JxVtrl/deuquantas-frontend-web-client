@@ -1,8 +1,4 @@
-import { AuthService } from './auth.service';
-import { RegisterFormData } from '@/interfaces/register';
-import { UseFormSetError } from 'react-hook-form';
 import { api } from '@/lib/axios';
-import { ErrorService } from './error.service';
 
 export class DocumentService {
   static validateCPF(cpf: string): boolean {
@@ -77,78 +73,6 @@ export class DocumentService {
     return phoneLimpo.length === 11 && /^[1-9]{2}9[0-9]{8}$/.test(phoneLimpo);
   }
 
-  static async checkClientDocuments(
-    num_cpf: string,
-    num_celular: string,
-    setError: UseFormSetError<RegisterFormData>,
-    showError: (message: string) => void,
-  ): Promise<boolean> {
-    try {
-      const [cpfExists, phoneExists] = await Promise.all([
-        AuthService.checkCPFExists(num_cpf.replace(/\D/g, '')),
-        AuthService.checkPhoneExists(num_celular.replace(/\D/g, '')),
-      ]);
-
-      if (cpfExists) {
-        setError('num_cpf', {
-          type: 'manual',
-          message: 'Este CPF já está cadastrado',
-        });
-        return false;
-      }
-
-      if (phoneExists) {
-        setError('num_celular', {
-          type: 'manual',
-          message: 'Este número de celular já está cadastrado',
-        });
-        return false;
-      }
-
-      return true;
-    } catch (error) {
-      console.error('Erro ao verificar documentos:', error);
-      showError('Não foi possível verificar os dados. Tente novamente.');
-      return false;
-    }
-  }
-
-  static async checkEstablishmentDocuments(
-    num_cnpj: string,
-    num_celular: string,
-    setError: UseFormSetError<RegisterFormData>,
-    showError: (message: string) => void,
-  ): Promise<boolean> {
-    try {
-      const [cnpjExists, phoneExists] = await Promise.all([
-        AuthService.checkCNPJExists(num_cnpj.replace(/\D/g, '')),
-        AuthService.checkPhoneExists(num_celular.replace(/\D/g, '')),
-      ]);
-
-      if (cnpjExists) {
-        setError('num_cnpj', {
-          type: 'manual',
-          message: 'Este CNPJ já está cadastrado',
-        });
-        return false;
-      }
-
-      if (phoneExists) {
-        setError('num_celular', {
-          type: 'manual',
-          message: 'Este número de celular já está cadastrado',
-        });
-        return false;
-      }
-
-      return true;
-    } catch (error) {
-      console.error('Erro ao verificar documentos do estabelecimento:', error);
-      showError('Não foi possível verificar os dados. Tente novamente.');
-      return false;
-    }
-  }
-
   static async checkCPFExists(
     cpf: string,
   ): Promise<{ exists: boolean; message: string }> {
@@ -163,29 +87,6 @@ export class DocumentService {
       return {
         exists: false,
         message: 'Erro ao verificar CPF',
-      };
-    }
-  }
-
-  static async checkCNPJExists(
-    cnpj: string,
-    showError: (message: string) => void,
-  ): Promise<{ exists: boolean; message: string }> {
-    try {
-      const response = await api.get(`/auth/check-cnpj/${cnpj}`);
-      return {
-        exists: response.data.exists,
-        message: response.data.message,
-      };
-    } catch (error) {
-      const errorMessage = ErrorService.handleError(
-        error,
-        'Erro ao verificar CNPJ',
-      );
-      showError(errorMessage);
-      return {
-        exists: false,
-        message: errorMessage,
       };
     }
   }

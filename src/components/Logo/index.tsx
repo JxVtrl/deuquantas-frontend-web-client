@@ -4,21 +4,16 @@ import Link from 'next/link';
 
 type LogoProps = {
   variant?: 'light' | 'dark';
-  isEstablishment?: boolean;
   size?: 'small' | 'medium' | 'large';
 };
 
-const Logo: React.FC<LogoProps> = ({
-  variant = 'light',
-  isEstablishment,
-  size = 'small',
-}) => {
+const Logo: React.FC<LogoProps> = ({ variant = 'light', size = 'small' }) => {
   const width = size === 'small' ? 56 : size === 'medium' ? 100 : 202;
   const height = size === 'small' ? 24 : size === 'medium' ? 40 : 86;
 
   return (
     <Link
-      href={isEstablishment ? '/establishment/home' : '/customer/home'}
+      href={'/customer/home'}
       className='flex items-center justify-center  transition-all duration-300'
       style={{ cursor: 'pointer', zIndex: 1 }}
     >

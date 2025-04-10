@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
-import { MesaSolicitacao, mesaService } from '@/services/mesa.service';
+import { SolicitacaoMesa, mesaService } from '@/services/mesa.service';
 import { Loader2 } from 'lucide-react';
 
 interface MesaAguardandoAprovacaoProps {
@@ -26,12 +26,12 @@ export const MesaAguardandoAprovacao: React.FC<
       // Solicitar a mesa
       mesaService.solicitarMesa(
         solicitacao.num_cnpj,
-        solicitacao.numMesa,
+        parseInt(solicitacao.numMesa),
         solicitacao.clienteId,
       );
 
       // Ouvir atualizações da solicitação
-      const handleAtualizacao = (solicitacao: MesaSolicitacao) => {
+      const handleAtualizacao = (solicitacao: SolicitacaoMesa) => {
         setStatus(solicitacao.status);
         setLoading(false);
 
@@ -43,7 +43,7 @@ export const MesaAguardandoAprovacao: React.FC<
         }
       };
 
-      mesaService.onAtualizacaoSolicitacao(handleAtualizacao);
+      mesaService.onSolicitacaoUpdate(handleAtualizacao);
 
       return () => {
         mesaService.removeAllListeners();

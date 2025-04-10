@@ -1,14 +1,10 @@
 import {
   ConsumptionIcon,
-  // DashboardIcon,
   FavoriteIcon,
   LocationIcon,
   OrdersIcon,
-  RequestIcon,
   ScanIcon,
-  TableIcon,
 } from '@/components/Icons';
-import { QrCodeIcon } from 'lucide-react';
 
 export interface ActionItem {
   icon: React.FC;
@@ -16,29 +12,11 @@ export interface ActionItem {
   href: string;
 }
 
-export const establishmentActions: ActionItem[] = [
-  {
-    icon: RequestIcon,
-    label: 'Solicitações',
-    href: '/establishment/manage/requests',
-  },
-  {
-    icon: QrCodeIcon,
-    label: 'QR Codes',
-    href: '/establishment/manage/qr-codes',
-  },
-  {
-    icon: TableIcon,
-    label: 'Mesas',
-    href: '/establishment/manage/tables',
-  },
-];
-
 export const customerActions: ActionItem[] = [
   {
     icon: ScanIcon,
     label: 'Scan QR',
-    href: '/customer/home/qr-code',
+    href: '/customer/qr-code',
   },
   {
     icon: ConsumptionIcon,

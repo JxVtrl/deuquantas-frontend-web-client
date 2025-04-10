@@ -12,7 +12,6 @@ import { jwtDecode } from 'jwt-decode';
 import Cookies from 'js-cookie';
 import { api } from '@/lib/axios';
 import { User, UserJwt } from '@/services/api/types';
-import { mesaService } from '@/services/mesa.service';
 
 interface AuthContextData {
   user: User | null;
@@ -21,9 +20,6 @@ interface AuthContextData {
   register: (data: RegisterData) => Promise<void>;
   logout: () => void;
   isAuthenticated: boolean;
-  is_admin: boolean;
-  isCliente: boolean;
-  isEstabelecimento: boolean;
   processLogin: (token: string) => void;
   clearSession: () => void;
 }
@@ -80,19 +76,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         }
       } else if (decodedToken.hasEstabelecimento) {
         console.log('Usuário é estabelecimento');
-        try {
-          const estabelecimentoResponse = await api.get(
-            `/estabelecimentos/usuario/${decodedToken.sub}`,
-          );
-          if (!estabelecimentoResponse.data.success) {
-            throw new Error('Erro ao buscar dados do estabelecimento');
-          }
-          response = estabelecimentoResponse.data.data;
-          console.log('Dados do estabelecimento:', response);
-        } catch (error) {
-          console.error('Erro ao buscar estabelecimento:', error);
-          throw new Error('Erro ao buscar dados do estabelecimento');
-        }
+        throw new Error('Usuário é estabelecimento');
       }
 
       if (!response) {
@@ -126,18 +110,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
               data_nascimento: response.data_nascimento,
             }
           : undefined,
-        estabelecimento: decodedToken.hasEstabelecimento
-          ? {
-              num_cnpj: response.num_cnpj,
-              nome_estab: response.nome_estab,
-              razao_social: response.razao_social,
-              num_celular: response.num_celular,
-              imgLogo: response.imgLogo,
-              status: response.status,
-              latitude: response.latitude,
-              longitude: response.longitude,
-            }
-          : undefined,
       };
 
       console.log('Usuário processado:', usr);
@@ -153,42 +125,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     }
   }, []);
 
-  useEffect(() => {
-    const joinRoom = async () => {
-      console.log('[DEBUG] Verificando se deve conectar ao socket');
-      if (
-        router.pathname.includes('establishment') &&
-        user?.estabelecimento?.num_cnpj &&
-        !mesaService.isConnected()
-      ) {
-        console.log('[DEBUG] Estabelecimento encontrado, conectando ao socket');
-        const roomName = `estabelecimento:${user?.estabelecimento?.num_cnpj}`;
-
-        try {
-          console.log('[DEBUG] Conectando ao socket:', roomName);
-          await mesaService.joinRoom(roomName);
-          console.log('[DEBUG] Conectado ao socket:', roomName);
-        } catch (error) {
-          console.error('[DEBUG] Erro ao conectar ao socket:', error);
-        }
-      }
-    };
-
-    joinRoom();
-  }, [router, user]);
-
-  // useEffect para ficar escutando as mensagens do socket
-  useEffect(() => {
-    mesaService.onSolicitacaoUpdate((solicitacao) => {
-      console.log('[DEBUG] Recebida solicitação:', solicitacao);
-    });
-  }, []);
-
   const redirectTo = useCallback(
     (user: User | null) => {
       try {
         console.log('Usuário no redirectTo:', user);
-        console.log('É estabelecimento?', !!user?.estabelecimento);
         console.log('É cliente?', !!user?.cliente);
         console.log('Permission level:', user?.usuario?.permission_level);
 
@@ -207,11 +147,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         }
 
         // Determina a rota baseada no tipo de usuário
-        const route = !!user.estabelecimento
-          ? '/establishment/home'
-          : !!user.cliente
-            ? '/customer/home'
-            : '/login';
+        const route = !!user.cliente ? '/customer/home' : '/login';
 
         console.log('Rota de destino:', route);
         console.log('Rota atual:', router.pathname);
@@ -255,7 +191,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     };
   }, [processToken]);
 
-  const is_admin = user?.usuario?.is_admin ?? false;
   const isAuthenticated = !!user;
 
   const login = async (data: LoginData) => {
@@ -285,20 +220,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     Cookies.remove('token');
     setUser(null);
     AuthService.setDefaultHeaderToken('');
-    // Desconectar do socket se necessário
-    if (user?.estabelecimento?.num_cnpj) {
-      mesaService.disconnect();
-    }
   };
 
   const clearSession = () => {
     Cookies.remove('token');
     setUser(null);
     AuthService.setDefaultHeaderToken('');
-    // Desconectar do socket se necessário
-    if (user?.estabelecimento?.num_cnpj) {
-      mesaService.disconnect();
-    }
   };
 
   const processLogin = async (token: string) => {
@@ -314,9 +241,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         register,
         logout,
         isAuthenticated,
-        is_admin,
-        isCliente: !!user?.cliente,
-        isEstabelecimento: !!user?.estabelecimento,
         processLogin,
         clearSession,
       }}

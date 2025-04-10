@@ -37,7 +37,7 @@ export class MesaService {
       }
 
       const socketUrl =
-        process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:3002';
+        process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:3011';
       console.log('[DEBUG] Inicializando socket com URL:', socketUrl);
 
       this.socket = io(socketUrl, {

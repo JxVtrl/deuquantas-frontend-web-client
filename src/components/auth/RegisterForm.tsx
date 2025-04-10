@@ -35,10 +35,7 @@ const RegisterForm: React.FC = () => {
     },
   });
 
-  const { setRegisterType, isRegisterAsEstablishment, toggleForm } =
-    useAuthFormContext();
-
-  const accountType = isRegisterAsEstablishment ? 'estabelecimento' : 'cliente';
+  const { toggleForm } = useAuthFormContext();
 
   const {
     currentStep,
@@ -48,7 +45,7 @@ const RegisterForm: React.FC = () => {
     isFirstStep,
     isLastStep,
     totalSteps,
-  } = useFormSteps(register_steps[accountType]);
+  } = useFormSteps(register_steps);
 
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
@@ -87,10 +84,10 @@ const RegisterForm: React.FC = () => {
     setValue('cep', '');
 
     // Reseta os campos do primeiro passo
-    if (register_steps[accountType][0].fields.includes('password')) {
-      register_steps[accountType][0].fields = ['email'];
+    if (register_steps[0].fields.includes('password')) {
+      register_steps[0].fields = ['email'];
     }
-  }, [accountType]);
+  }, []);
 
   // Efeito para validar os campos do step atual sempre que houver mudança nos valores
   useEffect(() => {
@@ -102,7 +99,6 @@ const RegisterForm: React.FC = () => {
         const isValid = await RegisterService.handleStepValidation(
           currentStep,
           watch(),
-          isRegisterAsEstablishment,
         );
         setIsStepValid(isValid);
       }
@@ -113,7 +109,6 @@ const RegisterForm: React.FC = () => {
     currentStep,
     watch(),
     currentStepData.fields,
-    isRegisterAsEstablishment,
     emailValidated,
     emailExists,
   ]);
@@ -173,39 +168,6 @@ const RegisterForm: React.FC = () => {
         }
       } catch (error) {
         console.error('Erro ao verificar CPF:', error);
-      }
-    }
-  };
-
-  const handleCNPJBlur = async (e: React.FocusEvent<HTMLInputElement>) => {
-    const cnpj = e.target.value.replace(/\D/g, '');
-    if (cnpj.length === 14) {
-      if (!DocumentService.validateCNPJ(cnpj)) {
-        setError('num_cnpj', {
-          type: 'manual',
-          message: 'CNPJ inválido',
-        });
-        return;
-      }
-      try {
-        const result = await DocumentService.checkCNPJExists(
-          cnpj,
-          (message) => {
-            toast({
-              title: 'Erro!',
-              description: message,
-              variant: 'destructive',
-            });
-          },
-        );
-        if (result.exists) {
-          setError('num_cnpj', {
-            type: 'manual',
-            message: result.message,
-          });
-        }
-      } catch (error) {
-        console.error('Erro ao verificar CNPJ:', error);
       }
     }
   };
@@ -323,7 +285,6 @@ const RegisterForm: React.FC = () => {
         setLoading(true);
         await RegisterService.handleRegistration(
           data,
-          isRegisterAsEstablishment,
           (message) => {
             toast({
               title: 'Sucesso!',
@@ -350,27 +311,6 @@ const RegisterForm: React.FC = () => {
 
   return (
     <div className='space-y-4'>
-      {currentStep === 0 && (
-        <div className='grid grid-cols-2 gap-4 mb-6'>
-          <Button
-            type='button'
-            variant={accountType === 'cliente' ? 'default' : 'outline'}
-            onClick={() => setRegisterType('cliente')}
-            className='flex-1'
-          >
-            Cliente
-          </Button>
-          <Button
-            type='button'
-            variant={accountType === 'estabelecimento' ? 'default' : 'outline'}
-            onClick={() => setRegisterType('estabelecimento')}
-            className='flex-1'
-          >
-            Estabelecimento
-          </Button>
-        </div>
-      )}
-
       <form
         onSubmit={handleSubmit(onSubmit)}
         className='space-y-4 w-full max-h-[calc(100vh-200px)] overflow-y-auto'
@@ -531,21 +471,6 @@ const RegisterForm: React.FC = () => {
                       ${errors[field as keyof RegisterFormData] ? 'border-red-500' : 'border-gray-300'}
                       bg-gray-100 cursor-not-allowed
                     `}
-                  />
-                ) : field === 'num_cnpj' ? (
-                  <MaskedInput
-                    maskType='num_cnpj'
-                    {...register(field as keyof RegisterFormData, {
-                      required: 'Este campo é obrigatório',
-                      validate: (value) => {
-                        const numbers = value?.replace(/\D/g, '') || '';
-                        if (numbers.length !== 14) return 'CNPJ inválido';
-                        return true;
-                      },
-                    })}
-                    error={!!errors[field as keyof RegisterFormData]}
-                    value={watch(field as keyof RegisterFormData) || ''}
-                    onBlur={handleCNPJBlur}
                   />
                 ) : (
                   <Input

@@ -11,17 +11,6 @@ export interface Cliente {
   num_celular: string;
 }
 
-export interface Estabelecimento {
-  num_cnpj: string;
-  nome_estab: string;
-  razao_social: string;
-  num_celular: string;
-  imgLogo?: string;
-  latitude?: number;
-  longitude?: number;
-  status: 'ativo' | 'em_breve';
-}
-
 export interface UserPreferences {
   isLeftHanded: boolean;
   language: 'pt' | 'en';
@@ -48,7 +37,6 @@ export interface User {
     permission_level: PermissionLevel;
   };
   cliente?: Cliente;
-  estabelecimento?: Estabelecimento;
   preferences?: UserPreferences;
 }
 

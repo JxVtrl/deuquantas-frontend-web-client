@@ -1,6 +1,5 @@
 import { api } from '@/lib/axios';
 import Cookies from 'js-cookie';
-import axios from 'axios';
 import { ErrorService } from './error.service';
 import { User } from './api/types';
 
@@ -24,49 +23,11 @@ export interface RegisterData {
   estado: string;
 }
 
-export interface RegisterEstablishmentData {
-  name: string;
-  email: string;
-  password: string;
-  num_cnpj: string;
-  num_celular: string;
-  nome_estab: string;
-  razao_social: string;
-  endereco: string;
-  numero: string;
-  complemento?: string;
-  bairro: string;
-  cidade: string;
-  estado: string;
-  cep: string;
-  imgLogo?: string;
-}
-
-export interface AuthResponse {
-  user: User;
-  token: string;
-}
-
 interface AuthApiResponse {
   token: string;
   user: User;
   success: boolean;
   message?: string;
-}
-
-export interface UserResponse {
-  id: string;
-  email: string;
-  name: string;
-  is_admin: boolean;
-  is_ativo: boolean;
-  data_criacao: string;
-  data_atualizacao: string;
-}
-
-export interface CheckAccountResponse {
-  hasClienteAccount: boolean;
-  hasEstabelecimentoAccount: boolean;
 }
 
 export class AuthService {
@@ -116,103 +77,6 @@ export class AuthService {
     api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
   }
 
-  static async registerEstablishment(data: RegisterEstablishmentData) {
-    try {
-      const response = await api.post('/auth/register-establishment', data);
-      return response.data;
-    } catch (error) {
-      console.error('Erro no registro do estabelecimento:', error);
-      const errorMessage = ErrorService.handleError(
-        error,
-        'Erro ao realizar o cadastro do estabelecimento.',
-      );
-      throw new Error(errorMessage);
-    }
-  }
-
-  static async checkAccountType(email: string) {
-    try {
-      const response = await api.get(`/auth/check-account-type?email=${email}`);
-      return response.data;
-    } catch (error) {
-      console.error('Erro ao verificar tipo de conta:', error);
-      const errorMessage = ErrorService.handleError(
-        error,
-        'Erro ao verificar tipo de conta.',
-      );
-      throw new Error(errorMessage);
-    }
-  }
-
-  static async checkCPFExists(cpf: string) {
-    try {
-      const response = await api.get(`/auth/check-cpf?cpf=${cpf}`);
-      return response.data;
-    } catch (error) {
-      console.error('Erro ao verificar CPF:', error);
-      const errorMessage = ErrorService.handleError(
-        error,
-        'Erro ao verificar CPF.',
-      );
-      throw new Error(errorMessage);
-    }
-  }
-
-  static async checkCNPJExists(cnpj: string) {
-    try {
-      const response = await api.get(`/auth/check-cnpj?cnpj=${cnpj}`);
-      return response.data;
-    } catch (error) {
-      console.error('Erro ao verificar CNPJ:', error);
-      const errorMessage = ErrorService.handleError(
-        error,
-        'Erro ao verificar CNPJ.',
-      );
-      throw new Error(errorMessage);
-    }
-  }
-
-  static async checkPhoneExists(phone: string) {
-    try {
-      const response = await api.get(`/auth/check-phone?phone=${phone}`);
-      return response.data;
-    } catch (error) {
-      const errorMessage = ErrorService.handleError(
-        error,
-        'Erro ao verificar telefone.',
-      );
-      throw new Error(errorMessage);
-    }
-  }
-
-  static async getUserData() {
-    try {
-      const response = await axios.get('/api/auth/user-data');
-      return response.data;
-    } catch (error) {
-      const errorMessage = ErrorService.handleError(
-        error,
-        'Erro ao buscar dados do usuário.',
-      );
-      throw new Error(errorMessage);
-    }
-  }
-
-  async getUserData(): Promise<AuthResponse> {
-    try {
-      console.log('=== BUSCANDO DADOS DO USUÁRIO ===');
-      const response = await api.get<AuthApiResponse>('/auth/me');
-      console.log('Dados do usuário obtidos:', response.data);
-      return {
-        user: response.data.user,
-        token: Cookies.get('token') || '',
-      };
-    } catch (error) {
-      console.error('=== ERRO AO BUSCAR DADOS DO USUÁRIO ===', error);
-      throw error;
-    }
-  }
-
   logout(): void {
     console.log('=== INÍCIO DO PROCESSO DE LOGOUT ===');
     // Remove o token dos cookies
@@ -223,14 +87,5 @@ export class AuthService {
     delete api.defaults.headers.common['Authorization'];
     console.log('Token removido do header das requisições');
     console.log('=== FIM DO PROCESSO DE LOGOUT ===');
-  }
-
-  async checkEmailExists(email: string): Promise<boolean> {
-    try {
-      const response = await api.get(`/auth/check-email/${email}`);
-      return response.data.exists;
-    } catch (error) {
-      throw error;
-    }
   }
 }

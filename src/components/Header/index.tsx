@@ -6,22 +6,15 @@ import { capitalize } from '@/utils/formatters';
 import HeaderMenu from '../HeaderMenu';
 import Logo from '../Logo';
 
-type HeaderProps = {
-  isEstablishment?: boolean;
-};
-
-export const Header: React.FC<HeaderProps> = ({ isEstablishment = false }) => {
+export const Header: React.FC = () => {
   const { user } = useAuth();
   const firstName = user?.usuario?.name || 'Usuário';
 
   return (
-    <MaxWidthLayout backgroundColor={isEstablishment ? '#000' : '#FFCC00'}>
+    <MaxWidthLayout backgroundColor={'#FFCC00'}>
       <header className='py-[7px] flex justify-between items-center'>
         <div className='flex items-center gap-[12px]'>
-          <Logo
-            isEstablishment={isEstablishment}
-            variant={isEstablishment ? 'light' : 'dark'}
-          />
+          <Logo variant={'dark'} />
 
           <Image
             src='/icons/line.svg'
@@ -32,16 +25,14 @@ export const Header: React.FC<HeaderProps> = ({ isEstablishment = false }) => {
           />
 
           <div className='flex items-center gap-2'>
-            <p
-              className={`text-[14px] text-${isEstablishment ? 'white' : 'black'} font-[300]`}
-            >
+            <p className={`text-[14px] text-black font-[300]`}>
               Bem-vindo{' '}
               <strong className='font-[700]'>{capitalize(firstName)}</strong>
             </p>
           </div>
         </div>
 
-        <HeaderMenu isEstablishment={isEstablishment} />
+        <HeaderMenu />
       </header>
     </MaxWidthLayout>
   );

@@ -6,10 +6,7 @@ interface AuthFormContextData {
   loading: boolean;
   error: string | null;
   isLogin: boolean;
-  isRegisterAsEstablishment: boolean;
   toggleForm: () => void;
-  toggleRegisterAsEstablishment: () => void;
-  setRegisterType: (type: 'cliente' | 'estabelecimento') => void;
   handleSubmit: (data: LoginData | RegisterData) => Promise<void>;
 }
 
