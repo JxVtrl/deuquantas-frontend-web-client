@@ -16,7 +16,10 @@ export const ComandaValueChart: React.FC = () => {
   const percentage = (consumo_user / consumo_total) * 100;
 
   return (
-    <MaxWidthLayout classNameContent='relative flex flex-col items-center'>
+    <MaxWidthLayout
+      className='py-[20px]'
+      classNameContent='relative flex flex-col items-center h-full'
+    >
       {/* Gráfico circular */}
       <svg
         width={(200 / 2 + 6) * 2}
@@ -50,21 +53,35 @@ export const ComandaValueChart: React.FC = () => {
       </svg>
 
       {/* Conteúdo central */}
-      <div className='absolute inset-0 flex flex-col items-center justify-center'>
+      <div className='absolute inset-0 flex flex-col items-center justify-center h-full'>
         <div className='text-center'>
           <p className='text-[12px] text-[#272727]'>
             R$
             <br />
             Meu consumo
           </p>
-          <p className='text-[40px] font-[700]'>
+          <p className='text-[40px] font-[700] leading-[40px] my-[8px]'>
             {currencyFormatter(consumo_user, {
               noPrefix: true,
             })}
           </p>
-          <p className='text-[10px] text-[#272727] font-[500]'>Total</p>
-          <p className='text-[28px] text-[#27272799] font-[700]'>
-            {currencyFormatter(consumo_total)}
+          <svg
+            width='132'
+            height='2'
+            viewBox='0 0 132 2'
+            fill='none'
+            xmlns='http://www.w3.org/2000/svg'
+          >
+            <line y1='1' x2='132' y2='1' stroke='black' stroke-opacity='0.1' />
+          </svg>
+
+          <p className='text-[10px] text-[#272727] font-[500] leading-[10px] my-[8px]'>
+            Total
+          </p>
+          <p className='text-[28px] text-[#27272799] font-[700] leading-[32px]'>
+            {currencyFormatter(consumo_total, {
+              noPrefix: true,
+            })}
           </p>
         </div>
       </div>

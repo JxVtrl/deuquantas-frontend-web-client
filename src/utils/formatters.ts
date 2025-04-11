@@ -20,12 +20,16 @@ export const currencyFormatter = (
   value: number,
   options?: { noPrefix?: boolean },
 ) => {
+  if (options?.noPrefix) {
+    return new Intl.NumberFormat('pt-BR', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(value);
+  }
+
   return new Intl.NumberFormat('pt-BR', {
     style: 'currency',
     currency: 'BRL',
-    ...(options?.noPrefix && {
-      prefix: '',
-    }),
   }).format(value);
 };
 

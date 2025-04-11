@@ -1,8 +1,7 @@
 import React, { useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { CustomerLayout, MaxWidthLayout } from '@/layout';
+import { CustomerLayout } from '@/layout';
 import { withAuthCustomer } from '@/hoc/withAuth';
-import { currencyFormatter, timeFormatter } from '@/utils/formatters';
 import { useComanda } from '@/contexts/ComandaContext';
 import { NavigationPills } from '@/components/NavigationPills';
 import ComandaButtons from '@/components/ComandaButtons';
@@ -45,83 +44,6 @@ const ComandaPage = () => {
       <NavigationPills />
       <ComandaButtons />
       <ComandaValueChart />
-      <MaxWidthLayout className='px-[16px] py-[24px]'>
-        <h1 className='text-2xl font-bold mb-6'>Comanda #{comanda.id}</h1>
-
-        <div className='bg-white rounded-lg shadow-md p-6 mb-6'>
-          <div className='mb-4'>
-            <p className='text-gray-600'>Mesa:</p>
-            <p className='font-semibold'>{comanda.numMesa}</p>
-          </div>
-          <div className='mb-4'>
-            <p className='text-gray-600'>Data:</p>
-            <p className='font-semibold'>
-              {timeFormatter(comanda.data_criacao)}
-            </p>
-          </div>
-          <div className='mb-4'>
-            <p className='text-gray-600'>Status:</p>
-            <p className='font-semibold'>{comanda.status}</p>
-          </div>
-
-          <div className='mt-6'>
-            <h2 className='text-xl font-semibold mb-4'>Itens</h2>
-            <div className='space-y-4'>
-              {comanda.itens.map((item) => (
-                <div
-                  key={item.codItem}
-                  className='flex justify-between items-center border-b pb-2'
-                >
-                  {/* <div>
-                    <p className='font-medium'>{item.desItem  }</p>
-                    <p className='text-sm text-gray-600'>
-                      {item.numQuant}x {currencyFormatter(item.valPreco)}
-                    </p>
-                  </div>
-                  <p className='font-semibold'>
-                    {currencyFormatter(item.valPreco)}
-                  </p> */}
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className='mt-6'>
-            {comanda.conta ? (
-              <div className='bg-gray-50 p-4 rounded-lg'>
-                <h2 className='text-xl font-semibold mb-4'>Conta</h2>
-                <div className='space-y-2'>
-                  <div className='flex justify-between'>
-                    <span className='text-gray-600'>Valor Total:</span>
-                    <span className='font-semibold'>
-                      {currencyFormatter(comanda.conta.valTotal)}
-                    </span>
-                  </div>
-                  <div className='flex justify-between'>
-                    <span className='text-gray-600'>Data:</span>
-                    <span>{timeFormatter(comanda.conta.data_criacao)}</span>
-                  </div>
-                  {comanda.conta.horPagto && (
-                    <div className='flex justify-between'>
-                      <span className='text-gray-600'>Hora do Pagamento:</span>
-                      <span>{timeFormatter(comanda.conta.horPagto)}</span>
-                    </div>
-                  )}
-                  <div className='flex justify-between'>
-                    <span className='text-gray-600'>Forma de Pagamento:</span>
-                    <span>Código: {comanda.conta.codFormaPg}</span>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className='flex justify-between items-center text-xl font-bold mt-4'>
-                <span>Total</span>
-                <span>{currencyFormatter(comanda.valor_total)}</span>
-              </div>
-            )}
-          </div>
-        </div>
-      </MaxWidthLayout>
     </CustomerLayout>
   );
 };
