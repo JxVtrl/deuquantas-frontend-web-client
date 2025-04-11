@@ -11,7 +11,7 @@ export const customerBottomNavigation = [
   {
     icon: MoneyIcon,
     label: 'Conta',
-    href: '/account',
+    href: '/conta/comanda',
   },
   {
     icon: FavoriteIcon,
