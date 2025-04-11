@@ -34,6 +34,12 @@ export interface ComandaResponse {
 }
 
 import { api } from '@/lib/axios';
+import { RegisterFormData } from '@/interfaces/register';
+
+interface GetComandaResponse {
+  comanda: ComandaResponse;
+  estabelecimento: RegisterFormData;
+}
 
 export const ComandaService = {
   async getComandaAtivaByCpf(num_cpf: string): Promise<ComandaResponse | null> {
@@ -43,6 +49,28 @@ export const ComandaService = {
     } catch (error) {
       console.error('Erro ao buscar comanda ativa:', error);
       return null;
+    }
+  },
+
+  async getComandaById(id: string): Promise<GetComandaResponse | null> {
+    try {
+      const comandaResponse = await api.get(`/comandas/${id}`);
+
+      if (!comandaResponse.data) {
+        throw new Error('Comanda não encontrada');
+      }
+
+      const estabelecimentoResponse = await api.get(
+        `/estabelecimentos/${comandaResponse.data.num_cnpj}`,
+      );
+
+      return {
+        comanda: comandaResponse.data,
+        estabelecimento: estabelecimentoResponse.data,
+      };
+    } catch (error) {
+      console.error('Erro ao buscar comanda:', error);
+      throw error;
     }
   },
 };

@@ -5,6 +5,7 @@ import { withAuthCustomer } from '@/hoc/withAuth';
 import { currencyFormatter, timeFormatter } from '@/utils/formatters';
 import { useComanda } from '@/contexts/ComandaContext';
 import { NavigationPills } from '@/components/NavigationPills';
+import ComandaButtons from '@/components/ComandaButtons';
 
 const ComandaPage = () => {
   const router = useRouter();
@@ -41,6 +42,7 @@ const ComandaPage = () => {
   return (
     <CustomerLayout>
       <NavigationPills />
+      <ComandaButtons />
       <MaxWidthLayout className='container mx-auto px-[16px] py-[24px]'>
         <h1 className='text-2xl font-bold mb-6'>Comanda #{comanda.id}</h1>
 

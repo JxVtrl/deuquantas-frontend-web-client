@@ -1,7 +1,8 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
-import { api } from '@/lib/axios';
 import { toast } from 'react-hot-toast';
 import { RegisterFormData } from '@/interfaces/register';
+import { ComandaService, ComandaResponse } from '@/services/comanda.service';
+import { useAuth } from './AuthContext';
 
 interface ComandaItem {
   id: string;
@@ -14,23 +15,11 @@ interface ComandaItem {
   };
 }
 
-interface Conta {
-  id: string;
-  valConta: number;
-  datConta: string;
-  codFormaPg: number;
-  horPagto?: string;
-}
-
-interface Comanda {
-  id: string;
-  numMesa: string;
-  data_criacao: string;
+type Comanda = ComandaResponse & {
   status: string;
   itens: ComandaItem[];
-  conta?: Conta;
   valor_total: number;
-}
+};
 
 interface ComandaContextData {
   comanda: Comanda | null;
@@ -38,6 +27,7 @@ interface ComandaContextData {
   loading: boolean;
   error: string | null;
   fetchComanda: (id: string) => Promise<void>;
+  fetchComandaAtiva: () => Promise<string | null>;
   clearComanda: () => void;
   updateComanda: (data: Partial<Comanda>) => void;
 }
@@ -49,6 +39,7 @@ const ComandaContext = createContext<ComandaContextData>(
 export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
+  const { user } = useAuth();
   const [comanda, setComanda] = useState<Comanda | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -60,19 +51,14 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
       setLoading(true);
       setError(null);
 
-      const response = await api.get(`/comandas/${id}`);
+      const response = await ComandaService.getComandaById(id);
 
-      if (!response.data) {
+      if (!response) {
         throw new Error('Comanda não encontrada');
       }
 
-      setComanda(response.data);
-
-      const estabelecimentoResponse = await api.get(
-        `/estabelecimentos/${response.data.num_cnpj}`,
-      );
-
-      setEstabelecimento(estabelecimentoResponse.data);
+      setComanda(response.comanda as Comanda);
+      setEstabelecimento(response.estabelecimento);
     } catch (err) {
       const message =
         err instanceof Error ? err.message : 'Erro ao carregar comanda';
@@ -82,6 +68,31 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
       setLoading(false);
     }
   }, []);
+
+  const fetchComandaAtiva = useCallback(async () => {
+    try {
+      if (!user?.cliente?.num_cpf) {
+        console.error('CPF do usuário não encontrado');
+        return null;
+      }
+
+      setLoading(true);
+      const comandaAtiva = await ComandaService.getComandaAtivaByCpf(
+        user.cliente.num_cpf,
+      );
+
+      if (comandaAtiva?.id) {
+        return comandaAtiva.id;
+      }
+
+      return null;
+    } catch (error) {
+      console.error('Erro ao buscar comanda ativa:', error);
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  }, [user?.cliente?.num_cpf]);
 
   const clearComanda = useCallback(() => {
     setComanda(null);
@@ -100,6 +111,7 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
         loading,
         error,
         fetchComanda,
+        fetchComandaAtiva,
         clearComanda,
         updateComanda,
       }}
