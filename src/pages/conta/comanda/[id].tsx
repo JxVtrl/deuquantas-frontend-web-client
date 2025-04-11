@@ -6,6 +6,7 @@ import { useComanda } from '@/contexts/ComandaContext';
 import { NavigationPills } from '@/components/NavigationPills';
 import ComandaButtons from '@/components/ComandaButtons';
 import { ComandaValueChart } from '@/components/ComandaValueChart';
+import ComandaNotifications from '@/components/ComandaNotifications';
 
 const ComandaPage = () => {
   const router = useRouter();
@@ -44,6 +45,7 @@ const ComandaPage = () => {
       <NavigationPills />
       <ComandaButtons />
       <ComandaValueChart />
+      <ComandaNotifications />
     </CustomerLayout>
   );
 };

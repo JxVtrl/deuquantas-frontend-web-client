@@ -2,7 +2,12 @@ import Image from 'next/image';
 import React from 'react';
 
 interface ButtonProps {
-  variant: 'primary' | 'secondary' | 'menu';
+  variant:
+    | 'primary'
+    | 'secondary'
+    | 'notification_primary'
+    | 'notification_secondary'
+    | 'menu';
   onClick?: (e: React.FormEvent<Element>) => void | (() => void);
   disabled?: boolean;
   text: string | React.ReactNode;
@@ -26,12 +31,66 @@ const Button: React.FC<ButtonProps> = ({
   className,
 }) => {
   const sharedClasses =
-    'p-[12px] h-[40px] rounded-md hover:bg-[#272727]/80 focus:outline-none focus:ring-2 focus:ring-[#272727]';
+    'p-[12px] h-[40px] rounded-md hover:bg-[#272727]/80 focus:outline-none focus:ring-2 focus:ring-[#272727] transition-all duration-300 shrink-0 flex items-center justify-center';
 
   const buttonClasses = {
-    primary: `${sharedClasses} bg-[#272727] text-[#EBEDF0] border border-[#272727] hover:bg-[#272727]/80 focus:ring-[#272727]`,
-    secondary: `${sharedClasses} bg-[#F0F0F0] text-[#272727] border border-solid border-[#808080]/80 hover:bg-[#F0F0F0]/80 focus:ring-[#808080]/80`,
-    menu: `${sharedClasses} bg-[#F0F0F0] text-[#000000] border border-[#272727] focus:ring-[#272727] hover:scale-105 transition-all duration-300 hover:bg-[#F0F0F0] `,
+    primary: `
+    ${sharedClasses} 
+    bg-[#272727] 
+    text-[#EBEDF0] 
+    border 
+    border-[#272727] 
+    hover:bg-[#272727]/80 
+    focus:ring-[#272727]
+    `,
+    secondary: `
+    ${sharedClasses} 
+    bg-[#F0F0F0] 
+    text-[#272727] 
+    border 
+    border-solid 
+    border-[#808080]/80 
+    hover:bg-[#F0F0F0]/80 
+    focus:ring-[#808080]/80
+    `,
+    notification_primary: `
+    ${sharedClasses}
+    w-[40px]
+    h-[40px]
+    rounded-[36px] 
+    bg-[#FFCC00] 
+    text-[#1D1B20] 
+    border 
+    border-solid 
+    border-[#FFCC00]/80 
+    hover:border-[#E5E5EA]/80 
+    hover:bg-[#E5E5EA] 
+    focus:ring-[#E5E5EA]
+    `,
+    notification_secondary: `
+    ${sharedClasses} 
+    w-[40px]
+    h-[40px]
+    rounded-[36px]
+    bg-[#E5E5EA] 
+    text-[#272727] 
+    border 
+    border-solid 
+    border-[#E5E5EA]/80 
+    hover:bg-[#F0F0F0]/80 
+    focus:ring-[#808080]/80
+    `,
+    menu: `
+    ${sharedClasses} 
+    bg-[#F0F0F0] 
+    text-[#000000] 
+    border 
+    border-[#272727] 
+    focus:ring-[#272727] 
+    hover:scale-105 
+    
+    hover:bg-[#F0F0F0] 
+    `,
   };
 
   const handleClick = (e: React.FormEvent<Element>) => {
