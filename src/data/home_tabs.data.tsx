@@ -1,4 +1,3 @@
-import { ComandaCards, ComandaConfirm } from '@/components/Comanda';
 import QrCodeCard from '@/components/QrCodeCard';
 import { HomeTabs } from '@/interfaces/tab';
 import { Benefits, PurchaseHistory } from '@/sections';
@@ -21,8 +20,6 @@ export const tabs: HomeTabs[] = [
     title: 'Comanda',
     content: (
       <>
-        <ComandaCards />
-        <ComandaConfirm />
         <Benefits />
       </>
     ),

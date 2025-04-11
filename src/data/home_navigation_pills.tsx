@@ -13,3 +13,15 @@ export const customerNavigationPills: NavigationPill[] = [
     label: 'Limite de compras',
   },
 ];
+
+export const contaNavigationPills: NavigationPill[] = [
+  {
+    label: 'Meus Pedidos',
+  },
+  {
+    label: 'Limite de compras',
+  },
+  {
+    label: 'Crédito de compras',
+  },
+];

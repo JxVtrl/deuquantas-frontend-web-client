@@ -43,7 +43,7 @@ const ComandaPage = () => {
     <CustomerLayout>
       <NavigationPills />
       <ComandaButtons />
-      <MaxWidthLayout className='container mx-auto px-[16px] py-[24px]'>
+      <MaxWidthLayout className='px-[16px] py-[24px]'>
         <h1 className='text-2xl font-bold mb-6'>Comanda #{comanda.id}</h1>
 
         <div className='bg-white rounded-lg shadow-md p-6 mb-6'>
