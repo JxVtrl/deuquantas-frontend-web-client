@@ -6,6 +6,7 @@ import { currencyFormatter, timeFormatter } from '@/utils/formatters';
 import { useComanda } from '@/contexts/ComandaContext';
 import { NavigationPills } from '@/components/NavigationPills';
 import ComandaButtons from '@/components/ComandaButtons';
+import { ComandaValueChart } from '@/components/ComandaValueChart';
 
 const ComandaPage = () => {
   const router = useRouter();
@@ -43,6 +44,7 @@ const ComandaPage = () => {
     <CustomerLayout>
       <NavigationPills />
       <ComandaButtons />
+      <ComandaValueChart />
       <MaxWidthLayout className='px-[16px] py-[24px]'>
         <h1 className='text-2xl font-bold mb-6'>Comanda #{comanda.id}</h1>
 
@@ -67,18 +69,18 @@ const ComandaPage = () => {
             <div className='space-y-4'>
               {comanda.itens.map((item) => (
                 <div
-                  key={item.id}
+                  key={item.codItem}
                   className='flex justify-between items-center border-b pb-2'
                 >
-                  <div>
-                    <p className='font-medium'>{item.item.nome}</p>
+                  {/* <div>
+                    <p className='font-medium'>{item.desItem  }</p>
                     <p className='text-sm text-gray-600'>
-                      {item.quantidade}x {currencyFormatter(item.item.preco)}
+                      {item.numQuant}x {currencyFormatter(item.valPreco)}
                     </p>
                   </div>
                   <p className='font-semibold'>
-                    {currencyFormatter(item.valor_total)}
-                  </p>
+                    {currencyFormatter(item.valPreco)}
+                  </p> */}
                 </div>
               ))}
             </div>
@@ -92,12 +94,12 @@ const ComandaPage = () => {
                   <div className='flex justify-between'>
                     <span className='text-gray-600'>Valor Total:</span>
                     <span className='font-semibold'>
-                      {currencyFormatter(comanda.conta.valConta)}
+                      {currencyFormatter(comanda.conta.valTotal)}
                     </span>
                   </div>
                   <div className='flex justify-between'>
                     <span className='text-gray-600'>Data:</span>
-                    <span>{timeFormatter(comanda.conta.datConta)}</span>
+                    <span>{timeFormatter(comanda.conta.data_criacao)}</span>
                   </div>
                   {comanda.conta.horPagto && (
                     <div className='flex justify-between'>

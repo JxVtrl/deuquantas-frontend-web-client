@@ -10,27 +10,31 @@ export interface CreateComandaDto {
 }
 
 export interface ComandaResponse {
+  conta: {
+    codErro?: number;
+    codFormaPg: number;
+    data_criacao: string;
+    data_fechamento: string;
+    horPagto?: string;
+    id: string;
+    id_comanda: string;
+    valDesconto?: number;
+    valServico?: number;
+    valTotal: number;
+  };
+  data_criacao: string;
   id: string;
+  itens: {
+    codItem: string;
+    desItem: string;
+    tipItem: string;
+    imgItem: string;
+  }[];
+
   num_cpf: string;
   num_cnpj: string;
   numMesa: string;
-  datApropriacao: string;
-  horPedido: string;
-  codItem: string;
-  numQuant: number;
-  valPreco: number;
-  is_ativo: boolean;
-  data_criacao: string;
-  conta: {
-    num_cnpj: string;
-    numMesa: string;
-    num_cpf: string;
-    datConta: string;
-    valConta: number;
-    codFormaPg: number;
-    horPagto?: string;
-    codErro?: number;
-  };
+  status: 'ativo' | 'finalizado';
 }
 
 import { api } from '@/lib/axios';

@@ -16,10 +16,16 @@ export const timeFormatter = (value: Date | string) => {
   }
 };
 
-export const currencyFormatter = (value: number) => {
+export const currencyFormatter = (
+  value: number,
+  options?: { noPrefix?: boolean },
+) => {
   return new Intl.NumberFormat('pt-BR', {
     style: 'currency',
     currency: 'BRL',
+    ...(options?.noPrefix && {
+      prefix: '',
+    }),
   }).format(value);
 };
 

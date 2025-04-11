@@ -6,6 +6,8 @@ export const conta_buttons_navigation: ComandaCardProps[] = [
     icon: {
       src: '/icons/bottles.svg',
       alt: 'Garrafas',
+      width: 20,
+      height: 22,
     },
     title: <>Menu</>,
   },
@@ -14,6 +16,8 @@ export const conta_buttons_navigation: ComandaCardProps[] = [
     icon: {
       src: '/icons/receipt.svg',
       alt: 'Comanda',
+      width: 20,
+      height: 23,
     },
     title: <>Comanda</>,
   },
@@ -22,6 +26,8 @@ export const conta_buttons_navigation: ComandaCardProps[] = [
     icon: {
       src: '/icons/people.svg',
       alt: 'Pessoas',
+      width: 20,
+      height: 15,
     },
     title: <>Pessoas</>,
   },

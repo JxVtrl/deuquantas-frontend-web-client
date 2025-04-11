@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import React from 'react';
 
 interface ButtonProps {
@@ -5,6 +6,12 @@ interface ButtonProps {
   onClick?: (e: React.FormEvent<Element>) => void | (() => void);
   disabled?: boolean;
   text: string | React.ReactNode;
+  icon?: {
+    src: string;
+    alt: string;
+    width: number;
+    height: number;
+  };
   type?: 'button' | 'submit' | 'reset';
   className?: string;
 }
@@ -14,6 +21,7 @@ const Button: React.FC<ButtonProps> = ({
   onClick,
   disabled,
   text,
+  icon,
   type = 'button',
   className,
 }) => {
@@ -39,6 +47,14 @@ const Button: React.FC<ButtonProps> = ({
       disabled={disabled}
       type={type}
     >
+      {icon && (
+        <Image
+          src={icon.src}
+          alt={icon.alt}
+          width={icon.width}
+          height={icon.height}
+        />
+      )}
       <p className='text-[14px] leading-[120%] font-[500]'>{text}</p>
     </button>
   );

@@ -57,6 +57,8 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
         throw new Error('Comanda não encontrada');
       }
 
+      console.log('COMANDA', response.comanda);
+
       setComanda(response.comanda as Comanda);
       setEstabelecimento(response.estabelecimento);
     } catch (err) {
