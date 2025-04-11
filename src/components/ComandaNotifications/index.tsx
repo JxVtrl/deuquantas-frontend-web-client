@@ -62,7 +62,7 @@ const ComandaNotifications: React.FC = () => {
         Notificações
       </p>
 
-      <div className='flex flex-col gap-4'>
+      <div className='flex flex-col gap-[8px]'>
         {notifications_data.map((notification) => (
           <div
             key={notification.type}
