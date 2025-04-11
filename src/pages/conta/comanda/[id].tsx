@@ -1,12 +1,13 @@
 import React, { useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { CustomerLayout } from '@/layout';
+import { CustomerLayout, MaxWidthLayout } from '@/layout';
 import { withAuthCustomer } from '@/hoc/withAuth';
 import { useComanda } from '@/contexts/ComandaContext';
 import { NavigationPills } from '@/components/NavigationPills';
 import ComandaButtons from '@/components/ComandaButtons';
 import { ComandaValueChart } from '@/components/ComandaValueChart';
 import ComandaNotifications from '@/components/ComandaNotifications';
+import Button from '@/components/Button';
 
 const ComandaPage = () => {
   const router = useRouter();
@@ -46,6 +47,13 @@ const ComandaPage = () => {
       <ComandaButtons />
       <ComandaValueChart />
       <ComandaNotifications />
+      <MaxWidthLayout>
+        <Button
+          variant='primary'
+          text='PAGAMENTO'
+          className='w-full mt-[24px]'
+        />
+      </MaxWidthLayout>
     </CustomerLayout>
   );
 };

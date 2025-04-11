@@ -64,10 +64,6 @@ const ComandaNotifications: React.FC = () => {
 
       <div className='flex flex-col gap-4'>
         {notifications_data.map((notification) => (
-          //             backdrop-filter: blur(10px)
-
-          // box-shadow: 0px 4px 4px 0px #00000040;
-
           <div
             key={notification.type}
             className='bg-[#F0F0F0] backdrop-blur-[10px] shadow-[0px_4px_4px_0px_#00000040] border-radius-[10px] p-[10px] flex justify-between'
