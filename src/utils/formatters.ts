@@ -3,7 +3,7 @@ export const timeFormatter = (value: Date | string) => {
     const date = value instanceof Date ? value : new Date(value);
 
     if (isNaN(date.getTime())) {
-      throw new Error('Data inválida');
+      return 'Data inválida';
     }
 
     return new Intl.DateTimeFormat('pt-BR', {
@@ -11,8 +11,7 @@ export const timeFormatter = (value: Date | string) => {
       minute: '2-digit',
       second: '2-digit',
     }).format(date);
-  } catch (error) {
-    console.error('Erro ao formatar data:', error);
+  } catch {
     return 'Data inválida';
   }
 };
