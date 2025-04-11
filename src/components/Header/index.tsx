@@ -12,10 +12,10 @@ export const Header: React.FC = () => {
   const { estabelecimento } = useComanda();
   const firstName = user?.usuario?.name || 'Usuário';
   const router = useRouter();
-  const isComandaPage = router.pathname.includes('/comanda');
+  const isContaPage = router.pathname.includes('/conta');
 
   const welcomeMessage =
-    isComandaPage && estabelecimento ? (
+    isContaPage && estabelecimento ? (
       <>
         Você está no{' '}
         <strong className='font-[700]'>{estabelecimento.nome_estab}</strong>

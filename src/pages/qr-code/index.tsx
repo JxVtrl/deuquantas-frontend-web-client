@@ -59,7 +59,7 @@ const CustomerQrCode: React.FC = () => {
           console.log('COMANDA ENCONTRADA', JSON.stringify(comanda, null, 2));
 
           if (comanda?.id) {
-            router.push(`/comanda/${comanda.id}`);
+            router.push(`/conta/comanda/${comanda.id}`);
           } else {
             toast.error('Erro ao buscar comanda ativa');
             setError('Erro ao buscar comanda. Tente novamente.');

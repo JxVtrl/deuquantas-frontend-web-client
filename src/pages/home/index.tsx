@@ -16,7 +16,7 @@ const CustomerHome: React.FC = () => {
     const checkComandaAtiva = async () => {
       const comandaId = await fetchComandaAtiva();
       if (comandaId) {
-        router.push(`/comanda/${comandaId}`);
+        router.push(`/conta/comanda/${comandaId}`);
       }
     };
 
