@@ -1,75 +1,20 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { toast } from 'react-hot-toast';
-import { api } from '@/lib/axios';
-import { CustomerLayout } from '@/layout';
+import { CustomerLayout, MaxWidthLayout } from '@/layout';
 import { withAuthCustomer } from '@/hoc/withAuth';
 import { currencyFormatter, timeFormatter } from '@/utils/formatters';
-
-interface ComandaItem {
-  id: string;
-  quantidade: number;
-  valor_total: number;
-  item: {
-    nome: string;
-    descricao: string;
-    preco: number;
-  };
-}
-
-interface Conta {
-  id: string;
-  valConta: number;
-  datConta: string;
-  codFormaPg: number;
-  horPagto?: string;
-}
-
-interface Comanda {
-  id: string;
-  numMesa: string;
-  data_criacao: string;
-  status: string;
-  itens: ComandaItem[];
-  conta?: Conta;
-  valor_total: number;
-}
+import { useComanda } from '@/contexts/ComandaContext';
+import { NavigationPills } from '@/components/NavigationPills';
 
 const ComandaPage = () => {
   const router = useRouter();
   const { id } = router.query;
-  const [comanda, setComanda] = useState<Comanda | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { comanda, loading, error, fetchComanda } = useComanda();
 
   useEffect(() => {
     if (!id) return;
-
-    const fetchComanda = async () => {
-      try {
-        setLoading(true);
-        const response = await api.get(`/comandas/${id}`);
-
-        console.log('response', response.data);
-
-        // Verifica se a comanda pertence ao usuário logado
-        if (!response.data) {
-          throw new Error('Comanda não encontrada');
-        }
-
-        setComanda(response.data);
-      } catch (err) {
-        const message =
-          err instanceof Error ? err.message : 'Erro ao carregar comanda';
-        setError(message);
-        toast.error(message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchComanda();
-  }, [id]);
+    fetchComanda(id as string);
+  }, [id, fetchComanda]);
 
   if (loading) {
     return (
@@ -95,7 +40,8 @@ const ComandaPage = () => {
 
   return (
     <CustomerLayout>
-      <div className='container mx-auto px-4 py-8'>
+      <NavigationPills />
+      <MaxWidthLayout className='container mx-auto px-[16px] py-[24px]'>
         <h1 className='text-2xl font-bold mb-6'>Comanda #{comanda.id}</h1>
 
         <div className='bg-white rounded-lg shadow-md p-6 mb-6'>
@@ -171,7 +117,7 @@ const ComandaPage = () => {
             )}
           </div>
         </div>
-      </div>
+      </MaxWidthLayout>
     </CustomerLayout>
   );
 };
