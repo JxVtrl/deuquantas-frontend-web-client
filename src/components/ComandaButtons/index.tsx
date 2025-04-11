@@ -26,6 +26,7 @@ const ComandaButtons: React.FC = () => {
             }`}
             icon={button.icon}
             text={button.title}
+            href={button.href}
           />
         ))}
       </div>

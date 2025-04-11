@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import Link from 'next/link';
 import React from 'react';
 
 interface ButtonProps {
@@ -19,6 +20,7 @@ interface ButtonProps {
   };
   type?: 'button' | 'submit' | 'reset';
   className?: string;
+  href?: string;
 }
 
 const Button: React.FC<ButtonProps> = ({
@@ -29,9 +31,10 @@ const Button: React.FC<ButtonProps> = ({
   icon,
   type = 'button',
   className,
+  href,
 }) => {
   const sharedClasses =
-    'p-[12px] h-[40px] rounded-md hover:bg-[#272727]/80 focus:outline-none focus:ring-2 focus:ring-[#272727] transition-all duration-300 shrink-0 flex items-center justify-center';
+    'p-[12px] max-h-[40px] rounded-md hover:bg-[#272727]/80 focus:outline-none focus:ring-2 focus:ring-[#272727] transition-all duration-300 shrink-0 flex items-center justify-center w-full h-full shrink-0';
 
   const buttonClasses = {
     primary: `
@@ -100,22 +103,38 @@ const Button: React.FC<ButtonProps> = ({
   };
 
   return (
-    <button
-      className={`${buttonClasses[variant]} ${className}`}
-      onClick={handleClick}
-      disabled={disabled}
-      type={type}
+    <Link
+      href={href || ''}
+      style={{
+        border: 'none',
+        background: 'none',
+        padding: '0',
+        margin: '0',
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        textDecoration: 'none',
+      }}
     >
-      {icon && (
-        <Image
-          src={icon.src}
-          alt={icon.alt}
-          width={icon.width}
-          height={icon.height}
-        />
-      )}
-      <p className='text-[14px] leading-[120%] font-[500]'>{text}</p>
-    </button>
+      <button
+        onClick={handleClick}
+        disabled={disabled}
+        type={type}
+        className={`${buttonClasses[variant]} ${className}`}
+      >
+        {icon && (
+          <Image
+            src={icon.src}
+            alt={icon.alt}
+            width={icon.width}
+            height={icon.height}
+          />
+        )}
+        <p className='text-[14px] leading-[120%] font-[500]'>{text}</p>
+      </button>
+    </Link>
   );
 };
 

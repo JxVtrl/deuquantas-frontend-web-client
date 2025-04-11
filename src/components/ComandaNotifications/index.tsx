@@ -79,7 +79,7 @@ const ComandaNotifications: React.FC = () => {
               </p>
             </div>
 
-            <div className='flex flex-row gap-[4px]'>
+            <div className='grid grid-cols-2 gap-[4px]'>
               <Button
                 variant='notification_primary'
                 text={
