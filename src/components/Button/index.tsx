@@ -4,11 +4,11 @@ import React from 'react';
 
 interface ButtonProps {
   variant:
-    | 'primary'
-    | 'secondary'
-    | 'notification_primary'
-    | 'notification_secondary'
-    | 'menu';
+  | 'primary'
+  | 'secondary'
+  | 'notification_primary'
+  | 'notification_secondary'
+  | 'menu';
   onClick?: (e: React.FormEvent<Element>) => void | (() => void);
   disabled?: boolean;
   text: string | React.ReactNode;
@@ -102,22 +102,9 @@ const Button: React.FC<ButtonProps> = ({
     }
   };
 
-  return (
-    <Link
-      href={href || ''}
-      style={{
-        border: 'none',
-        background: 'none',
-        padding: '0',
-        margin: '0',
-        width: '100%',
-        height: '100%',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        textDecoration: 'none',
-      }}
-    >
+
+  const ButtonComponent = () => {
+    return (
       <button
         onClick={handleClick}
         disabled={disabled}
@@ -134,8 +121,38 @@ const Button: React.FC<ButtonProps> = ({
         )}
         <p className='text-[14px] leading-[120%] font-[500]'>{text}</p>
       </button>
-    </Link>
-  );
+    )
+  }
+
+  const LinkComponent = () => {
+    return (
+      <Link href={href || ''} style={{
+        border: 'none',
+        background: 'none',
+        padding: '0',
+        margin: '0',
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        textDecoration: 'none',
+      }}>
+        <ButtonComponent />
+      </Link>
+    );
+  };
+
+
+  if (href) {
+    return (
+      <LinkComponent />
+    )
+  } else {
+    return (
+      <ButtonComponent />
+    )
+  }
 };
 
 export default Button;

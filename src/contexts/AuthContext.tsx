@@ -20,7 +20,6 @@ interface AuthContextData {
   register: (data: RegisterData) => Promise<void>;
   logout: () => void;
   isAuthenticated: boolean;
-  processLogin: (token: string) => void;
   clearSession: () => void;
 }
 
@@ -194,6 +193,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   const isAuthenticated = !!user;
 
   const login = async (data: LoginData) => {
+    console.log('Login:', data);
     try {
       const response = await AuthService.login(data);
       const token = response.token;
@@ -228,9 +228,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     AuthService.setDefaultHeaderToken('');
   };
 
-  const processLogin = async (token: string) => {
-    await processToken(token);
-  };
 
   return (
     <AuthContext.Provider
@@ -241,7 +238,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         register,
         logout,
         isAuthenticated,
-        processLogin,
         clearSession,
       }}
     >
