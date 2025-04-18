@@ -1,5 +1,4 @@
 import { useEffect } from 'react';
-import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import {
   Instagram,
@@ -17,6 +16,7 @@ import {
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { motion } from 'framer-motion';
+import { Button, Logo } from '@deuquantas/components';
 
 export default function Home() {
   // Smooth scroll for anchor links
@@ -48,29 +48,7 @@ export default function Home() {
       {/* Header */}
       <header className='fixed top-0 left-0 right-0 z-50 transition-all duration-300 py-4 px-6 bg-white/80 backdrop-blur-md shadow-sm dark:bg-black/80'>
         <div className='container mx-auto flex items-center justify-between'>
-          <Link href='/' className='flex items-center'>
-            <svg
-              xmlns='http://www.w3.org/2000/svg'
-              width='112'
-              height='48'
-              viewBox='0 0 56 24'
-              fill='none'
-              className='mb-0'
-            >
-              <path
-                d='M8.39967 21.3432C3.46054 21.3432 0 18.1845 0 13.4908C0 8.47233 3.99535 5.99262 7.64464 5.99262C9.6895 5.99262 11.3883 6.76015 12.4265 8.23616V0H16.6735V13.5203C16.6735 18.3616 13.213 21.3432 8.39967 21.3432ZM8.36821 17.6236C10.7906 17.6236 12.4265 16 12.4265 13.6679C12.4265 11.3358 10.7906 9.71218 8.36821 9.71218C5.94583 9.71218 4.30994 11.3358 4.30994 13.6679C4.30994 16 5.94583 17.6236 8.36821 17.6236Z'
-                fill='#FFCC00'
-              />
-              <path
-                d='M41.6648 24H36.474L34.0831 20.7823C32.9191 21.1365 31.6293 21.3432 30.2451 21.3432C23.8273 21.3432 19.2972 17.0923 19.2972 11.3063C19.2972 5.5203 23.8273 1.26937 30.2451 1.26937C36.6628 1.26937 41.1929 5.5203 41.1929 11.3063C41.1929 14.3469 39.9346 16.9742 37.8268 18.7454L41.6648 24ZM30.2451 17.3579C30.6855 17.3579 31.0945 17.3284 31.5034 17.2694L28.5462 13.2546H33.8L35.2156 15.203C36.065 14.1697 36.5369 12.8413 36.5369 11.3063C36.5369 7.79336 34.0202 5.25461 30.2451 5.25461C26.4699 5.25461 23.9532 7.79336 23.9532 11.3063C23.9532 14.8192 26.4699 17.3579 30.2451 17.3579Z'
-                fill='#FFCC00'
-              />
-              <path
-                d='M46.5936 14.6125V14.3764C46.5936 11.3653 48.3239 10.3026 49.7396 9.41697C50.8092 8.73801 51.7215 8.17712 51.7215 6.99631C51.7215 5.72694 50.8092 4.98893 49.425 4.98893C48.1666 4.98893 47.1284 5.72694 47.1284 7.11439V7.35055H43.1016V6.96679C43.1016 3.4834 45.8386 1.26937 49.5508 1.26937C53.2945 1.26937 56 3.42435 56 6.96679C56 10.0074 54.2697 10.952 52.7597 11.7786C51.5957 12.428 50.5575 12.9889 50.5575 14.3764V14.6125H46.5936ZM48.6385 21.3432C47.0655 21.3432 45.8701 20.2214 45.8701 18.7454C45.8701 17.2694 47.0655 16.1476 48.6385 16.1476C50.2115 16.1476 51.4069 17.2694 51.4069 18.7454C51.4069 20.2214 50.2115 21.3432 48.6385 21.3432Z'
-                fill='#FFCC00'
-              />
-            </svg>
-          </Link>
+          <Logo size='medium' />
 
           <nav className='hidden md:flex items-center space-x-8'>
             {['Início', 'Funcionalidades', 'Como Funciona', 'Contato'].map(
@@ -87,21 +65,13 @@ export default function Home() {
           </nav>
 
           <div className='flex items-center gap-4'>
-            <Link
-              href={`${process.env.NODE_ENV === 'development' ? 'http://localhost:3000/register' : 'https://deuquantas.com.br/register'}`}
-            >
-              <Button
-                className='bg-brand-yellow hover:bg-brand-yellow/90'
-                variant='default'
-              >
-                Cadastrar
-              </Button>
-            </Link>
+            <Button variant='primary' text='Cadastrar' href='/register' />
+            <Button variant='secondary' text='Entrar' href='/login' />
           </div>
         </div>
       </header>
 
-      <main className='relative flex  flex-col min-h-screen'>
+      <main className='relative flex  flex-col min-h-screen overflow-x-hidden overflow-y-auto'>
         {/* Hero Section */}
         <section
           className='min-h-[calc(140vh)] flex flex-col justify-center 
@@ -233,25 +203,22 @@ export default function Home() {
 
               {/* CTA Form */}
               <div className='w-full max-w-xl mx-auto px-4 sm:px-0'>
-                <form className='flex flex-col sm:flex-row gap-4'>
-                  <div className='flex-1'>
-                    <Input
-                      placeholder='Seu email para lista de espera'
-                      type='email'
-                      required
-                      className='h-12 text-base sm:text-lg bg-transparent
-                        placeholder:text-neutral-500 dark:placeholder:text-neutral-400'
-                    />
-                  </div>
+                <form className='flex flex-col md:flex-row gap-4'>
+                  <Input
+                    placeholder='Seu email para lista de espera'
+                    type='email'
+                    required
+                    className='w-full md:w-[50%] shrink-0'
+                  />
+
                   <Button
+                    variant='primary'
+                    text='Quero testar'
                     type='submit'
-                    className='w-full sm:w-auto bg-brand-yellow hover:bg-brand-yellow/90 
-                      text-brand-dark font-medium text-base whitespace-nowrap
-                      px-6 py-3 rounded-full transform hover:scale-105
-                      transition-all duration-300 shadow-lg hover:shadow-xl'
-                  >
-                    Quero testar
-                  </Button>
+                    style={{
+                      width: '100%',
+                    }}
+                  />
                 </form>
               </div>
             </motion.div>
@@ -480,9 +447,7 @@ export default function Home() {
                   transformando a experiência dos seus clientes.
                 </p>
               </div>
-              <Button className='bg-brand-yellow hover:bg-brand-yellow/90 text-black font-medium rounded-full px-8 py-6 whitespace-nowrap'>
-                Começar Agora
-              </Button>
+              <Button variant='primary' text='Começar Agora' />
             </div>
           </div>
         </section>
@@ -523,12 +488,7 @@ export default function Home() {
                   className='h-12 text-md bg-transparent'
                 />
 
-                <Button
-                  type='submit'
-                  className='w-full bg-brand-yellow hover:bg-brand-yellow/90 text-brand-dark font-medium text-lg h-12 mt-8'
-                >
-                  Quero fazer parte
-                </Button>
+                <Button variant='primary' text='Quero fazer parte' />
               </form>
             </div>
           </div>
@@ -645,12 +605,7 @@ export default function Home() {
                     placeholder='Seu email'
                     className='bg-white/10 mr-2 dark:bg-white/5 rounded-l-lg py-2 px-4 w-full focus:outline-none focus:ring-1 focus:ring-brand-yellow text-white placeholder-neutral-400 dark:placeholder-neutral-500'
                   />
-                  <Button
-                    type='submit'
-                    className='bg-brand-yellow ml-2 text-black font-medium px-4 rounded-r-lg hover:bg-brand-yellow/90 transition-colors'
-                  >
-                    Enviar
-                  </Button>
+                  <Button variant='primary' text='Enviar' />
                 </form>
               </div>
             </div>

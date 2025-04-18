@@ -323,9 +323,8 @@ const RegisterForm: React.FC = () => {
             {Array.from({ length: totalSteps }).map((_, index) => (
               <div
                 key={index}
-                className={`h-1 flex-1 rounded-full ${
-                  index <= currentStep ? 'bg-[#FFCC00]' : 'bg-gray-200'
-                }`}
+                className={`h-1 flex-1 rounded-full ${index <= currentStep ? 'bg-[#FFCC00]' : 'bg-gray-200'
+                  }`}
               />
             ))}
           </div>

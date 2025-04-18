@@ -1,11 +1,8 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import { useAuthFormContext } from '@/contexts/AuthFormContext';
 import { Button } from '@deuquantas/components';
-interface LoginFormData {
-  email: string;
-  password: string;
-}
+import { login_inputs, LoginFormData } from '@/data/login_inputs';
+import { useAuthFormContext } from '@/contexts/AuthFormContext';
 
 export function LoginForm() {
   const {
@@ -23,26 +20,6 @@ export function LoginForm() {
     mode: 'onChange',
   });
 
-  const list_of_inputs: Array<{
-    id: keyof LoginFormData;
-    type: string;
-    label: string;
-    placeholder: string;
-  }> = [
-    {
-      id: 'email',
-      type: 'email',
-      label: 'E-mail',
-      placeholder: 'your-email@email.com',
-    },
-    {
-      id: 'password',
-      type: 'password',
-      label: 'Senha',
-      placeholder: '••••••••••',
-    },
-  ];
-
   const getErrorMessage = (field: keyof LoginFormData) => {
     if (errors[field]) {
       return errors[field]?.message;
@@ -56,7 +33,7 @@ export function LoginForm() {
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <div className='flex flex-col gap-[12px] mb-[32px]'>
-        {list_of_inputs.map((input) => (
+        {login_inputs.map((input) => (
           <div key={input.id}>
             <label
               htmlFor={input.id}
@@ -97,12 +74,6 @@ export function LoginForm() {
           variant='primary'
           text={loading || isSubmitting ? 'Entrando...' : 'Entrar'}
           type='submit'
-        />
-        <Button
-          disabled={loading || isSubmitting}
-          variant='secondary'
-          text={loading || isSubmitting ? 'Entrando...' : 'Entrar com Google'}
-          type='button'
         />
       </div>
 
