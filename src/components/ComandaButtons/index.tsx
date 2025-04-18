@@ -1,5 +1,9 @@
 import React from 'react';
-import { MaxWidthWrapper, Button, ShoppingCartIcon } from '@deuquantas/components';
+import {
+  MaxWidthWrapper,
+  Button,
+  ShoppingCartIcon,
+} from '@deuquantas/components';
 
 const ComandaButtons: React.FC = () => {
   const left_button_class = {
@@ -20,7 +24,6 @@ const ComandaButtons: React.FC = () => {
     h: 'h-[48px]',
   };
 
-
   const conta_buttons_navigation = [
     {
       href: '/conta/comanda',
@@ -38,7 +41,11 @@ const ComandaButtons: React.FC = () => {
             variant='menu'
             style={{
               ...shared_button_class,
-              ...(index === 0 ? left_button_class : index === conta_buttons_navigation.length - 1 ? right_button_class : middle_button_class),
+              ...(index === 0
+                ? left_button_class
+                : index === conta_buttons_navigation.length - 1
+                  ? right_button_class
+                  : middle_button_class),
             }}
             icon={{
               src: button.icon,

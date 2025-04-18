@@ -34,4 +34,3 @@ export const register_steps: Step[] = [
     ],
   },
 ];
-

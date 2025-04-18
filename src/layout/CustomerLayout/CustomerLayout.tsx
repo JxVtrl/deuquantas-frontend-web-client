@@ -14,14 +14,17 @@ export default function CustomerLayout({
   return (
     <>
       <StatusBar />
-      <Header name={user?.usuario?.name} menu_items={[
-        {
-          label: 'Sair',
-          onClick: () => {
-            logout();
-          }
-        }
-      ]} />
+      <Header
+        name={user?.usuario?.name}
+        menu_items={[
+          {
+            label: 'Sair',
+            onClick: () => {
+              logout();
+            },
+          },
+        ]}
+      />
       {children}
       <MaxWidthWrapper
         backgroundColor='#272727'

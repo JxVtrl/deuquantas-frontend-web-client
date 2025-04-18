@@ -29,19 +29,19 @@ export function LoginForm() {
     label: string;
     placeholder: string;
   }> = [
-      {
-        id: 'email',
-        type: 'email',
-        label: 'E-mail',
-        placeholder: 'your-email@email.com',
-      },
-      {
-        id: 'password',
-        type: 'password',
-        label: 'Senha',
-        placeholder: '••••••••••',
-      },
-    ];
+    {
+      id: 'email',
+      type: 'email',
+      label: 'E-mail',
+      placeholder: 'your-email@email.com',
+    },
+    {
+      id: 'password',
+      type: 'password',
+      label: 'Senha',
+      placeholder: '••••••••••',
+    },
+  ];
 
   const getErrorMessage = (field: keyof LoginFormData) => {
     if (errors[field]) {

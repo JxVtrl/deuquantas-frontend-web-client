@@ -32,9 +32,7 @@ export const useNavigation = () => {
   >([]);
 
   const checkNavItems = () => {
-    const activeItem = navigation.find(
-      (item) => item.href === router.pathname,
-    );
+    const activeItem = navigation.find((item) => item.href === router.pathname);
     if (activeItem) {
       setBottomNavItems(
         navigation.map((item) => ({
