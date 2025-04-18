@@ -1,8 +1,7 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import Button from '../Button';
 import { useAuthFormContext } from '@/contexts/AuthFormContext';
-
+import { Button } from '@deuquantas/components';
 interface LoginFormData {
   email: string;
   password: string;
@@ -30,19 +29,19 @@ export function LoginForm() {
     label: string;
     placeholder: string;
   }> = [
-    {
-      id: 'email',
-      type: 'email',
-      label: 'E-mail',
-      placeholder: 'your-email@email.com',
-    },
-    {
-      id: 'password',
-      type: 'password',
-      label: 'Senha',
-      placeholder: '••••••••••',
-    },
-  ];
+      {
+        id: 'email',
+        type: 'email',
+        label: 'E-mail',
+        placeholder: 'your-email@email.com',
+      },
+      {
+        id: 'password',
+        type: 'password',
+        label: 'Senha',
+        placeholder: '••••••••••',
+      },
+    ];
 
   const getErrorMessage = (field: keyof LoginFormData) => {
     if (errors[field]) {

@@ -1,7 +1,6 @@
-import { Header } from '@/components/Header';
-import { StatusBar } from '@/components/StatusBar';
+import { useAuth } from '@/contexts/AuthContext';
 import { useNavigation } from '@/hooks/useNavigation';
-import { Navigation } from '@deuquantas/components';
+import { Header, Navigation, StatusBar } from '@deuquantas/components';
 import { MaxWidthWrapper } from '@deuquantas/components';
 
 export default function CustomerLayout({
@@ -10,11 +9,19 @@ export default function CustomerLayout({
   children: React.ReactNode;
 }) {
   const { bottomNavItems, handleAddClick } = useNavigation();
+  const { user, logout } = useAuth();
 
   return (
     <>
       <StatusBar />
-      <Header />
+      <Header name={user?.usuario?.name} menu_items={[
+        {
+          label: 'Sair',
+          onClick: () => {
+            logout();
+          }
+        }
+      ]} />
       {children}
       <MaxWidthWrapper
         backgroundColor='#272727'

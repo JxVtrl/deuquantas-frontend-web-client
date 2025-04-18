@@ -1,14 +1,13 @@
-import { MaxWidthWrapper } from '@deuquantas/components';
+import { Button, MaxWidthWrapper } from '@deuquantas/components';
 import React from 'react';
-import Button from '../Button';
 
 type Notification = {
   type:
-    | 'limit-warning'
-    | 'limit-exceeded'
-    | 'limit-reached'
-    | 'order-pending'
-    | 'order-transfer';
+  | 'limit-warning'
+  | 'limit-exceeded'
+  | 'limit-reached'
+  | 'order-pending'
+  | 'order-transfer';
   title: string;
   quantity?: number;
   button_icon?: React.ReactNode;

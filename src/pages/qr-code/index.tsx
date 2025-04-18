@@ -7,15 +7,14 @@ import QrCodeInput from '@/components/InputQrCode';
 import { toast } from 'react-hot-toast';
 import { MesaService } from '@/services/mesa.service';
 import { ComandaService } from '@/services/comanda.service';
-import LoadingLottie from '@/components/LoadingLottie';
-import Button from '@/components/Button';
 import dynamic from 'next/dynamic';
+import { Button, ConfirmLottie } from '@deuquantas/components';
 
 const QrCodeScanner = dynamic(() => import('@/components/QrCodeScanner'), {
   ssr: false,
   loading: () => (
     <div className='flex flex-col items-center justify-center h-full'>
-      <LoadingLottie />
+      <ConfirmLottie />
       <p className='mt-4'>Carregando câmera...</p>
     </div>
   ),
@@ -213,7 +212,7 @@ const CustomerQrCode: React.FC = () => {
 
         {isLoading ? (
           <div className='flex flex-col items-center'>
-            <LoadingLottie />
+            <ConfirmLottie />
             <p className='mt-4'>Processando QR Code...</p>
           </div>
         ) : showScanner ? (
@@ -225,7 +224,7 @@ const CustomerQrCode: React.FC = () => {
           </div>
         ) : (
           <div className='flex flex-col items-center'>
-            <LoadingLottie />
+            <ConfirmLottie />
             <p className='mt-4'>Aguardando resposta do estabelecimento...</p>
             <div className='mt-4'>
               <Button

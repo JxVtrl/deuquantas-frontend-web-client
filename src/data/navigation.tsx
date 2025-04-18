@@ -1,6 +1,6 @@
 import { FavoriteIcon, HomeIcon, MoneyIcon } from '@deuquantas/components';
 
-export const bottomNavigation = [
+export const navigation = [
   {
     icon: HomeIcon,
     label: 'Início',

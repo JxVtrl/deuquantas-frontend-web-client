@@ -5,7 +5,7 @@ import { LoginForm } from '@/components/auth/LoginForm';
 import RegisterForm from '@/components/auth/RegisterForm';
 import { AuthFormProvider } from '@/contexts/AuthFormContext';
 import { useAuthFormContext } from '@/contexts/AuthFormContext';
-import Logo from '@/components/Logo';
+import { Logo } from '@deuquantas/components';
 
 function AuthPageContent() {
   const { isLogin } = useAuthFormContext();

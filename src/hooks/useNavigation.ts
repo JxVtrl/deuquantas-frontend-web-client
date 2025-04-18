@@ -1,5 +1,5 @@
-import { bottomNavigation } from '@/data/bottom_navigation';
-import { actions } from '@/data/home_actions';
+import { navigation } from '@/data/navigation';
+import { actions } from '@/data/actions';
 import {
   contaNavigationPills,
   customerNavigationPills,
@@ -32,12 +32,12 @@ export const useNavigation = () => {
   >([]);
 
   const checkNavItems = () => {
-    const activeItem = bottomNavigation.find(
+    const activeItem = navigation.find(
       (item) => item.href === router.pathname,
     );
     if (activeItem) {
       setBottomNavItems(
-        bottomNavigation.map((item) => ({
+        navigation.map((item) => ({
           ...item,
           isActive: item.href === router.pathname,
           onClick: () => router.push(item.href),

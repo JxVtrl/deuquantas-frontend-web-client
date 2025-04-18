@@ -5,7 +5,7 @@ import { CustomerLayout } from '@/layout';
 import { PromotionSlider } from '@/components/PromotionSlider';
 import { useNavigation } from '@/hooks/useNavigation';
 import { useComanda } from '@/contexts/ComandaContext';
-import { ActionItem } from '@/data/home_actions';
+import { ActionItem } from '@/data/actions';
 import { ActionGrid, ReceiptIcon } from '@deuquantas/components';
 import { MaxWidthWrapper } from '@deuquantas/components';
 import { FavoritePlaces } from '@/sections/FavoritePlaces';

@@ -7,8 +7,7 @@ import { NavigationPills } from '@/components/NavigationPills';
 import ComandaButtons from '@/components/ComandaButtons';
 import { ComandaValueChart } from '@/components/ComandaValueChart';
 import ComandaNotifications from '@/components/ComandaNotifications';
-import Button from '@/components/Button';
-import { MaxWidthWrapper } from '@deuquantas/components';
+import { Button, MaxWidthWrapper } from '@deuquantas/components';
 
 const ComandaPage = () => {
   const router = useRouter();
@@ -52,7 +51,10 @@ const ComandaPage = () => {
         <Button
           variant='primary'
           text='PAGAMENTO'
-          className='w-full mt-[24px]'
+          style={{
+            width: '100%',
+            marginTop: '24px',
+          }}
         />
       </MaxWidthWrapper>
     </CustomerLayout>
