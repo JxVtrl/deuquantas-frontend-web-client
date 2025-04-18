@@ -1,5 +1,5 @@
 import React from 'react';
-import { MaxWidthLayout } from '@/layout';
+import { MaxWidthWrapper } from '@deuquantas/components';
 import { useAuth } from '@/contexts/AuthContext';
 import Image from 'next/image';
 import { capitalize } from '@/utils/formatters';
@@ -28,7 +28,7 @@ export const Header: React.FC = () => {
     );
 
   return (
-    <MaxWidthLayout backgroundColor={'#FFCC00'}>
+    <MaxWidthWrapper backgroundColor={'#FFCC00'}>
       <header className='py-[7px] flex justify-between items-center'>
         <div className='flex items-center gap-[12px]'>
           <Logo variant={'dark'} />
@@ -50,6 +50,6 @@ export const Header: React.FC = () => {
 
         <HeaderMenu />
       </header>
-    </MaxWidthLayout>
+    </MaxWidthWrapper>
   );
 };

@@ -228,7 +228,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     AuthService.setDefaultHeaderToken('');
   };
 
-
   return (
     <AuthContext.Provider
       value={{

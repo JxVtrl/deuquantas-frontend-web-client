@@ -4,6 +4,6 @@ export PATH="/c/Program Files/nodejs:$PATH"
 echo "🎨 Formatando arquivos com Prettier..."
 npx prettier --write "src/**/*.{ts,tsx}"
 
-echo "⏳ Iniciando o build. Por favor, aguarde..."
-rm -rf .next
-npm run build || exit 1
+#echo "⏳ Iniciando o build. Por favor, aguarde..."
+#rm -rf .next
+#npm run build || exit 1

@@ -7,12 +7,16 @@ import {
   CarouselPrevious,
 } from '@/components/ui/carousel';
 import { Card } from '../ui/card';
-import { MaxWidthLayout } from '@/layout';
+import { MaxWidthWrapper } from '@deuquantas/components';
 import Image from 'next/image';
 
 export const PromotionSlider: React.FC = () => {
   return (
-    <MaxWidthLayout className='mt-[20px]'>
+    <MaxWidthWrapper
+      style={{
+        marginTop: '20px',
+      }}
+    >
       <Carousel
         opts={{
           align: 'start',
@@ -47,6 +51,6 @@ export const PromotionSlider: React.FC = () => {
         <CarouselPrevious />
         <CarouselNext />
       </Carousel>
-    </MaxWidthLayout>
+    </MaxWidthWrapper>
   );
 };

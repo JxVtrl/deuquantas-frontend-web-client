@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { CustomerLayout, MaxWidthLayout } from '@/layout';
+import { CustomerLayout } from '@/layout';
 import { withAuthCustomer } from '@/hoc/withAuth';
 import { useComanda } from '@/contexts/ComandaContext';
 import { NavigationPills } from '@/components/NavigationPills';
@@ -8,6 +8,7 @@ import ComandaButtons from '@/components/ComandaButtons';
 import { ComandaValueChart } from '@/components/ComandaValueChart';
 import ComandaNotifications from '@/components/ComandaNotifications';
 import Button from '@/components/Button';
+import { MaxWidthWrapper } from '@deuquantas/components';
 
 const ComandaPage = () => {
   const router = useRouter();
@@ -47,13 +48,13 @@ const ComandaPage = () => {
       <ComandaButtons />
       <ComandaValueChart />
       <ComandaNotifications />
-      <MaxWidthLayout>
+      <MaxWidthWrapper>
         <Button
           variant='primary'
           text='PAGAMENTO'
           className='w-full mt-[24px]'
         />
-      </MaxWidthLayout>
+      </MaxWidthWrapper>
     </CustomerLayout>
   );
 };

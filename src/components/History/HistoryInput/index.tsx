@@ -1,5 +1,5 @@
 import { Input } from '@/components/ui/input';
-import Image from 'next/image';
+import { MagnifyingIcon } from '@deuquantas/components';
 import React from 'react';
 
 export const HistoryInput: React.FC<{
@@ -18,12 +18,7 @@ export const HistoryInput: React.FC<{
       h-[48px]
     '
     >
-      <Image
-        src='/icons/magnifying.svg'
-        width={15}
-        height={15}
-        alt='Ícone de lupa'
-      />
+      <MagnifyingIcon />
 
       <Input
         placeholder='Buscar'

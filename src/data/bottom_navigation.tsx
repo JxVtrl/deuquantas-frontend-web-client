@@ -1,8 +1,6 @@
-import { FavoriteIcon } from '@/components/Icons';
-import { HomeIcon } from '@/components/Icons';
-import { MoneyIcon } from '@/components/Icons';
+import { FavoriteIcon, HomeIcon, MoneyIcon } from '@deuquantas/components';
 
-export const customerBottomNavigation = [
+export const bottomNavigation = [
   {
     icon: HomeIcon,
     label: 'Início',

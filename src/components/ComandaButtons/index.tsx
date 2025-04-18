@@ -1,7 +1,7 @@
-import { MaxWidthLayout } from '@/layout';
 import React from 'react';
 import { conta_buttons_navigation } from '@/data/conta_buttons_navigation.data';
 import Button from '../Button';
+import { MaxWidthWrapper } from '@deuquantas/components';
 
 const ComandaButtons: React.FC = () => {
   const left_button_class = 'rounded-l-md rounded-r-none';
@@ -11,7 +11,7 @@ const ComandaButtons: React.FC = () => {
     'place-items-center flex flex-row items-center gap-[10px] justify-center h-[48px]';
 
   return (
-    <MaxWidthLayout>
+    <MaxWidthWrapper>
       <div className='grid grid-cols-3 gap-[2px] w-full max-w-[500px] my-[20px] h-[48px]'>
         {conta_buttons_navigation.map((button, index) => (
           <Button
@@ -30,7 +30,7 @@ const ComandaButtons: React.FC = () => {
           />
         ))}
       </div>
-    </MaxWidthLayout>
+    </MaxWidthWrapper>
   );
 };
 

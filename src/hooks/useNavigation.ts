@@ -1,5 +1,5 @@
-import { customerBottomNavigation } from '@/data/bottom_navigation';
-import { customerActions } from '@/data/home_actions';
+import { bottomNavigation } from '@/data/bottom_navigation';
+import { actions } from '@/data/home_actions';
 import {
   contaNavigationPills,
   customerNavigationPills,
@@ -19,8 +19,36 @@ export const useNavigation = () => {
   const navigationPills = isConta
     ? contaNavigationPills
     : customerNavigationPills;
-  const actionItems = customerActions;
-  const bottomNavItems = customerBottomNavigation;
+  const actionItems = actions;
+
+  const [bottomNavItems, setBottomNavItems] = useState<
+    {
+      icon: React.FC;
+      label: string;
+      onClick: () => void;
+      isActive: boolean;
+      href: string;
+    }[]
+  >([]);
+
+  const checkNavItems = () => {
+    const activeItem = bottomNavigation.find(
+      (item) => item.href === router.pathname,
+    );
+    if (activeItem) {
+      setBottomNavItems(
+        bottomNavigation.map((item) => ({
+          ...item,
+          isActive: item.href === router.pathname,
+          onClick: () => router.push(item.href),
+        })),
+      );
+    }
+  };
+
+  useEffect(() => {
+    checkNavItems();
+  }, [router.pathname]);
 
   const handleAddClick = () => {
     // Implement add functionality

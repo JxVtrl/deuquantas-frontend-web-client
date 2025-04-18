@@ -1,5 +1,5 @@
 import { useNavigation } from '@/hooks/useNavigation';
-import { MaxWidthLayout } from '@/layout';
+import { MaxWidthWrapper } from '@deuquantas/components';
 import React from 'react';
 
 interface NavigationPill {
@@ -25,12 +25,12 @@ export const NavigationPills: React.FC = () => {
   const { navigationPills } = useNavigation();
 
   return (
-    <MaxWidthLayout>
+    <MaxWidthWrapper>
       <div className='py-[16px] flex gap-2 overflow-x-auto border-b border-[#F0F0F0]'>
         {navigationPills.map((pill) => (
           <Pill key={pill.label} {...pill} />
         ))}
       </div>
-    </MaxWidthLayout>
+    </MaxWidthWrapper>
   );
 };

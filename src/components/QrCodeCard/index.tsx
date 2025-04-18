@@ -5,8 +5,8 @@ import {
   CardFooter,
   CardHeader,
 } from '@/components/ui/card';
-import Image from 'next/image';
 import { useRouter } from 'next/router';
+import { QrCodeIcon } from '@deuquantas/components';
 
 const QrCodeCard: React.FC = () => {
   const router = useRouter();
@@ -19,7 +19,7 @@ const QrCodeCard: React.FC = () => {
       }}
     >
       <CardHeader>
-        <Image src='/icons/qr-code.svg' alt='QR Code' width={32} height={32} />
+        <QrCodeIcon />
       </CardHeader>
       <CardContent>
         <p className='font-[400] text-black text-[14px] leading-[24px] m-0'>

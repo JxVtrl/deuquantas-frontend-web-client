@@ -1,7 +1,7 @@
 import React from 'react';
 import { currencyFormatter } from '@/utils/formatters';
 import { useComanda } from '@/contexts/ComandaContext';
-import { MaxWidthLayout } from '@/layout';
+import { MaxWidthWrapper } from '@deuquantas/components';
 
 export const ComandaValueChart: React.FC = () => {
   const { comanda } = useComanda();
@@ -16,9 +16,17 @@ export const ComandaValueChart: React.FC = () => {
   const percentage = (consumo_user / consumo_total) * 100;
 
   return (
-    <MaxWidthLayout
-      className='py-[20px]'
-      classNameContent='relative flex flex-col items-center h-full'
+    <MaxWidthWrapper
+      style={{
+        paddingBottom: '20px',
+      }}
+      styleContent={{
+        position: 'relative',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        height: '100%',
+      }}
     >
       {/* Gráfico circular */}
       <svg
@@ -97,6 +105,6 @@ export const ComandaValueChart: React.FC = () => {
           </div>
         )}
       </div>
-    </MaxWidthLayout>
+    </MaxWidthWrapper>
   );
 };

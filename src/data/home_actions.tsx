@@ -4,7 +4,7 @@ import {
   LocationIcon,
   OrdersIcon,
   ScanIcon,
-} from '@/components/Icons';
+} from '@deuquantas/components';
 
 export interface ActionItem {
   icon: React.FC;
@@ -12,7 +12,7 @@ export interface ActionItem {
   href: string;
 }
 
-export const customerActions: ActionItem[] = [
+export const actions: ActionItem[] = [
   {
     icon: ScanIcon,
     label: 'Scan QR',

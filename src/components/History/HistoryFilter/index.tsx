@@ -10,19 +10,14 @@ import {
   DrawerTrigger,
 } from '@/components/ui/drawer';
 import { Button } from '../../ui/button';
-import Image from 'next/image';
+import { FilterIcon } from '@deuquantas/components';
 
 export const HistoryFilter: React.FC = () => {
   return (
     <div>
       <Drawer>
         <DrawerTrigger className='bg-transparent cursor-pointer p-[8px] hover:bg-transparent'>
-          <Image
-            src='/icons/filter.svg'
-            width={20}
-            height={20}
-            alt='Filter icon'
-          />
+          <FilterIcon />
         </DrawerTrigger>
         <DrawerContent>
           <DrawerHeader>

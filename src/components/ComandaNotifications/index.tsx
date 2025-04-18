@@ -1,4 +1,4 @@
-import { MaxWidthLayout } from '@/layout';
+import { MaxWidthWrapper } from '@deuquantas/components';
 import React from 'react';
 import Button from '../Button';
 
@@ -54,9 +54,15 @@ const ComandaNotifications: React.FC = () => {
   };
 
   return (
-    <MaxWidthLayout
-      className='py-[20px]'
-      classNameContent='flex flex-col gap-[8px]'
+    <MaxWidthWrapper
+      style={{
+        paddingTop: '20px',
+      }}
+      styleContent={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '8px',
+      }}
     >
       <p className='text-md font-[600] leading-[100%] text-[#000000]'>
         Notificações
@@ -120,7 +126,7 @@ const ComandaNotifications: React.FC = () => {
           </div>
         ))}
       </div>
-    </MaxWidthLayout>
+    </MaxWidthWrapper>
   );
 };
 

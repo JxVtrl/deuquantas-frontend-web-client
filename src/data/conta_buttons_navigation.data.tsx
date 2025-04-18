@@ -1,10 +1,11 @@
 import { ComandaCardProps } from '@/interfaces/comanda';
+import { ReceiptIcon, DrinksIcon, PeopleIcon } from '@deuquantas/components';
 
 export const conta_buttons_navigation: ComandaCardProps[] = [
   {
     href: '/conta/menu',
     icon: {
-      src: '/icons/bottles.svg',
+      src: () => <DrinksIcon />,
       alt: 'Garrafas',
       width: 20,
       height: 22,
@@ -14,7 +15,7 @@ export const conta_buttons_navigation: ComandaCardProps[] = [
   {
     href: '/conta/comanda',
     icon: {
-      src: '/icons/receipt.svg',
+      src: () => <ReceiptIcon />,
       alt: 'Comanda',
       width: 20,
       height: 23,
@@ -24,7 +25,7 @@ export const conta_buttons_navigation: ComandaCardProps[] = [
   {
     href: '/conta/pessoas',
     icon: {
-      src: '/icons/people.svg',
+      src: () => <PeopleIcon />,
       alt: 'Pessoas',
       width: 20,
       height: 15,
