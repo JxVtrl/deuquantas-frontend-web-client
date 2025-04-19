@@ -16,6 +16,7 @@ export default function CustomerLayout({
       <StatusBar />
       <Header
         name={user?.usuario?.name}
+        variant='client'
         menu_items={[
           {
             label: 'Sair',
