@@ -1,6 +1,11 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigation } from '@/hooks/useNavigation';
-import { Header, Navigation, NavigationMenu, StatusBar } from '@deuquantas/components';
+import {
+  Header,
+  Navigation,
+  NavigationMenu,
+  StatusBar,
+} from '@deuquantas/components';
 import { MaxWidthWrapper } from '@deuquantas/components';
 import { useState } from 'react';
 
@@ -33,7 +38,8 @@ export default function CustomerLayout({
               logout();
             },
           },
-        ]} />
+        ]}
+      />
       <MaxWidthWrapper
         backgroundColor='#272727'
         style={{
