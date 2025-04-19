@@ -35,12 +35,12 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               onClick: () => {
                 logout();
               },
-            }
+            };
           }
-          return ({
+          return {
             label: item.label,
             onClick: () => router.push(item.href),
-          })
+          };
         })}
       />
       <Navigation items={bottomNavItems} onAddClick={handleAddClick} />
