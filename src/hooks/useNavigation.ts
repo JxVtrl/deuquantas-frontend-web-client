@@ -6,6 +6,7 @@ import {
 } from '@/data/home_navigation_pills';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
+import { menu_items } from '@/data/menu';
 
 export const useNavigation = () => {
   const router = useRouter();

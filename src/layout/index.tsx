@@ -1,4 +1,5 @@
 import { useAuth } from '@/contexts/AuthContext';
+import { menu_items } from '@/data/menu';
 import { useNavigation } from '@/hooks/useNavigation';
 import {
   Header,
@@ -7,11 +8,12 @@ import {
   StatusBar,
 } from '@deuquantas/components';
 import { useState } from 'react';
-
+import { useRouter } from 'next/router';
 export default function Layout({ children }: { children: React.ReactNode }) {
   const { bottomNavItems, handleAddClick } = useNavigation();
   const { user, logout } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
+  const router = useRouter();
 
   return (
     <>
@@ -26,14 +28,20 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       <NavigationMenu
         menuOpen={menuOpen}
         setMenuOpen={setMenuOpen}
-        menuItems={[
-          {
-            label: 'Sair',
-            onClick: () => {
-              logout();
-            },
-          },
-        ]}
+        menuItems={menu_items.map((item) => {
+          if (item.href === '/sair') {
+            return {
+              label: item.label,
+              onClick: () => {
+                logout();
+              },
+            }
+          }
+          return ({
+            label: item.label,
+            onClick: () => router.push(item.href),
+          })
+        })}
       />
       <Navigation items={bottomNavItems} onAddClick={handleAddClick} />
     </>
