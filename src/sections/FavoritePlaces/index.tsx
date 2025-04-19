@@ -1,4 +1,4 @@
-import { ActionRounded, MaxWidthWrapper } from '@deuquantas/components';
+import { ActionRounded, MaxWidthWrapper, Title } from '@deuquantas/components';
 
 interface Place {
   id: string;
@@ -18,9 +18,7 @@ export const FavoritePlaces = () => {
   return (
     <>
       <MaxWidthWrapper>
-        <h2 className='text-[11px] leading-[24px] font-[500]'>
-          Locais favoritos
-        </h2>
+        <Title title='Locais favoritos' />
         <ActionRounded places={places} />
       </MaxWidthWrapper>
     </>
