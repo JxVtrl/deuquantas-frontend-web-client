@@ -32,7 +32,6 @@ export const useNavigation = () => {
     ? contaNavigationPills
     : customerNavigationPills;
 
-
   const checkNavItems = () => {
     const activeItem = navigation.find((item) => item.href === router.pathname);
     if (activeItem) {
@@ -57,7 +56,7 @@ export const useNavigation = () => {
     }));
 
     setActionItems(items);
-  }
+  };
 
   useEffect(() => {
     checkActionItems();

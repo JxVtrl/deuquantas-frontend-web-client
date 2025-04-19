@@ -39,11 +39,15 @@ const CustomerHome: React.FC = () => {
   return (
     <CustomerLayout>
       <NavigationPills />
-      <ActionSquared actionItems={actionItemsWithComanda as unknown as {
-        icon: React.FC;
-        label: string;
-        onClick: () => void;
-      }[]} />
+      <ActionSquared
+        actionItems={
+          actionItemsWithComanda as unknown as {
+            icon: React.FC;
+            label: string;
+            onClick: () => void;
+          }[]
+        }
+      />
       <FavoritePlaces />
       <PromotionSlider />
     </CustomerLayout>
