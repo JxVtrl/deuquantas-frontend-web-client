@@ -1,7 +1,8 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigation } from '@/hooks/useNavigation';
-import { Header, Navigation, StatusBar } from '@deuquantas/components';
+import { Header, Navigation, NavigationMenu, StatusBar } from '@deuquantas/components';
 import { MaxWidthWrapper } from '@deuquantas/components';
+import { useState } from 'react';
 
 export default function CustomerLayout({
   children,
@@ -10,6 +11,7 @@ export default function CustomerLayout({
 }) {
   const { bottomNavItems, handleAddClick } = useNavigation();
   const { user, logout } = useAuth();
+  const [menuOpen, setMenuOpen] = useState(false);
 
   return (
     <>
@@ -17,16 +19,21 @@ export default function CustomerLayout({
       <Header
         name={user?.usuario?.name}
         variant='client'
-        menu_items={[
+        menuOpen={menuOpen}
+        setMenuOpen={setMenuOpen}
+      />
+      {children}
+      <NavigationMenu
+        menuOpen={menuOpen}
+        setMenuOpen={setMenuOpen}
+        menuItems={[
           {
             label: 'Sair',
             onClick: () => {
               logout();
             },
           },
-        ]}
-      />
-      {children}
+        ]} />
       <MaxWidthWrapper
         backgroundColor='#272727'
         style={{

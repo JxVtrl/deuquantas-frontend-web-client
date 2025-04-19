@@ -27,14 +27,9 @@ export const PromotionSlider: React.FC = () => {
   React.useEffect(() => {
     const fetchPromotions = async () => {
       try {
-        const response = await fetch('/api/promotions');
-        const data = await response.json();
-
-        if (data.length === 0) {
-          setPromotions(promotionsFallback);
-        } else {
-          setPromotions(data);
-        }
+        // const response = await fetch('/api/promotions');
+        // const data = await response.json();
+        setPromotions(promotionsFallback);
       } catch (error) {
         console.error('Error fetching promotions:', error);
         setPromotions(promotionsFallback);
