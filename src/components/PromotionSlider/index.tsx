@@ -7,12 +7,11 @@ import {
 import { Card } from '../ui/card';
 import { MaxWidthWrapper } from '@deuquantas/components';
 import Image from 'next/image';
-import Autoplay from "embla-carousel-autoplay"
+import Autoplay from 'embla-carousel-autoplay';
 export const PromotionSlider: React.FC = () => {
-
   const plugin = React.useRef(
-    Autoplay({ delay: 5000, stopOnInteraction: true })
-  )
+    Autoplay({ delay: 5000, stopOnInteraction: true }),
+  );
 
   const [promotions, setPromotions] = React.useState<any[]>([]);
 
@@ -43,8 +42,6 @@ export const PromotionSlider: React.FC = () => {
     };
     fetchPromotions();
   }, []);
-
-
 
   return (
     <MaxWidthWrapper
