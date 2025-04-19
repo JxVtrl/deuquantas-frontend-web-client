@@ -13,7 +13,7 @@ export default function CustomerLayout({
 
   return (
     <>
-      <StatusBar />
+      <StatusBar variant='client' />
       <Header
         name={user?.usuario?.name}
         variant='client'
