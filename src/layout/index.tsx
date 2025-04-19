@@ -28,6 +28,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       <NavigationMenu
         menuOpen={menuOpen}
         setMenuOpen={setMenuOpen}
+        variant='client'
         menuItems={menu_items.map((item) => {
           if (item.href === '/sair') {
             return {
