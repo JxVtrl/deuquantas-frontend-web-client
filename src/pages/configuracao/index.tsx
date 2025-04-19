@@ -1,5 +1,5 @@
 import { withAuthCustomer } from '@/hoc/withAuth';
-import { CustomerLayout } from '@/layout';
+import Layout from '@/layout';
 import React from 'react';
 import { useUserPreferences } from '@/contexts/UserPreferencesContext';
 import { IOSSwitch } from '@/components/ui/ios-switch';
@@ -12,7 +12,7 @@ const Configuração: React.FC = () => {
     useUserPreferences();
 
   return (
-    <CustomerLayout>
+    <Layout>
       <div className='max-w-4xl mx-auto p-6 overflow-y-scroll h-[calc(100vh-120px)]'>
         <h1 className='text-2xl font-bold mb-6'>Configurações</h1>
 
@@ -50,7 +50,7 @@ const Configuração: React.FC = () => {
           </CardContent>
         </Card>
       </div>
-    </CustomerLayout>
+    </Layout>
   );
 };
 

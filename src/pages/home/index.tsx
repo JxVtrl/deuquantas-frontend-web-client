@@ -1,7 +1,7 @@
 import { withAuthCustomer } from '@/hoc/withAuth';
 import React, { useEffect, useState } from 'react';
 import { NavigationPills } from '@/components/NavigationPills';
-import { CustomerLayout } from '@/layout';
+import Layout from '@/layout';
 import { PromotionSlider } from '@/components/PromotionSlider';
 import { useNavigation } from '@/hooks/useNavigation';
 import { useComanda } from '@/contexts/ComandaContext';
@@ -37,7 +37,7 @@ const CustomerHome: React.FC = () => {
   });
 
   return (
-    <CustomerLayout>
+    <Layout>
       <NavigationPills />
       <ActionSquared
         actionItems={
@@ -50,7 +50,7 @@ const CustomerHome: React.FC = () => {
       />
       <FavoritePlaces />
       <PromotionSlider />
-    </CustomerLayout>
+    </Layout>
   );
 };
 

@@ -1,6 +1,6 @@
 import { withAuthCustomer } from '@/hoc/withAuth';
 import React, { useState, useEffect } from 'react';
-import { CustomerLayout } from '@/layout';
+import Layout from '@/layout';
 import { useRouter } from 'next/router';
 import { useAuth } from '@/contexts/AuthContext';
 import QrCodeInput from '@/components/InputQrCode';
@@ -192,7 +192,7 @@ const CustomerQrCode: React.FC = () => {
   };
 
   return (
-    <CustomerLayout>
+    <Layout>
       <div className='flex flex-col items-center justify-center min-h-screen p-4'>
         {error && (
           <div className='mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded'>
@@ -236,7 +236,7 @@ const CustomerQrCode: React.FC = () => {
           </div>
         )}
       </div>
-    </CustomerLayout>
+    </Layout>
   );
 };
 

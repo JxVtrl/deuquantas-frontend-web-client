@@ -1,6 +1,6 @@
 import React from 'react';
 import { withAuthCustomer } from '@/hoc/withAuth';
-import { CustomerLayout } from '@/layout';
+import Layout from '@/layout';
 import { UserPreferences } from '@/components/UserPreferences';
 import { MaxWidthWrapper } from '@deuquantas/components';
 
@@ -8,7 +8,7 @@ import { MaxWidthWrapper } from '@deuquantas/components';
 
 const Conta: React.FC = () => {
   return (
-    <CustomerLayout>
+    <Layout>
       <MaxWidthWrapper>
         <div className='py-6'>
           <h1 className='text-2xl font-bold mb-6'>Minha Conta</h1>
@@ -18,7 +18,7 @@ const Conta: React.FC = () => {
           </div>
         </div>
       </MaxWidthWrapper>
-    </CustomerLayout>
+    </Layout>
   );
 };
 
