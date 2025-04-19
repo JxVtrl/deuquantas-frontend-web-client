@@ -1,5 +1,5 @@
 import { navigation } from '@/data/navigation';
-import { actions } from '@/data/actions';
+import { ActionItem, actions } from '@/data/actions';
 import {
   contaNavigationPills,
   customerNavigationPills,
@@ -8,18 +8,13 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 
 export const useNavigation = () => {
-  const [isConta, setIsConta] = useState(false);
-
   const router = useRouter();
+
+  const [isConta, setIsConta] = useState(false);
 
   useEffect(() => {
     setIsConta(router.pathname.includes('/conta/'));
   }, [router.pathname]);
-
-  const navigationPills = isConta
-    ? contaNavigationPills
-    : customerNavigationPills;
-  const actionItems = actions;
 
   const [bottomNavItems, setBottomNavItems] = useState<
     {
@@ -30,6 +25,13 @@ export const useNavigation = () => {
       href: string;
     }[]
   >([]);
+
+  const [actionItems, setActionItems] = useState<ActionItem[]>([]);
+
+  const navigationPills = isConta
+    ? contaNavigationPills
+    : customerNavigationPills;
+
 
   const checkNavItems = () => {
     const activeItem = navigation.find((item) => item.href === router.pathname);
@@ -46,6 +48,19 @@ export const useNavigation = () => {
 
   useEffect(() => {
     checkNavItems();
+  }, [router.pathname]);
+
+  const checkActionItems = () => {
+    const items = actions.map((item) => ({
+      ...item,
+      onClick: () => router.push(item.href),
+    }));
+
+    setActionItems(items);
+  }
+
+  useEffect(() => {
+    checkActionItems();
   }, [router.pathname]);
 
   const handleAddClick = () => {

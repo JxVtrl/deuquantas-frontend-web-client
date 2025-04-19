@@ -8,9 +8,10 @@ import { useComanda } from '@/contexts/ComandaContext';
 import { ActionItem } from '@/data/actions';
 import { ActionSquared, ReceiptIcon } from '@deuquantas/components';
 import { FavoritePlaces } from '@/sections/FavoritePlaces';
-
+import { useRouter } from 'next/router';
 const CustomerHome: React.FC = () => {
   const { actionItems } = useNavigation();
+  const router = useRouter();
 
   const [comanda, setComanda] = useState<boolean>(false);
   const { fetchComandaAtiva } = useComanda();
@@ -24,10 +25,10 @@ const CustomerHome: React.FC = () => {
     checkComandaAtiva();
   }, [fetchComandaAtiva]);
 
-  const actionItemsWithComanda: ActionItem[] = actionItems.map((item) => {
+  const actionItemsWithComanda = actionItems.map((item) => {
     if (item.href === '/qr-code') {
       return {
-        href: '/conta/comanda',
+        onClick: () => router.push('/conta/comanda'),
         label: 'Comanda',
         icon: ReceiptIcon,
       };
@@ -38,7 +39,11 @@ const CustomerHome: React.FC = () => {
   return (
     <CustomerLayout>
       <NavigationPills />
-      <ActionSquared actionItems={actionItemsWithComanda} />
+      <ActionSquared actionItems={actionItemsWithComanda as unknown as {
+        icon: React.FC;
+        label: string;
+        onClick: () => void;
+      }[]} />
       <FavoritePlaces />
       <PromotionSlider />
     </CustomerLayout>

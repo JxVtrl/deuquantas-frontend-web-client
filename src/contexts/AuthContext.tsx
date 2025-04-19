@@ -61,17 +61,17 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       if (decodedToken.hasCliente) {
         console.log('Usuário é cliente');
         try {
-          const clienteResponse = await api.get(
+          const res = await api.get(
             `/clientes/usuario/${decodedToken.sub}`,
           );
-          if (!clienteResponse.data.success) {
-            throw new Error('Erro ao buscar dados do cliente');
+          if (!res.data.success) {
+            throw new Error('Erro ao buscar dados');
           }
-          response = clienteResponse.data.data;
-          console.log('Dados do cliente:', response);
+          response = res.data.data;
+          console.log('Dados do encontrados:', response);
         } catch (error) {
-          console.error('Erro ao buscar cliente:', error);
-          throw new Error('Erro ao buscar dados do cliente');
+          console.error('Erro ao buscar dados:', error);
+          throw new Error('Erro ao buscar dados');
         }
       } else if (decodedToken.hasEstabelecimento) {
         console.log('Usuário é estabelecimento');
@@ -104,10 +104,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         },
         cliente: decodedToken.hasCliente
           ? {
-              num_cpf: response.num_cpf,
-              num_celular: response.num_celular,
-              data_nascimento: response.data_nascimento,
-            }
+            num_cpf: response.num_cpf,
+            num_celular: response.num_celular,
+            data_nascimento: response.data_nascimento,
+          }
           : undefined,
       };
 
