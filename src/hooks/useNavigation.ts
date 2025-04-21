@@ -34,16 +34,13 @@ export const useNavigation = () => {
     : customerNavigationPills;
 
   const checkNavItems = () => {
-    const activeItem = navigation.find((item) => item.href === router.pathname);
-    if (activeItem) {
-      setBottomNavItems(
-        navigation.map((item) => ({
-          ...item,
-          isActive: item.href === router.pathname,
-          onClick: () => router.push(item.href),
-        })),
-      );
-    }
+    setBottomNavItems(
+      navigation.map((item) => ({
+        ...item,
+        isActive: item.href === router.pathname,
+        onClick: () => router.push(item.href),
+      })),
+    );
   };
 
   useEffect(() => {

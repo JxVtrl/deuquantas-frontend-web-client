@@ -14,7 +14,7 @@ const QrCodeScanner = dynamic(() => import('@/components/QrCodeScanner'), {
   ssr: false,
   loading: () => (
     <div className='flex flex-col items-center justify-center h-full'>
-      <ConfirmLottie />
+      {/* <ConfirmLottie /> */}
       <p className='mt-4'>Carregando câmera...</p>
     </div>
   ),
@@ -212,7 +212,7 @@ const CustomerQrCode: React.FC = () => {
 
         {isLoading ? (
           <div className='flex flex-col items-center'>
-            <ConfirmLottie />
+            {/* <ConfirmLottie /> */}
             <p className='mt-4'>Processando QR Code...</p>
           </div>
         ) : showScanner ? (
@@ -224,7 +224,7 @@ const CustomerQrCode: React.FC = () => {
           </div>
         ) : (
           <div className='flex flex-col items-center'>
-            <ConfirmLottie />
+            {/* <ConfirmLottie /> */}
             <p className='mt-4'>Aguardando resposta do estabelecimento...</p>
             <div className='mt-4'>
               <Button
