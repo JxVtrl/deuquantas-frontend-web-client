@@ -1,5 +1,6 @@
 export interface NavigationPill {
   label: string;
+  isActive?: boolean;
 }
 
 export const customerNavigationPills: NavigationPill[] = [
@@ -25,3 +26,20 @@ export const contaNavigationPills: NavigationPill[] = [
     label: 'Crédito de compras',
   },
 ];
+
+export const menuNavigationPills: NavigationPill[] = [
+  {
+    label: 'Menu',
+    isActive: true,
+  },
+  {
+    label: 'Bebidas',
+  },
+  {
+    label: 'Petiscos',
+  },
+  {
+    label: 'Refeições',
+  }
+];
+

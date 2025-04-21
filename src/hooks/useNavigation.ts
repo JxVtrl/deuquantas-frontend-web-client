@@ -3,20 +3,25 @@ import { ActionItem, actions } from '@/data/actions';
 import {
   contaNavigationPills,
   customerNavigationPills,
+  menuNavigationPills,
+  NavigationPill,
 } from '@/data/home_navigation_pills';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import { menu_items } from '@/data/menu';
 
 export const useNavigation = () => {
   const router = useRouter();
 
   const [isConta, setIsConta] = useState(false);
+  const [isMenu, setIsMenu] = useState(false);
 
   useEffect(() => {
     setIsConta(router.pathname.includes('/conta/'));
+    setIsMenu(router.pathname.includes('/conta/menu'));
   }, [router.pathname]);
 
+  const [actionItems, setActionItems] = useState<ActionItem[]>([]);
+  const [navigationPills, setNavigationPills] = useState<NavigationPill[]>([]);
   const [bottomNavItems, setBottomNavItems] = useState<
     {
       icon: React.FC;
@@ -26,12 +31,6 @@ export const useNavigation = () => {
       href: string;
     }[]
   >([]);
-
-  const [actionItems, setActionItems] = useState<ActionItem[]>([]);
-
-  const navigationPills = isConta
-    ? contaNavigationPills
-    : customerNavigationPills;
 
   const checkNavItems = () => {
     setBottomNavItems(
@@ -43,10 +42,6 @@ export const useNavigation = () => {
     );
   };
 
-  useEffect(() => {
-    checkNavItems();
-  }, [router.pathname]);
-
   const checkActionItems = () => {
     const items = actions.map((item) => ({
       ...item,
@@ -56,9 +51,31 @@ export const useNavigation = () => {
     setActionItems(items);
   };
 
+
+  const checkNavPills = () => {
+    let list = customerNavigationPills
+
+    if (isConta) {
+      list = contaNavigationPills
+
+      if (isMenu) {
+        list = menuNavigationPills
+      }
+    }
+
+    setNavigationPills(list);
+  };
+
   useEffect(() => {
+    checkNavPills()
+  }, [isConta, isMenu]);
+
+  useEffect(() => {
+    checkNavItems();
     checkActionItems();
+    checkNavPills()
   }, [router.pathname]);
+
 
   const handleAddClick = () => {
     // Implement add functionality

@@ -4,8 +4,11 @@ import {
   Button,
   ShoppingCartIcon,
 } from '@deuquantas/components';
+import { useRouter } from 'next/router';
 
 export const ComandaButtons: React.FC = () => {
+  const router = useRouter();
+
   const conta_buttons_navigation = [
     {
       href: '/conta/menu',
@@ -49,24 +52,24 @@ export const ComandaButtons: React.FC = () => {
                 },
                 ...(isFirst
                   ? {
-                      borderTopLeftRadius: '12px',
-                      borderBottomLeftRadius: '12px',
-                      borderTopRightRadius: '0px',
-                      borderBottomRightRadius: '0px',
-                    }
+                    borderTopLeftRadius: '12px',
+                    borderBottomLeftRadius: '12px',
+                    borderTopRightRadius: '0px',
+                    borderBottomRightRadius: '0px',
+                  }
                   : isLast
                     ? {
-                        borderTopRightRadius: '12px',
-                        borderBottomRightRadius: '12px',
-                        borderTopLeftRadius: '0px',
-                        borderBottomLeftRadius: '0px',
-                      }
+                      borderTopRightRadius: '12px',
+                      borderBottomRightRadius: '12px',
+                      borderTopLeftRadius: '0px',
+                      borderBottomLeftRadius: '0px',
+                    }
                     : {
-                        borderTopLeftRadius: '0px',
-                        borderBottomLeftRadius: '0px',
-                        borderTopRightRadius: '0px',
-                        borderBottomRightRadius: '0px',
-                      }),
+                      borderTopLeftRadius: '0px',
+                      borderBottomLeftRadius: '0px',
+                      borderTopRightRadius: '0px',
+                      borderBottomRightRadius: '0px',
+                    }),
               }}
               icon={{
                 src: button.icon,
@@ -75,7 +78,9 @@ export const ComandaButtons: React.FC = () => {
                 height: 24,
               }}
               text={button.title}
-              href={button.href}
+              onClick={() => {
+                router.push(button.href);
+              }}
             />
           );
         })}
