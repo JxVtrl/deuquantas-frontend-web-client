@@ -16,7 +16,7 @@ interface Item {
 export class MenuService {
   static async getItensByEstabelecimento(cnpj: string): Promise<Item[]> {
     try {
-      const response = await api.get<Item[]>(`/itens/estabelecimento/${cnpj}`);
+      const response = await api.get<Item[]>(`/itens/${cnpj}`);
       return response.data;
     } catch (error) {
       console.error('Erro ao buscar itens do estabelecimento:', error);
