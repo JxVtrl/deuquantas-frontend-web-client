@@ -1,26 +1,26 @@
 import { api } from '@/lib/axios';
 
 interface Item {
-    id: string;
-    nome: string;
-    tipo: string;
-    preco: number;
-    img?: string;
-    descricao?: string;
-    disponivel: boolean;
-    data_criacao: Date;
-    data_atualizacao: Date;
-    estabelecimento_id: string;
+  id: string;
+  nome: string;
+  tipo: string;
+  preco: number;
+  img?: string;
+  descricao?: string;
+  disponivel: boolean;
+  data_criacao: Date;
+  data_atualizacao: Date;
+  estabelecimento_id: string;
 }
 
 export class MenuService {
-    static async getItensByEstabelecimento(cnpj: string): Promise<Item[]> {
-        try {
-            const response = await api.get<Item[]>(`/itens/estabelecimento/${cnpj}`);
-            return response.data;
-        } catch (error) {
-            console.error('Erro ao buscar itens do estabelecimento:', error);
-            throw error;
-        }
+  static async getItensByEstabelecimento(cnpj: string): Promise<Item[]> {
+    try {
+      const response = await api.get<Item[]>(`/itens/estabelecimento/${cnpj}`);
+      return response.data;
+    } catch (error) {
+      console.error('Erro ao buscar itens do estabelecimento:', error);
+      throw error;
     }
-} 
+  }
+}

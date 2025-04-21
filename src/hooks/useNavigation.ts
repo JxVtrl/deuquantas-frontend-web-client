@@ -51,15 +51,14 @@ export const useNavigation = () => {
     setActionItems(items);
   };
 
-
   const checkNavPills = () => {
-    let list = customerNavigationPills
+    let list = customerNavigationPills;
 
     if (isConta) {
-      list = contaNavigationPills
+      list = contaNavigationPills;
 
       if (isMenu) {
-        list = menuNavigationPills
+        list = menuNavigationPills;
       }
     }
 
@@ -67,15 +66,14 @@ export const useNavigation = () => {
   };
 
   useEffect(() => {
-    checkNavPills()
+    checkNavPills();
   }, [isConta, isMenu]);
 
   useEffect(() => {
     checkNavItems();
     checkActionItems();
-    checkNavPills()
+    checkNavPills();
   }, [router.pathname]);
-
 
   const handleAddClick = () => {
     // Implement add functionality

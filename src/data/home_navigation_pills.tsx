@@ -40,6 +40,5 @@ export const menuNavigationPills: NavigationPill[] = [
   },
   {
     label: 'Refeições',
-  }
+  },
 ];
-

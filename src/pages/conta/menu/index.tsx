@@ -19,7 +19,7 @@ const MenuDaConta: React.FC = () => {
       console.error(error);
       router.push('/home');
     }
-  }
+  };
 
   useEffect(() => {
     if (comanda) {
@@ -29,8 +29,6 @@ const MenuDaConta: React.FC = () => {
       router.push('/home');
     }
   }, [comanda]);
-
-
 
   return (
     <Layout>
