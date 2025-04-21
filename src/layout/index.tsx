@@ -7,13 +7,27 @@ import {
   NavigationMenu,
   StatusBar,
 } from '@deuquantas/components';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
+import { useComanda } from '@/contexts/ComandaContext';
 export default function Layout({ children }: { children: React.ReactNode }) {
   const { bottomNavItems, handleAddClick } = useNavigation();
+  const { estabelecimento } = useComanda();
   const { user, logout } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
   const router = useRouter();
+
+  const [establishmentName, setEstablishmentName] = useState<
+    string | undefined
+  >(undefined);
+
+  useEffect(() => {
+    if (router.pathname.includes('/conta')) {
+      setEstablishmentName(estabelecimento?.nome_estab);
+    } else {
+      setEstablishmentName(undefined);
+    }
+  }, [router.pathname, estabelecimento]);
 
   return (
     <>
@@ -21,8 +35,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         <div className='flex-none'>
           <StatusBar variant='client' />
           <Header
-            name={user?.usuario?.name}
+            name={!establishmentName ? user?.usuario?.name : establishmentName}
             variant='client'
+            text_variant={!establishmentName ? 'welcome' : 'on-establishment'}
             menuOpen={menuOpen}
             setMenuOpen={setMenuOpen}
           />
