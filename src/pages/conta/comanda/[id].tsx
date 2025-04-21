@@ -4,10 +4,7 @@ import Layout from '@/layout';
 import { withAuthCustomer } from '@/hoc/withAuth';
 import { useComanda } from '@/contexts/ComandaContext';
 import { NavigationPills } from '@/components/NavigationPills';
-import ComandaButtons from '@/components/ComandaButtons';
-import { ComandaValueChart } from '@/components/ComandaValueChart';
-import ComandaNotifications from '@/components/ComandaNotifications';
-import { Button, MaxWidthWrapper } from '@deuquantas/components';
+import { ComandaButtons, ComandaValueChart, ComandaNotifications, ComandaPayButton } from '@/components/Comanda';
 
 const ComandaPage = () => {
   const router = useRouter();
@@ -47,16 +44,7 @@ const ComandaPage = () => {
       <ComandaButtons />
       <ComandaValueChart />
       <ComandaNotifications />
-      <MaxWidthWrapper>
-        <Button
-          variant='primary'
-          text='PAGAMENTO'
-          style={{
-            width: '100%',
-            marginTop: '24px',
-          }}
-        />
-      </MaxWidthWrapper>
+      <ComandaPayButton />
     </Layout>
   );
 };

@@ -3,17 +3,17 @@ import React from 'react';
 
 type Notification = {
   type:
-    | 'limit-warning'
-    | 'limit-exceeded'
-    | 'limit-reached'
-    | 'order-pending'
-    | 'order-transfer';
+  | 'limit-warning'
+  | 'limit-exceeded'
+  | 'limit-reached'
+  | 'order-pending'
+  | 'order-transfer';
   title: string;
   quantity?: number;
   button_icon?: React.ReactNode;
 };
 
-const ComandaNotifications: React.FC = () => {
+export const ComandaNotifications: React.FC = () => {
   const notifications_data: Notification[] = [
     {
       type: 'limit-warning',
@@ -129,4 +129,3 @@ const ComandaNotifications: React.FC = () => {
   );
 };
 
-export default ComandaNotifications;
