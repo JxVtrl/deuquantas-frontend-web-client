@@ -6,8 +6,6 @@ import {
 } from '@deuquantas/components';
 
 const ComandaButtons: React.FC = () => {
-
-
   const conta_buttons_navigation = [
     {
       href: '/conta/menu',
@@ -51,24 +49,24 @@ const ComandaButtons: React.FC = () => {
                 },
                 ...(isFirst
                   ? {
-                    borderTopLeftRadius: '12px',
-                    borderBottomLeftRadius: '12px',
-                    borderTopRightRadius: '0px',
-                    borderBottomRightRadius: '0px',
-                  }
-                  : isLast
-                    ? {
-                      borderTopRightRadius: '12px',
-                      borderBottomRightRadius: '12px',
-                      borderTopLeftRadius: '0px',
-                      borderBottomLeftRadius: '0px',
-                    }
-                    : {
-                      borderTopLeftRadius: '0px',
-                      borderBottomLeftRadius: '0px',
+                      borderTopLeftRadius: '12px',
+                      borderBottomLeftRadius: '12px',
                       borderTopRightRadius: '0px',
                       borderBottomRightRadius: '0px',
-                    }),
+                    }
+                  : isLast
+                    ? {
+                        borderTopRightRadius: '12px',
+                        borderBottomRightRadius: '12px',
+                        borderTopLeftRadius: '0px',
+                        borderBottomLeftRadius: '0px',
+                      }
+                    : {
+                        borderTopLeftRadius: '0px',
+                        borderBottomLeftRadius: '0px',
+                        borderTopRightRadius: '0px',
+                        borderBottomRightRadius: '0px',
+                      }),
               }}
               icon={{
                 src: button.icon,
@@ -79,7 +77,7 @@ const ComandaButtons: React.FC = () => {
               text={button.title}
               href={button.href}
             />
-          )
+          );
         })}
       </div>
     </MaxWidthWrapper>
