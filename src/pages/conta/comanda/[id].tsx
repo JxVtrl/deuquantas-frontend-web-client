@@ -4,7 +4,12 @@ import Layout from '@/layout';
 import { withAuthCustomer } from '@/hoc/withAuth';
 import { useComanda } from '@/contexts/ComandaContext';
 import { NavigationPills } from '@/components/NavigationPills';
-import { ComandaButtons, ComandaValueChart, ComandaNotifications, ComandaPayButton } from '@/components/Comanda';
+import {
+  ComandaButtons,
+  ComandaValueChart,
+  ComandaNotifications,
+  ComandaPayButton,
+} from '@/components/Comanda';
 
 const ComandaPage = () => {
   const router = useRouter();

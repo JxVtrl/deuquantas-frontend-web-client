@@ -49,24 +49,24 @@ export const ComandaButtons: React.FC = () => {
                 },
                 ...(isFirst
                   ? {
-                    borderTopLeftRadius: '12px',
-                    borderBottomLeftRadius: '12px',
-                    borderTopRightRadius: '0px',
-                    borderBottomRightRadius: '0px',
-                  }
-                  : isLast
-                    ? {
-                      borderTopRightRadius: '12px',
-                      borderBottomRightRadius: '12px',
-                      borderTopLeftRadius: '0px',
-                      borderBottomLeftRadius: '0px',
-                    }
-                    : {
-                      borderTopLeftRadius: '0px',
-                      borderBottomLeftRadius: '0px',
+                      borderTopLeftRadius: '12px',
+                      borderBottomLeftRadius: '12px',
                       borderTopRightRadius: '0px',
                       borderBottomRightRadius: '0px',
-                    }),
+                    }
+                  : isLast
+                    ? {
+                        borderTopRightRadius: '12px',
+                        borderBottomRightRadius: '12px',
+                        borderTopLeftRadius: '0px',
+                        borderBottomLeftRadius: '0px',
+                      }
+                    : {
+                        borderTopLeftRadius: '0px',
+                        borderBottomLeftRadius: '0px',
+                        borderTopRightRadius: '0px',
+                        borderBottomRightRadius: '0px',
+                      }),
               }}
               icon={{
                 src: button.icon,
@@ -83,4 +83,3 @@ export const ComandaButtons: React.FC = () => {
     </MaxWidthWrapper>
   );
 };
-
