@@ -12,17 +12,15 @@ const CustomerHome: React.FC = () => {
   const { actionItems } = useNavigation();
   const router = useRouter();
 
-  const [comanda, setComanda] = useState<boolean>(false);
-  const { fetchComandaAtiva } = useComanda();
+  const { fetchComandaAtiva, comanda } = useComanda();
+
+  const checkComandaAtiva = async () => {
+    await fetchComandaAtiva();
+  };
 
   useEffect(() => {
-    const checkComandaAtiva = async () => {
-      const comandaId = await fetchComandaAtiva();
-      setComanda(!!comandaId);
-    };
-
     checkComandaAtiva();
-  }, [fetchComandaAtiva]);
+  }, []);
 
   const actionsResolved = actionItems.map((item) => {
     if (item.href === '/qr-code' && comanda) {

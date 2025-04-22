@@ -84,6 +84,7 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
       );
 
       if (comandaAtiva?.id) {
+        fetchComanda(comandaAtiva.id);
         return comandaAtiva.id;
       }
 

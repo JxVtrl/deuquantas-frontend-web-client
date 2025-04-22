@@ -8,6 +8,7 @@ import {
 } from '@/data/home_navigation_pills';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
+import { useComanda } from '@/contexts/ComandaContext';
 
 export const useNavigation = () => {
   const router = useRouter();
@@ -75,10 +76,17 @@ export const useNavigation = () => {
     checkNavPills();
   }, [router.pathname]);
 
+  const { comanda } = useComanda();
+
   const handleAddClick = () => {
-    console.log('handleAddClick');
-    if (!router.pathname.includes('/conta/menu')) {
+    // se ele não estiver na comanda e existir uma comanda ativa, ele vai para a comanda
+    if (!router.pathname.includes('/conta/menu') && !!comanda) {
       router.push('/conta/menu');
+    }
+
+    // se nao exisir uma comanda ativa, ele vai para o qr code
+    if (!comanda) {
+      router.push('/qr-code');
     }
   };
 
