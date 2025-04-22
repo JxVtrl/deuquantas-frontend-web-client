@@ -30,8 +30,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   }, [router.pathname, estabelecimento]);
 
   const hasItemsInCart = false;
-  const isButtonDisabled = hasItemsInCart && router.pathname.includes('/conta/menu');
-
+  const isButtonDisabled =
+    hasItemsInCart && router.pathname.includes('/conta/menu');
 
   return (
     <>
@@ -69,7 +69,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               };
             })}
           />
-          <Navigation items={bottomNavItems} onAddClick={handleAddClick} disableButton={isButtonDisabled} />
+          <Navigation
+            items={bottomNavItems}
+            onAddClick={handleAddClick}
+            disableButton={isButtonDisabled}
+          />
         </div>
       </div>
     </>

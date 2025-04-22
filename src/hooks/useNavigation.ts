@@ -80,7 +80,6 @@ export const useNavigation = () => {
     if (!router.pathname.includes('/conta/menu')) {
       router.push('/conta/menu');
     }
-
   };
 
   return {
