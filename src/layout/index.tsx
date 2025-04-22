@@ -29,6 +29,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     }
   }, [router.pathname, estabelecimento]);
 
+  const hasItemsInCart = false;
+  const isButtonDisabled = hasItemsInCart && router.pathname.includes('/conta/menu');
+
+
   return (
     <>
       <div className='flex flex-col h-screen fixed inset-0'>
@@ -65,7 +69,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               };
             })}
           />
-          <Navigation items={bottomNavItems} onAddClick={handleAddClick} />
+          <Navigation items={bottomNavItems} onAddClick={handleAddClick} disableButton={isButtonDisabled} />
         </div>
       </div>
     </>

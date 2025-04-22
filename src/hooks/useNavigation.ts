@@ -76,8 +76,11 @@ export const useNavigation = () => {
   }, [router.pathname]);
 
   const handleAddClick = () => {
-    // Implement add functionality
-    console.log('Add clicked');
+    console.log('handleAddClick');
+    if (!router.pathname.includes('/conta/menu')) {
+      router.push('/conta/menu');
+    }
+
   };
 
   return {
