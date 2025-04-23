@@ -12,7 +12,7 @@ import { useRouter } from 'next/router';
 import { useComanda } from '@/contexts/ComandaContext';
 export default function Layout({ children }: { children: React.ReactNode }) {
   const { bottomNavItems, handleAddClick } = useNavigation();
-  const { estabelecimento } = useComanda();
+  const { estabelecimento, itensInCart } = useComanda();
   const { user, logout } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
   const router = useRouter();
@@ -29,9 +29,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     }
   }, [router.pathname, estabelecimento]);
 
-  const hasItemsInCart = false;
-  const isButtonDisabled =
-    hasItemsInCart && router.pathname.includes('/conta/menu');
+  const isButtonDisabled = itensInCart.length <= 0 && router.pathname.includes('/conta/menu');
 
   return (
     <>

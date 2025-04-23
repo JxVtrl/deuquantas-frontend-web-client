@@ -10,12 +10,25 @@ interface NavigationPill {
   hasArrowBack?: boolean;
 }
 
-const Pill: React.FC<NavigationPill> = ({ label, isActive, onClick, hasArrowBack }) => (
+const Pill: React.FC<NavigationPill> = ({
+  label,
+  isActive,
+  onClick,
+  hasArrowBack,
+}) => (
   <button
     onClick={onClick}
     style={{
-      borderColor: hasArrowBack ? '#00000040' : isActive ? '#FFCC00' : '#000000',
-      backgroundColor: hasArrowBack ? 'transparent' : isActive ? '#FFCC00' : '#ffffff',
+      borderColor: hasArrowBack
+        ? '#00000040'
+        : isActive
+          ? '#FFCC00'
+          : '#000000',
+      backgroundColor: hasArrowBack
+        ? 'transparent'
+        : isActive
+          ? '#FFCC00'
+          : '#ffffff',
       fontWeight: hasArrowBack ? 500 : isActive ? 'bold' : 'normal',
       borderRadius: hasArrowBack ? '6px' : '32px',
     }}
@@ -73,9 +86,12 @@ export const NavigationPills: React.FC<{
           </p>
         </div>
       )}
-      <div style={{
-        gap: hasArrowBack ? 6 : 16
-      }} className='my-[20px] px-[16px] flex overflow-x-auto border-b border-[#F0F0F0]'>
+      <div
+        style={{
+          gap: hasArrowBack ? 6 : 16,
+        }}
+        className='my-[20px] px-[16px] flex overflow-x-auto border-b border-[#F0F0F0]'
+      >
         {navigationPills.map((pill) => (
           <Pill key={pill.label} {...pill} hasArrowBack={hasArrowBack} />
         ))}

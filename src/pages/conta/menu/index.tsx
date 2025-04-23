@@ -8,9 +8,10 @@ import { MenuService } from '@/services/menu.service';
 import Image from 'next/image';
 import { MaxWidthWrapper } from '@deuquantas/components';
 import { capitalize, currencyFormatter } from '@/utils/formatters';
+import { CartDrawer } from '@/components/CartDrawer';
 
 const MenuDaConta: React.FC = () => {
-  const { comanda } = useComanda();
+  const { comanda, setSelectedItem, clearCart, setItensInCart } = useComanda();
   const router = useRouter();
   const [menu, setMenu] = useState<any[]>([]);
 
@@ -23,6 +24,10 @@ const MenuDaConta: React.FC = () => {
       router.push('/home');
     }
   };
+
+  useEffect(() => {
+    clearCart();
+  }, []);
 
   useEffect(() => {
     if (comanda) {
@@ -38,11 +43,18 @@ const MenuDaConta: React.FC = () => {
       <NavigationPills hasArrowBack />
 
       <MaxWidthWrapper>
-        <div className='grid grid-cols-3 md:grid-cols-4 gap-x-[16px] gap-y-[12px]'>
+        <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-x-[16px] gap-y-[12px]'>
           {menu.map((item) => (
             <div
               key={item.id}
-              className='flex flex-col rounded-[8px] bg-[#F5F5F5] shadow-[0px_4px_4px_0px_#00000040] w-full'
+              className='flex flex-col rounded-[8px] bg-[#F5F5F5] shadow-[0px_4px_4px_0px_#00000040] w-full cursor-pointer'
+              onClick={() => {
+                setSelectedItem(item)
+                setItensInCart([{
+                  ...item,
+                  quantidade: 1
+                }])
+              }}
             >
               <div
                 className='relative w-full'
@@ -69,6 +81,7 @@ const MenuDaConta: React.FC = () => {
           ))}
         </div>
       </MaxWidthWrapper>
+      <CartDrawer />
     </Layout>
   );
 };

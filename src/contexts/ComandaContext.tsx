@@ -4,20 +4,18 @@ import { RegisterFormData } from '@/interfaces/register';
 import { ComandaService, ComandaResponse } from '@/services/comanda.service';
 import { useAuth } from './AuthContext';
 
-interface ComandaItem {
+
+interface Item {
   id: string;
+  nome: string;
+  descricao: string;
+  preco: number;
   quantidade: number;
-  valor_total: number;
-  item: {
-    nome: string;
-    descricao: string;
-    preco: number;
-  };
 }
 
 type Comanda = ComandaResponse & {
   status: string;
-  itens: ComandaItem[];
+  itens: Item[];
   valor_total: number;
 };
 
@@ -30,6 +28,11 @@ interface ComandaContextData {
   fetchComandaAtiva: () => Promise<string | null>;
   clearComanda: () => void;
   updateComanda: (data: Partial<Comanda>) => void;
+  selectedItem: Item | null;
+  setSelectedItem: (item: Item) => void;
+  itensInCart: Item[];
+  setItensInCart: (itens: Item[]) => void;
+  clearCart: () => void;
 }
 
 const ComandaContext = createContext<ComandaContextData>(
@@ -45,6 +48,8 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
   const [error, setError] = useState<string | null>(null);
   const [estabelecimento, setEstabelecimento] =
     useState<RegisterFormData | null>(null);
+  const [itensInCart, setItensInCart] = useState<Item[]>([]);
+  const [selectedItem, setSelectedItem] = useState<Item | null>(null);
 
   const fetchComanda = useCallback(async (id: string) => {
     try {
@@ -106,6 +111,11 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
     setComanda((prev) => (prev ? { ...prev, ...data } : null));
   }, []);
 
+  const clearCart = useCallback(() => {
+    setItensInCart([]);
+    setSelectedItem(null);
+  }, []);
+
   return (
     <ComandaContext.Provider
       value={{
@@ -117,6 +127,11 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
         fetchComandaAtiva,
         clearComanda,
         updateComanda,
+        itensInCart,
+        clearCart,
+        selectedItem,
+        setSelectedItem,
+        setItensInCart,
       }}
     >
       {children}
