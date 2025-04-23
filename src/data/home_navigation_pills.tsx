@@ -29,10 +29,6 @@ export const contaNavigationPills: NavigationPill[] = [
 
 export const menuNavigationPills: NavigationPill[] = [
   {
-    label: 'Menu',
-    isActive: true,
-  },
-  {
     label: 'Bebidas',
   },
   {

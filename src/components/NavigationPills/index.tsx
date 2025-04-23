@@ -7,16 +7,21 @@ interface NavigationPill {
   label: string;
   isActive?: boolean;
   onClick?: () => void;
+  hasArrowBack?: boolean;
 }
 
-const Pill: React.FC<NavigationPill> = ({ label, isActive, onClick }) => (
+const Pill: React.FC<NavigationPill> = ({ label, isActive, onClick, hasArrowBack }) => (
   <button
     onClick={onClick}
-    className={`h-[24px] px-4 flex items-center justify-center rounded-full text-sm whitespace-nowrap border border-solid hover:bg-[#FFCC00] hover:border-[#FFCC00] hover:font-bold transition-all duration-300 ${
-      isActive
-        ? 'bg-[#FFCC00] border-[#FFCC00] font-bold'
-        : 'bg-[#ffffff] border-[#000000] '
-    }`}
+    style={{
+      borderColor: hasArrowBack ? '#00000040' : isActive ? '#FFCC00' : '#000000',
+      backgroundColor: hasArrowBack ? 'transparent' : isActive ? '#FFCC00' : '#ffffff',
+      fontWeight: hasArrowBack ? 500 : isActive ? 'bold' : 'normal',
+      borderRadius: hasArrowBack ? '6px' : '32px',
+    }}
+    className={`h-[24px] px-${hasArrowBack ? '[16px]' : 4} flex items-center justify-center
+    whitespace-nowrap border border-solid hover:bg-[#FFCC00] hover:border-[#FFCC00] hover:font-bold
+     transition-all duration-300`}
   >
     <p className={`text-[14px] leading-[140%] text-center`}>{label}</p>
   </button>
@@ -28,11 +33,10 @@ export const NavigationPills: React.FC<{
   const { navigationPills } = useNavigation();
   const router = useRouter();
   return (
-    <MaxWidthWrapper
-      styleContent={{
+    <div
+      style={{
         display: 'flex',
-        alignItems: 'center',
-        gap: 8,
+        flexDirection: 'column',
       }}
     >
       {hasArrowBack && (
@@ -42,6 +46,14 @@ export const NavigationPills: React.FC<{
           }}
           style={{
             cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            borderBottom: '1px solid #F0F0F0',
+            paddingBottom: 12,
+            paddingTop: 6,
+            marginTop: 20,
+            marginLeft: 16,
           }}
         >
           <svg
@@ -56,13 +68,18 @@ export const NavigationPills: React.FC<{
               fill='#1D1B20'
             />
           </svg>
+          <p className='text-[14px] leading-[140%] font-bold text-center'>
+            Painel
+          </p>
         </div>
       )}
-      <div className='py-[16px] flex gap-2 overflow-x-auto border-b border-[#F0F0F0]'>
+      <div style={{
+        gap: hasArrowBack ? 6 : 16
+      }} className='my-[20px] px-[16px] flex overflow-x-auto border-b border-[#F0F0F0]'>
         {navigationPills.map((pill) => (
-          <Pill key={pill.label} {...pill} />
+          <Pill key={pill.label} {...pill} hasArrowBack={hasArrowBack} />
         ))}
       </div>
-    </MaxWidthWrapper>
+    </div>
   );
 };
