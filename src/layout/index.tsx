@@ -29,7 +29,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     }
   }, [router.pathname, estabelecimento]);
 
-  const isButtonDisabled = itensInCart.length <= 0 && router.pathname.includes('/conta/menu');
+  const isButtonDisabled =
+    itensInCart.length <= 0 && router.pathname.includes('/conta/menu');
 
   return (
     <>

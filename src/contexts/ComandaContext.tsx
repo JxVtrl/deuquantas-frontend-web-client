@@ -4,7 +4,6 @@ import { RegisterFormData } from '@/interfaces/register';
 import { ComandaService, ComandaResponse } from '@/services/comanda.service';
 import { useAuth } from './AuthContext';
 
-
 interface Item {
   id: string;
   nome: string;

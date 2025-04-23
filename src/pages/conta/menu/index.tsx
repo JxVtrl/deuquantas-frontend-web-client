@@ -49,11 +49,13 @@ const MenuDaConta: React.FC = () => {
               key={item.id}
               className='flex flex-col rounded-[8px] bg-[#F5F5F5] shadow-[0px_4px_4px_0px_#00000040] w-full cursor-pointer'
               onClick={() => {
-                setSelectedItem(item)
-                setItensInCart([{
-                  ...item,
-                  quantidade: 1
-                }])
+                setSelectedItem(item);
+                setItensInCart([
+                  {
+                    ...item,
+                    quantidade: 1,
+                  },
+                ]);
               }}
             >
               <div
