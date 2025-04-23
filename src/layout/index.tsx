@@ -34,7 +34,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
   return (
     <>
-      <div className='flex flex-col h-screen fixed inset-0'>
+      <div className='flex flex-col h-screen fixed inset-0 '>
         <div className='flex-none'>
           <StatusBar variant='client' />
           <Header

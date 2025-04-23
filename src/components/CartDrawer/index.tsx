@@ -2,6 +2,7 @@ import {
     Drawer,
     DrawerClose,
     DrawerContent,
+    DrawerFooter,
     DrawerHeader,
 } from '@/components/ui/drawer';
 import { useComanda } from '@/contexts/ComandaContext';
@@ -9,13 +10,16 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { capitalize, currencyFormatter } from '@/utils/formatters';
 import { Counter } from '../Counter';
-import { DialogTitle } from '../ui/dialog';
-
+import { DialogDescription, DialogTitle } from '../ui/dialog';
+import {
+    Navigation,
+} from '@deuquantas/components';
+import { useNavigation } from '@/hooks/useNavigation';
 export const CartDrawer = () => {
     const [quantidade, setQuantidade] = useState(1);
     const [total, setTotal] = useState(0);
     const { clearCart, selectedItem, itensInCart, setItensInCart } = useComanda();
-
+    const { bottomNavItems, handleAddClick } = useNavigation();
     useEffect(() => {
         setQuantidade(
             itensInCart.find((item) => item.id === selectedItem?.id)?.quantidade || 1,
@@ -43,8 +47,10 @@ export const CartDrawer = () => {
     }, [itensInCart]);
 
     return (
-        <Drawer open={!!selectedItem} onClose={clearCart}>
-            <DrawerContent>
+        <Drawer open={!!selectedItem} onClose={clearCart} >
+            <DrawerContent style={{
+                boxShadow: '0px -4px 30px 0px #00000040',
+            }}>
                 <DrawerClose className='cursor-pointer p-0 m-0 absolute top-[16px] right-[16px]'>
                     <svg
                         width='10'
@@ -59,7 +65,7 @@ export const CartDrawer = () => {
                         />
                     </svg>
                 </DrawerClose>
-                <div className='flex items-center gap-4 px-[16px] py-[10px]'>
+                <div className='flex  gap-[8px] px-[16px] py-[10px] pb-[81px]'>
                     <Image
                         src={'/products/beer.webp'}
                         alt={selectedItem?.nome || ''}
@@ -70,16 +76,23 @@ export const CartDrawer = () => {
                         <DialogTitle className='text-[12px] font-[600] leading-[24px] tracking-[0.5px] text-[#000000]'>
                             {capitalize(selectedItem?.nome || '')}
                         </DialogTitle>
-                        <p className='text-[12px] font-[400] leading-[16px] tracking-[0.5px] text-[#000000]'>
-                            {selectedItem?.descricao}
-                        </p>
-                        <p className='text-[14px] font-[600] leading-[16px] tracking-[0.5px] text-[#000000]'>
+                        <DialogDescription className='text-[12px] font-[400] leading-[16px] tracking-[0.5px] text-[#000000]'>
+                            {selectedItem?.descricao || ''}
+                        </DialogDescription>
+                        <p className='text-[14px] font-[600] leading-[16px] tracking-[0.5px] text-[#272727]'>
                             {currencyFormatter(total || 0)}
                         </p>
 
                         <Counter value={quantidade} onChange={handleQuantidadeChange} />
                     </div>
                 </div>
+                {/* TODO: REMOVER ESSE NAVIGATION DAQUI/CRIAR O PROPRIO COMPONENTE DE DRAWER */}
+                <DrawerFooter>
+                    <Navigation
+                        items={bottomNavItems}
+                        onAddClick={handleAddClick}
+                    />
+                </DrawerFooter>
             </DrawerContent>
         </Drawer>
     );
