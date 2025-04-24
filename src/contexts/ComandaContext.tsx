@@ -76,11 +76,13 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
       setEstabelecimento(response.estabelecimento);
 
       const menuResponse = await getMenu(response.estabelecimento.num_cnpj);
-      setMenu(menuResponse.map((item) => ({
-        ...item,
-        quantidade: 0,
-        descricao: item.descricao || '',
-      })));
+      setMenu(
+        menuResponse.map((item) => ({
+          ...item,
+          quantidade: 0,
+          descricao: item.descricao || '',
+        })),
+      );
     } catch (err) {
       const message =
         err instanceof Error ? err.message : 'Erro ao carregar comanda';

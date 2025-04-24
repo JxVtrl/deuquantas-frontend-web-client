@@ -26,7 +26,9 @@ const Pill: React.FC<NavigationPill> = ({
           : '#000000',
       backgroundColor: isActive
         ? '#FFCC00'
-        : hasArrowBack ? 'transparent' : '#ffffff',
+        : hasArrowBack
+          ? 'transparent'
+          : '#ffffff',
       fontWeight: isActive ? 'bold' : hasArrowBack ? 500 : 'normal',
       borderRadius: hasArrowBack ? '6px' : '32px',
     }}

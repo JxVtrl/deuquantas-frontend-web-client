@@ -66,7 +66,7 @@ export const useNavigation = () => {
         const tipos = menu.map((item) => item.tipo);
         const tiposUnicos = Array.from(new Set(tipos));
         list = tiposUnicos.map((type) => {
-          return ({
+          return {
             label: capitalize(type),
             isActive: type === tipo,
             onClick: () => {
@@ -76,7 +76,7 @@ export const useNavigation = () => {
                 setTipo(type);
               }
             },
-          })
+          };
         });
       }
     }

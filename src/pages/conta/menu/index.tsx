@@ -10,7 +10,8 @@ import { capitalize, currencyFormatter } from '@/utils/formatters';
 import { CartDrawer } from '@/components/CartDrawer';
 
 const MenuDaConta: React.FC = () => {
-  const { setSelectedItem, clearCart, setItensInCart, tipo, menu } = useComanda();
+  const { setSelectedItem, clearCart, setItensInCart, tipo, menu } =
+    useComanda();
   const [filteredMenu, setFilteredMenu] = useState<Item[]>([]);
 
   useEffect(() => {
@@ -19,7 +20,9 @@ const MenuDaConta: React.FC = () => {
 
   useEffect(() => {
     if (tipo) {
-      const filteredMenu = menu.filter((item) => item.tipo.toLowerCase() === tipo.toLowerCase());
+      const filteredMenu = menu.filter(
+        (item) => item.tipo.toLowerCase() === tipo.toLowerCase(),
+      );
       setFilteredMenu(filteredMenu);
     } else {
       setFilteredMenu(menu);
@@ -45,7 +48,9 @@ const MenuDaConta: React.FC = () => {
                   },
                 ] as Item[] extends {
                   quantidade: number;
-                } ? Item[] : never);
+                }
+                  ? Item[]
+                  : never);
               }}
             >
               <div
@@ -74,7 +79,7 @@ const MenuDaConta: React.FC = () => {
         </div>
       </MaxWidthWrapper>
       <CartDrawer />
-    </Layout >
+    </Layout>
   );
 };
 
