@@ -19,17 +19,15 @@ const Pill: React.FC<NavigationPill> = ({
   <button
     onClick={onClick}
     style={{
-      borderColor: hasArrowBack
-        ? '#00000040'
-        : isActive
-          ? '#FFCC00'
+      borderColor: isActive
+        ? '#FFCC00'
+        : hasArrowBack
+          ? '#00000040'
           : '#000000',
-      backgroundColor: hasArrowBack
-        ? 'transparent'
-        : isActive
-          ? '#FFCC00'
-          : '#ffffff',
-      fontWeight: hasArrowBack ? 500 : isActive ? 'bold' : 'normal',
+      backgroundColor: isActive
+        ? '#FFCC00'
+        : hasArrowBack ? 'transparent' : '#ffffff',
+      fontWeight: isActive ? 'bold' : hasArrowBack ? 500 : 'normal',
       borderRadius: hasArrowBack ? '6px' : '32px',
     }}
     className={`h-[24px] px-${hasArrowBack ? '[16px]' : 4} flex items-center justify-center

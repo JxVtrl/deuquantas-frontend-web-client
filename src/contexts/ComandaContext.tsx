@@ -3,14 +3,7 @@ import { toast } from 'react-hot-toast';
 import { RegisterFormData } from '@/interfaces/register';
 import { ComandaService, ComandaResponse } from '@/services/comanda.service';
 import { useAuth } from './AuthContext';
-
-interface Item {
-  id: string;
-  nome: string;
-  descricao: string;
-  preco: number;
-  quantidade: number;
-}
+import { Item, MenuService } from '@/services/menu.service';
 
 type Comanda = ComandaResponse & {
   status: string;
@@ -32,6 +25,10 @@ interface ComandaContextData {
   itensInCart: Item[];
   setItensInCart: (itens: Item[]) => void;
   clearCart: () => void;
+  tipo: string | null;
+  setTipo: (tipo: string | null) => void;
+  menu: Item[];
+  setMenu: (menu: Item[]) => void;
 }
 
 const ComandaContext = createContext<ComandaContextData>(
@@ -48,7 +45,19 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
   const [estabelecimento, setEstabelecimento] =
     useState<RegisterFormData | null>(null);
   const [itensInCart, setItensInCart] = useState<Item[]>([]);
+  const [tipo, setTipo] = useState<string | null>(null);
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
+  const [menu, setMenu] = useState<Item[]>([]);
+
+  const getMenu = async (cnpj: string) => {
+    try {
+      const itens = await MenuService.getItensByEstabelecimento(cnpj);
+      return itens;
+    } catch (error) {
+      console.error(error);
+      return [];
+    }
+  };
 
   const fetchComanda = useCallback(async (id: string) => {
     try {
@@ -65,6 +74,13 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
 
       setComanda(response.comanda as Comanda);
       setEstabelecimento(response.estabelecimento);
+
+      const menuResponse = await getMenu(response.estabelecimento.num_cnpj);
+      setMenu(menuResponse.map((item) => ({
+        ...item,
+        quantidade: 0,
+        descricao: item.descricao || '',
+      })));
     } catch (err) {
       const message =
         err instanceof Error ? err.message : 'Erro ao carregar comanda';
@@ -131,6 +147,10 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
         selectedItem,
         setSelectedItem,
         setItensInCart,
+        tipo,
+        setTipo,
+        menu,
+        setMenu,
       }}
     >
       {children}

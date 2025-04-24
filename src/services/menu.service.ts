@@ -1,6 +1,6 @@
 import { api } from '@/lib/axios';
 
-interface Item {
+export interface Item {
   id: string;
   nome: string;
   tipo: string;

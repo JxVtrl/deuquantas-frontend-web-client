@@ -54,15 +54,7 @@ export const useNavigation = () => {
     setActionItems(items);
   };
 
-  const getMenu = async (cnpj: string) => {
-    try {
-      const itens = await MenuService.getItensByEstabelecimento(cnpj);
-      return itens;
-    } catch (error) {
-      console.error(error);
-      return [];
-    }
-  };
+  const { tipo, setTipo, menu } = useComanda();
 
   const checkNavPills = async () => {
     let list = customerNavigationPills;
@@ -71,15 +63,21 @@ export const useNavigation = () => {
       list = contaNavigationPills;
 
       if (isMenu) {
-        const itens = await getMenu(comanda?.num_cnpj || '');
-        const tipos = itens.map((item) => item.tipo);
+        const tipos = menu.map((item) => item.tipo);
         const tiposUnicos = Array.from(new Set(tipos));
-        list = tiposUnicos.map((tipo) => ({
-          label: capitalize(tipo),
-          onClick: () => {
-            router.push(`/conta/menu?tipo=${tipo}`);
-          },
-        }));
+        list = tiposUnicos.map((type) => {
+          return ({
+            label: capitalize(type),
+            isActive: type === tipo,
+            onClick: () => {
+              if (type === tipo) {
+                setTipo(null);
+              } else {
+                setTipo(type);
+              }
+            },
+          })
+        });
       }
     }
 
@@ -88,7 +86,7 @@ export const useNavigation = () => {
 
   useEffect(() => {
     checkNavPills();
-  }, [isConta, isMenu]);
+  }, [isConta, isMenu, tipo]);
 
   useEffect(() => {
     checkNavItems();
