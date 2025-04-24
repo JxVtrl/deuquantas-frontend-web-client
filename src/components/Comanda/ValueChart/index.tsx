@@ -29,7 +29,6 @@ export const ComandaValueChart: React.FC = () => {
       }}
     >
       <div className='transform translate-x-[-15,00,%] sm:translate-x-0'>
-
         {/* Gráfico circular */}
         <svg
           width={(200 / 2 + 6) * 2}
@@ -63,9 +62,11 @@ export const ComandaValueChart: React.FC = () => {
         </svg>
 
         {/* Conteúdo central */}
-        <div className='
+        <div
+          className='
      
-      absolute inset-0 flex flex-col items-center justify-center h-full'>
+      absolute inset-0 flex flex-col items-center justify-center h-full'
+        >
           <div className='text-center'>
             <p className='text-[12px] text-[#272727]'>
               R$
@@ -84,7 +85,13 @@ export const ComandaValueChart: React.FC = () => {
               fill='none'
               xmlns='http://www.w3.org/2000/svg'
             >
-              <line y1='1' x2='132' y2='1' stroke='black' stroke-opacity='0.1' />
+              <line
+                y1='1'
+                x2='132'
+                y2='1'
+                stroke='black'
+                stroke-opacity='0.1'
+              />
             </svg>
 
             <p className='text-[10px] text-[#272727] font-[500] leading-[10px] my-[8px]'>
@@ -98,7 +105,6 @@ export const ComandaValueChart: React.FC = () => {
           </div>
         </div>
       </div>
-
 
       <div className='absolute top-0 right-0 flex flex-col gap-[10px]'>
         {/* Informações adicionais */}
