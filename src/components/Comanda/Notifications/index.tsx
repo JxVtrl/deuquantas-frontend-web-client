@@ -3,11 +3,11 @@ import React from 'react';
 
 type Notification = {
   type:
-    | 'limit-warning'
-    | 'limit-exceeded'
-    | 'limit-reached'
-    | 'order-pending'
-    | 'order-transfer';
+  | 'limit-warning'
+  | 'limit-exceeded'
+  | 'limit-reached'
+  | 'order-pending'
+  | 'order-transfer';
   title: string;
   quantity?: number;
   button_icon?: React.ReactNode;
@@ -84,7 +84,7 @@ export const ComandaNotifications: React.FC = () => {
               </p>
             </div>
 
-            <div className='grid grid-cols-2 gap-[4px]'>
+            <div className='grid grid-cols-2 gap-[4px] shrink-0'>
               <Button
                 variant='notification_primary'
                 text={

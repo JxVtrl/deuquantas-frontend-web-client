@@ -3,14 +3,13 @@ import { ActionItem, actions } from '@/data/actions';
 import {
   contaNavigationPills,
   customerNavigationPills,
-  menuNavigationPills,
   NavigationPill,
 } from '@/data/home_navigation_pills';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { useComanda } from '@/contexts/ComandaContext';
-import { MenuService } from '@/services/menu.service';
 import { capitalize } from '@/utils/formatters';
+import { toast } from 'react-hot-toast';
 
 export const useNavigation = () => {
   const router = useRouter();
@@ -54,7 +53,7 @@ export const useNavigation = () => {
     setActionItems(items);
   };
 
-  const { tipo, setTipo, menu } = useComanda();
+  const { tipo, setTipo, menu, itensInCart } = useComanda();
 
   const checkNavPills = async () => {
     let list = customerNavigationPills;
@@ -105,6 +104,10 @@ export const useNavigation = () => {
     // se nao exisir uma comanda ativa, ele vai para o qr code
     if (!comanda) {
       router.push('/qr-code');
+    }
+
+    if (router.pathname.includes('/conta/menu') && itensInCart.length <= 0) {
+      // TODO: ABRIR O TOAST DE OPS! SELECIONE UM ITEM...
     }
   };
 
