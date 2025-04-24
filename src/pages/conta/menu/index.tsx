@@ -14,7 +14,7 @@ const MenuDaConta: React.FC = () => {
   const { comanda, setSelectedItem, clearCart, setItensInCart } = useComanda();
   const router = useRouter();
   const [menu, setMenu] = useState<any[]>([]);
-
+  const [tipo, setTipo] = useState<string | null>(null);
   const getMenu = async (cnpj: string) => {
     try {
       const itens = await MenuService.getItensByEstabelecimento(cnpj);
@@ -37,6 +37,16 @@ const MenuDaConta: React.FC = () => {
       router.push('/home');
     }
   }, [comanda]);
+
+  useEffect(() => {
+    const type = router.query.tipo;
+
+    if (type === tipo) {
+      setTipo(null);
+    } else {
+      setTipo(type as string);
+    }
+  }, [router.query.tipo]);
 
   return (
     <Layout>

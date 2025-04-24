@@ -193,7 +193,7 @@ const CustomerQrCode: React.FC = () => {
 
   return (
     <Layout>
-      <div className='flex flex-col items-center justify-center min-h-screen p-4'>
+      <div className='flex flex-col items-center mt-[10vh] min-h-screen p-4'>
         {error && (
           <div className='mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded'>
             {error}

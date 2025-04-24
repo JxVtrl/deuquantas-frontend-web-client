@@ -89,8 +89,9 @@ export const NavigationPills: React.FC<{
       <div
         style={{
           gap: hasArrowBack ? 6 : 16,
+          borderBottom: hasArrowBack ? 'none' : '1px solid #F0F0F0',
         }}
-        className='my-[20px] px-[16px] flex overflow-x-auto border-b border-[#F0F0F0]'
+        className='my-[20px] px-[16px] flex overflow-x-auto'
       >
         {navigationPills.map((pill) => (
           <Pill key={pill.label} {...pill} hasArrowBack={hasArrowBack} />

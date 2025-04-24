@@ -9,6 +9,8 @@ import {
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { useComanda } from '@/contexts/ComandaContext';
+import { MenuService } from '@/services/menu.service';
+import { capitalize } from '@/utils/formatters';
 
 export const useNavigation = () => {
   const router = useRouter();
@@ -52,14 +54,33 @@ export const useNavigation = () => {
     setActionItems(items);
   };
 
-  const checkNavPills = () => {
+
+  const getMenu = async (cnpj: string) => {
+    try {
+      const itens = await MenuService.getItensByEstabelecimento(cnpj);
+      return itens;
+    } catch (error) {
+      console.error(error);
+      return [];
+    }
+  };
+
+  const checkNavPills = async () => {
     let list = customerNavigationPills;
 
     if (isConta) {
       list = contaNavigationPills;
 
       if (isMenu) {
-        list = menuNavigationPills;
+        const itens = await getMenu(comanda?.num_cnpj || '');
+        const tipos = itens.map((item) => item.tipo);
+        const tiposUnicos = Array.from(new Set(tipos));
+        list = tiposUnicos.map((tipo) => ({
+          label: capitalize(tipo),
+          onClick: () => {
+            router.push(`/conta/menu?tipo=${tipo}`);
+          },
+        }));
       }
     }
 
