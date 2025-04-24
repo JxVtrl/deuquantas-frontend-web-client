@@ -28,71 +28,77 @@ export const ComandaValueChart: React.FC = () => {
         height: '100%',
       }}
     >
-      {/* Gráfico circular */}
-      <svg
-        width={(200 / 2 + 6) * 2}
-        height={(200 / 2 + 6) * 2}
-        className='transform -rotate-90'
-      >
-        {/* Círculo de fundo */}
-        <circle
-          cx={200 / 2 + 6}
-          cy={200 / 2 + 6}
-          r={200 / 2}
-          fill='none'
-          stroke='#F0F0F0'
-          strokeWidth={6}
-        />
-        {/* Círculo de progresso */}
-        <circle
-          cx={200 / 2 + 6}
-          cy={200 / 2 + 6}
-          r={200 / 2}
-          fill='none'
-          stroke='#FFCC00'
-          strokeWidth={6}
-          strokeDasharray={2 * Math.PI * (200 / 2)}
-          strokeDashoffset={
-            2 * Math.PI * (200 / 2) -
-            (percentage / 100) * (2 * Math.PI * (200 / 2))
-          }
-          strokeLinecap='round'
-        />
-      </svg>
+      <div className='transform translate-x-[-15,00,%] sm:translate-x-0'>
 
-      {/* Conteúdo central */}
-      <div className='absolute inset-0 flex flex-col items-center justify-center h-full'>
-        <div className='text-center'>
-          <p className='text-[12px] text-[#272727]'>
-            R$
-            <br />
-            Meu consumo
-          </p>
-          <p className='text-[40px] font-[700] leading-[40px] my-[8px]'>
-            {currencyFormatter(consumo_user, {
-              noPrefix: true,
-            })}
-          </p>
-          <svg
-            width='132'
-            height='2'
-            viewBox='0 0 132 2'
+        {/* Gráfico circular */}
+        <svg
+          width={(200 / 2 + 6) * 2}
+          height={(200 / 2 + 6) * 2}
+          className='transform -rotate-90'
+        >
+          {/* Círculo de fundo */}
+          <circle
+            cx={200 / 2 + 6}
+            cy={200 / 2 + 6}
+            r={200 / 2}
             fill='none'
-            xmlns='http://www.w3.org/2000/svg'
-          >
-            <line y1='1' x2='132' y2='1' stroke='black' stroke-opacity='0.1' />
-          </svg>
+            stroke='#F0F0F0'
+            strokeWidth={6}
+          />
+          {/* Círculo de progresso */}
+          <circle
+            cx={200 / 2 + 6}
+            cy={200 / 2 + 6}
+            r={200 / 2}
+            fill='none'
+            stroke='#FFCC00'
+            strokeWidth={6}
+            strokeDasharray={2 * Math.PI * (200 / 2)}
+            strokeDashoffset={
+              2 * Math.PI * (200 / 2) -
+              (percentage / 100) * (2 * Math.PI * (200 / 2))
+            }
+            strokeLinecap='round'
+          />
+        </svg>
 
-          <p className='text-[10px] text-[#272727] font-[500] leading-[10px] my-[8px]'>
-            Total
-          </p>
-          <p className='text-[28px] text-[#27272799] font-[700] leading-[32px]'>
-            {currencyFormatter(consumo_total, {
-              noPrefix: true,
-            })}
-          </p>
+        {/* Conteúdo central */}
+        <div className='
+     
+      absolute inset-0 flex flex-col items-center justify-center h-full'>
+          <div className='text-center'>
+            <p className='text-[12px] text-[#272727]'>
+              R$
+              <br />
+              Meu consumo
+            </p>
+            <p className='text-[40px] font-[700] leading-[40px] my-[8px]'>
+              {currencyFormatter(consumo_user, {
+                noPrefix: true,
+              })}
+            </p>
+            <svg
+              width='132'
+              height='2'
+              viewBox='0 0 132 2'
+              fill='none'
+              xmlns='http://www.w3.org/2000/svg'
+            >
+              <line y1='1' x2='132' y2='1' stroke='black' stroke-opacity='0.1' />
+            </svg>
+
+            <p className='text-[10px] text-[#272727] font-[500] leading-[10px] my-[8px]'>
+              Total
+            </p>
+            <p className='text-[28px] text-[#27272799] font-[700] leading-[32px]'>
+              {currencyFormatter(consumo_total, {
+                noPrefix: true,
+              })}
+            </p>
+          </div>
         </div>
       </div>
+
 
       <div className='absolute top-0 right-0 flex flex-col gap-[10px]'>
         {/* Informações adicionais */}
