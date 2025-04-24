@@ -54,7 +54,6 @@ export const useNavigation = () => {
     setActionItems(items);
   };
 
-
   const getMenu = async (cnpj: string) => {
     try {
       const itens = await MenuService.getItensByEstabelecimento(cnpj);

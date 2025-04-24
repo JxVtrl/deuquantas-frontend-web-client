@@ -97,10 +97,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         },
         cliente: decodedToken.hasCliente
           ? {
-            num_cpf: response.num_cpf,
-            num_celular: response.num_celular,
-            data_nascimento: response.data_nascimento,
-          }
+              num_cpf: response.num_cpf,
+              num_celular: response.num_celular,
+              data_nascimento: response.data_nascimento,
+            }
           : undefined,
       };
 
