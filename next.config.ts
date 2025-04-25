@@ -1,4 +1,5 @@
 import type { NextConfig } from 'next';
+import path from 'path';
 
 const isDocker = process.env.NEXT_PUBLIC_DOCKER_ENV === 'true';
 
@@ -11,6 +12,18 @@ const nextConfig: NextConfig = {
     ignoreDuringBuilds: false,
   },
   devIndicators: false,
+  transpilePackages: ['@deuquantas/components'],
+  webpack: (config, { isServer }) => {
+    // Configuração para resolver o React corretamente
+    if (!isServer) {
+      config.resolve.alias = {
+        ...config.resolve.alias,
+        'react': path.resolve('./node_modules/react'),
+        'react-dom': path.resolve('./node_modules/react-dom'),
+      };
+    }
+    return config;
+  },
   async rewrites() {
     return [
       {
