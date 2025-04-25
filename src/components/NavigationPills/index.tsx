@@ -1,5 +1,5 @@
 import { useNavigation } from '@/hooks/useNavigation';
-import { MaxWidthWrapper } from '@deuquantas/components';
+import { MaxWidthWrapper, CustomSwiper } from '@deuquantas/components';
 import { useRouter } from 'next/router';
 import React from 'react';
 
@@ -88,14 +88,15 @@ export const NavigationPills: React.FC<{
       )}
       <div
         style={{
-          gap: hasArrowBack ? 6 : 16,
           borderBottom: hasArrowBack ? 'none' : '1px solid #F0F0F0',
+          marginTop: 16,
         }}
-        className='my-[20px] px-[16px] flex overflow-x-auto'
       >
-        {navigationPills.map((pill) => (
-          <Pill key={pill.label} {...pill} hasArrowBack={hasArrowBack} />
-        ))}
+        <CustomSwiper gap={hasArrowBack ? 6 : 16} style={{ padding: '6px 16px 16px' }} showArrows={false}>
+          {navigationPills.map((pill) => (
+            <Pill key={pill.label} {...pill} hasArrowBack={hasArrowBack} />
+          ))}
+        </CustomSwiper>
       </div>
     </div>
   );

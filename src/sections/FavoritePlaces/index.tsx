@@ -17,10 +17,10 @@ export const FavoritePlaces = () => {
 
   return (
     <>
-      <MaxWidthWrapper>
+      <MaxWidthWrapper backgroundColor="transparent" style={{}} styleContent={{}}>
         <Title title='Locais favoritos' />
-        <ActionRounded places={places} />
       </MaxWidthWrapper>
+      <ActionRounded places={places} />
     </>
   );
 };
