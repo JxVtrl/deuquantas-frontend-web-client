@@ -5,7 +5,7 @@ WORKDIR /app
 # Copiar arquivos de configuração
 COPY frontend-web-client/package*.json ./
 COPY frontend-web-client/next.config.js ./
-COPY frontend-web-client/tsconfig*.json ./
+COPY frontend-web-client/tsconfig.json ./
 COPY frontend-web-client/.env.development ./.env
 
 # Instalar dependências
@@ -24,7 +24,7 @@ WORKDIR /app
 # Copiar arquivos de configuração
 COPY frontend-web-client/package*.json ./
 COPY frontend-web-client/next.config.js ./
-COPY frontend-web-client/tsconfig*.json ./
+COPY frontend-web-client/tsconfig.json ./
 COPY frontend-web-client/.env.production ./.env
 
 # Instalar apenas dependências de produção
