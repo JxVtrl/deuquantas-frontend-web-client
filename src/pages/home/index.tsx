@@ -45,9 +45,7 @@ const CustomerHome: React.FC = () => {
   return (
     <Layout>
       <NavigationPills />
-      <ActionSquared
-        actionItems={actionsResolved}
-      />
+      <ActionSquared actionItems={actionsResolved} />
       <FavoritePlaces />
       <PromotionSlider />
     </Layout>
