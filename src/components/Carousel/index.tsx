@@ -28,7 +28,7 @@ export const Carousel: React.FC<CarouselProps> = ({
       loop={loop}
       slidesOffsetBefore={slidesOffsetBefore}
       slidesOffsetAfter={slidesOffsetAfter}
-      onSlideChange={() => { }}
+      onSlideChange={() => {}}
       style={style}
     >
       {children}
