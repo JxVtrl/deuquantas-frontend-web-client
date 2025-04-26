@@ -1,4 +1,6 @@
+import { Carousel } from '@/components/Carousel';
 import { ActionRounded, MaxWidthWrapper, Title } from '@deuquantas/components';
+import { SwiperSlide } from 'swiper/react';
 
 interface Place {
   id: string;
@@ -17,10 +19,23 @@ export const FavoritePlaces = () => {
 
   return (
     <>
-      <MaxWidthWrapper backgroundColor="transparent" style={{}} styleContent={{}}>
+      <MaxWidthWrapper
+        backgroundColor='transparent'
+        style={{ marginBottom: 12 }}
+        styleContent={{}}
+      >
         <Title title='Locais favoritos' />
       </MaxWidthWrapper>
-      <ActionRounded places={places} />
+
+      <Carousel>
+        {places.map((place) => (
+          <SwiperSlide key={place.id} style={{
+            width: 'fit-content',
+          }}>
+            <ActionRounded {...place} />
+          </SwiperSlide>
+        ))}
+      </Carousel>
     </>
   );
 };

@@ -43,6 +43,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             text_variant={!establishmentName ? 'welcome' : 'on-establishment'}
             menuOpen={menuOpen}
             setMenuOpen={setMenuOpen}
+            onLogoClick={() => router.push('/home')}
           />
         </div>
         <div className='flex-1 overflow-y-auto relative'>

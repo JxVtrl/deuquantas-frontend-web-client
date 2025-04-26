@@ -11,6 +11,7 @@ export interface Item {
   data_criacao: Date;
   data_atualizacao: Date;
   estabelecimento_id: string;
+  quantidade?: number;
 }
 
 export class MenuService {

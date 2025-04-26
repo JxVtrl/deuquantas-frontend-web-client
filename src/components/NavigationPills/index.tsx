@@ -1,7 +1,9 @@
 import { useNavigation } from '@/hooks/useNavigation';
-import { MaxWidthWrapper, CustomSwiper } from '@deuquantas/components';
 import { useRouter } from 'next/router';
 import React from 'react';
+import { SwiperSlide } from 'swiper/react';
+import { Swiper } from 'swiper/react';
+import { Carousel } from '../Carousel';
 
 interface NavigationPill {
   label: string;
@@ -89,14 +91,23 @@ export const NavigationPills: React.FC<{
       <div
         style={{
           borderBottom: hasArrowBack ? 'none' : '1px solid #F0F0F0',
-          marginTop: 16,
+          marginTop: 20,
         }}
       >
-        <CustomSwiper gap={hasArrowBack ? 6 : 16} style={{ padding: '6px 16px 16px' }} showArrows={false}>
+        <Carousel
+          slidesPerView={'auto'}
+          style={{
+            padding: '6px 0 12px',
+          }}
+        >
           {navigationPills.map((pill) => (
-            <Pill key={pill.label} {...pill} hasArrowBack={hasArrowBack} />
+            <SwiperSlide key={pill.label} style={{
+              width: 'fit-content',
+            }}>
+              <Pill  {...pill} hasArrowBack={hasArrowBack} />
+            </SwiperSlide>
           ))}
-        </CustomSwiper>
+        </Carousel>
       </div>
     </div>
   );
