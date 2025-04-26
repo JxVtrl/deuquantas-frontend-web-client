@@ -8,6 +8,7 @@ import Image from 'next/image';
 import { MaxWidthWrapper } from '@deuquantas/components';
 import { capitalize, currencyFormatter } from '@/utils/formatters';
 import { CartDrawer } from '@/components/CartDrawer';
+import { NavigationPill } from '@/data/home_navigation_pills';
 
 const MenuDaConta: React.FC = () => {
   const {
@@ -18,6 +19,7 @@ const MenuDaConta: React.FC = () => {
     menu,
     getMenu,
     estabelecimento,
+    setTipo
   } = useComanda();
   const [filteredMenu, setFilteredMenu] = useState<Item[]>([]);
 
@@ -38,13 +40,34 @@ const MenuDaConta: React.FC = () => {
       setFilteredMenu(menu);
     }
   }, [tipo]);
+  const [navigationPills, setNavigationPills] = useState<NavigationPill[]>([]);
+
+  useEffect(() => {
+    const tipos = menu.map((item) => item.tipo);
+    const tiposUnicos = Array.from(new Set(tipos));
+    const list = tiposUnicos.map((type) => {
+      return {
+        label: capitalize(type),
+        isActive: type === tipo,
+        onClick: () => {
+          if (type === tipo) {
+            setTipo(null);
+          } else {
+            setTipo(type);
+          }
+        },
+      };
+    });
+
+    setNavigationPills(list);
+  }, []);
 
   return (
     <Layout>
-      <NavigationPills hasArrowBack />
+      <NavigationPills navigationPills={navigationPills} hasArrowBack />
 
       <MaxWidthWrapper style={{ paddingBottom: '96px' }}>
-        <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-x-[16px] gap-y-[12px]'>
+        <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-x-[16px] gap-y-[12px] p-[10px]'>
           {filteredMenu.map((item) => (
             <div
               key={item.id}

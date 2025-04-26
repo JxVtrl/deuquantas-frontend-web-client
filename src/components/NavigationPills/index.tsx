@@ -4,6 +4,7 @@ import React from 'react';
 import { SwiperSlide } from 'swiper/react';
 import { Swiper } from 'swiper/react';
 import { Carousel } from '../Carousel';
+import { MaxWidthWrapper } from '@deuquantas/components';
 
 interface NavigationPill {
   label: string;
@@ -43,9 +44,9 @@ const Pill: React.FC<NavigationPill> = ({
 );
 
 export const NavigationPills: React.FC<{
+  navigationPills: NavigationPill[];
   hasArrowBack?: boolean;
-}> = ({ hasArrowBack = false }) => {
-  const { navigationPills } = useNavigation();
+}> = ({ navigationPills, hasArrowBack = false }) => {
   const router = useRouter();
   return (
     <div
@@ -55,40 +56,41 @@ export const NavigationPills: React.FC<{
       }}
     >
       {hasArrowBack && (
-        <div
-          onClick={() => {
-            router.back();
-          }}
-          style={{
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 8,
-            borderBottom: '1px solid #F0F0F0',
-            paddingBottom: 12,
-            paddingTop: 6,
-            marginTop: 20,
-            marginLeft: 16,
-          }}
-        >
-          <svg
-            width='17'
-            height='16'
-            viewBox='0 0 17 16'
-            fill='none'
-            xmlns='http://www.w3.org/2000/svg'
+        <MaxWidthWrapper>
+          <div
+            onClick={() => {
+              router.back();
+            }}
+            style={{
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              borderBottom: '1px solid #F0F0F0',
+              paddingBottom: 12,
+              paddingTop: 6,
+              marginTop: 20,
+            }}
           >
-            <path
-              d='M4.325 9L9.925 14.6L8.5 16L0.5 8L8.5 0L9.925 1.4L4.325 7H16.5V9H4.325Z'
-              fill='#1D1B20'
-            />
-          </svg>
-          <p className='text-[14px] leading-[140%] font-bold text-center'>
-            Painel
-          </p>
-        </div>
+            <svg
+              width='17'
+              height='16'
+              viewBox='0 0 17 16'
+              fill='none'
+              xmlns='http://www.w3.org/2000/svg'
+            >
+              <path
+                d='M4.325 9L9.925 14.6L8.5 16L0.5 8L8.5 0L9.925 1.4L4.325 7H16.5V9H4.325Z'
+                fill='#1D1B20'
+              />
+            </svg>
+            <p className='text-[14px] leading-[140%] font-bold text-center'>
+              Painel
+            </p>
+          </div>
+        </MaxWidthWrapper>
       )}
-      <div
+      <MaxWidthWrapper
         style={{
           borderBottom: hasArrowBack ? 'none' : '1px solid #F0F0F0',
           marginTop: 20,
@@ -97,8 +99,11 @@ export const NavigationPills: React.FC<{
         <Carousel
           slidesPerView={'auto'}
           style={{
-            padding: '6px 0 12px',
+            padding: hasArrowBack ? '0 0 20px' : '6px 0 12px',
           }}
+          slidesOffsetBefore={0}
+          slidesOffsetAfter={0}
+          spaceBetween={hasArrowBack ? 6 : 8}
         >
           {navigationPills.map((pill) => (
             <SwiperSlide
@@ -111,7 +116,7 @@ export const NavigationPills: React.FC<{
             </SwiperSlide>
           ))}
         </Carousel>
-      </div>
+      </MaxWidthWrapper>
     </div>
   );
 };

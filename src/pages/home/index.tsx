@@ -6,11 +6,12 @@ import { PromotionSlider } from '@/sections/Promotions';
 import { FavoritePlaces } from '@/sections/FavoritePlaces';
 import { ActionsHome } from '@/sections/ActionsHome';
 import { OpenComandas } from '@/sections/OpenComandas';
+import { customerNavigationPills } from '@/data/home_navigation_pills';
 
 const CustomerHome: React.FC = () => {
   return (
     <Layout>
-      <NavigationPills />
+      <NavigationPills navigationPills={customerNavigationPills} />
       <ActionsHome />
       <OpenComandas />
       <FavoritePlaces />

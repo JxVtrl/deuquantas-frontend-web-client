@@ -10,6 +10,7 @@ import {
   ComandaNotifications,
   ComandaPayButton,
 } from '@/components/Comanda';
+import { contaNavigationPills } from '@/data/home_navigation_pills';
 
 const ComandaPage = () => {
   const router = useRouter();
@@ -45,7 +46,7 @@ const ComandaPage = () => {
 
   return (
     <Layout>
-      <NavigationPills />
+      <NavigationPills navigationPills={contaNavigationPills} />
       <ComandaButtons />
       <ComandaValueChart />
       <ComandaNotifications />

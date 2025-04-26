@@ -21,7 +21,7 @@ export const OpenComandas: React.FC = () => {
 
   const handleCardClick = () => {
     if (comanda) {
-      router.push(`/conta/comanda`);
+      router.push(`/conta/comanda/${comanda.id}`);
     }
   };
 

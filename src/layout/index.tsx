@@ -10,9 +10,11 @@ import {
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { useComanda } from '@/contexts/ComandaContext';
+import { CartEmptyError } from '@/components/CartEmptyError';
+
 export default function Layout({ children }: { children: React.ReactNode }) {
-  const { bottomNavItems, handleAddClick } = useNavigation();
-  const { estabelecimento, itensInCart } = useComanda();
+  const { bottomNavItems } = useNavigation();
+  const { estabelecimento, handleAddClick, isNavigationButtonDisabled } = useComanda();
   const { user, logout } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
   const router = useRouter();
@@ -29,12 +31,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     }
   }, [router.pathname, estabelecimento]);
 
-  const isButtonDisabled =
-    itensInCart.length <= 0 && router.pathname.includes('/conta/menu');
-
   return (
     <>
-      <div className='flex flex-col h-screen fixed inset-0 '>
+      <div className='flex flex-col h-screen fixed inset-0'>
         <div className='flex-none'>
           <StatusBar variant='client' />
           <Header
@@ -47,7 +46,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           />
         </div>
         <div className='flex-1 overflow-y-auto relative'>
-          <div className='absolute inset-0 overflow-y-auto'>{children}</div>
+          <div className='absolute inset-0 overflow-y-auto'>
+            {children}
+            <CartEmptyError />
+          </div>
         </div>
         <div className='flex-none'>
           <NavigationMenu
@@ -72,7 +74,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           <Navigation
             items={bottomNavItems}
             onAddClick={handleAddClick}
-            disableButton={isButtonDisabled}
+            disableButton={isNavigationButtonDisabled}
           />
         </div>
       </div>
