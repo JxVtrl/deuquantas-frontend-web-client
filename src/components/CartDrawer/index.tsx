@@ -9,7 +9,13 @@ import { useNavigation } from '@/hooks/useNavigation';
 export const CartDrawer = () => {
   const [quantidade, setQuantidade] = useState(1);
   const [total, setTotal] = useState(0);
-  const { clearCart, selectedItem, itensInCart, setItensInCart, handleAddClick } = useComanda();
+  const {
+    clearCart,
+    selectedItem,
+    itensInCart,
+    setItensInCart,
+    handleAddClick,
+  } = useComanda();
   const { bottomNavItems } = useNavigation();
 
   useEffect(() => {
