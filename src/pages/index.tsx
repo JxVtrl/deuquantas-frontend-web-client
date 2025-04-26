@@ -50,9 +50,12 @@ export default function Home() {
       {/* Header */}
       <header className='fixed top-0 left-0 right-0 z-50 transition-all duration-300 py-4 px-6 bg-white/80 backdrop-blur-md shadow-sm dark:bg-black/80'>
         <div className='container mx-auto flex items-center justify-between'>
-          <Logo size='medium' onClick={() => {
-            router.push('/home');
-          }} />
+          <Logo
+            size='medium'
+            onClick={() => {
+              router.push('/home');
+            }}
+          />
 
           <nav className='hidden md:flex items-center space-x-8'>
             {['Início', 'Funcionalidades', 'Como Funciona', 'Contato'].map(

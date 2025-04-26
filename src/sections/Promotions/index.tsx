@@ -49,7 +49,6 @@ export const PromotionSlider: React.FC = () => {
             width: '100%',
             position: 'relative',
           }}
-
         >
           <Image
             src={promotion.image}
@@ -59,8 +58,7 @@ export const PromotionSlider: React.FC = () => {
             className='absolute top-0 left-0 w-full h-full z-[-1]'
           />
         </SwiperSlide>
-      ))
-      }
-    </Carousel >
+      ))}
+    </Carousel>
   );
 };

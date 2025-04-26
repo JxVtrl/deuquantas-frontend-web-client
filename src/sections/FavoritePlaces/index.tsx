@@ -29,9 +29,12 @@ export const FavoritePlaces = () => {
 
       <Carousel>
         {places.map((place) => (
-          <SwiperSlide key={place.id} style={{
-            width: 'fit-content',
-          }}>
+          <SwiperSlide
+            key={place.id}
+            style={{
+              width: 'fit-content',
+            }}
+          >
             <ActionRounded {...place} />
           </SwiperSlide>
         ))}

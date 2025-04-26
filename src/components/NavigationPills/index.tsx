@@ -101,10 +101,13 @@ export const NavigationPills: React.FC<{
           }}
         >
           {navigationPills.map((pill) => (
-            <SwiperSlide key={pill.label} style={{
-              width: 'fit-content',
-            }}>
-              <Pill  {...pill} hasArrowBack={hasArrowBack} />
+            <SwiperSlide
+              key={pill.label}
+              style={{
+                width: 'fit-content',
+              }}
+            >
+              <Pill {...pill} hasArrowBack={hasArrowBack} />
             </SwiperSlide>
           ))}
         </Carousel>
