@@ -53,11 +53,13 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
   const getMenu = async (cnpj: string) => {
     try {
       const itens = await MenuService.getItensByEstabelecimento(cnpj);
-      setMenu(itens.map((item) => ({
-        ...item,
-        quantidade: 0,
-        descricao: item.descricao || '',
-      })));
+      setMenu(
+        itens.map((item) => ({
+          ...item,
+          quantidade: 0,
+          descricao: item.descricao || '',
+        })),
+      );
     } catch (error) {
       console.error(error);
     }

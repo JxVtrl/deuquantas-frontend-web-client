@@ -7,7 +7,7 @@ import React, { useEffect } from 'react';
 import { currencyFormatter } from '@/utils/formatters';
 
 export const OpenComandas: React.FC = () => {
-  const { user, } = useAuth();
+  const { user } = useAuth();
   const { fetchComandaAtiva, comanda, estabelecimento } = useComanda();
   const router = useRouter();
 
