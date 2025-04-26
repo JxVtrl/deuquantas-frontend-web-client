@@ -28,10 +28,7 @@ export const Carousel: React.FC<CarouselProps> = ({
       loop={loop}
       slidesOffsetBefore={slidesOffsetBefore}
       slidesOffsetAfter={slidesOffsetAfter}
-      onSlideChange={() => {}}
-      onSwiper={(swiper) => {
-        console.log(swiper);
-      }}
+      onSlideChange={() => { }}
       style={style}
     >
       {children}
