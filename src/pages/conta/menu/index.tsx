@@ -19,7 +19,7 @@ const MenuDaConta: React.FC = () => {
     menu,
     getMenu,
     estabelecimento,
-    setTipo
+    setTipo,
   } = useComanda();
   const [filteredMenu, setFilteredMenu] = useState<Item[]>([]);
 

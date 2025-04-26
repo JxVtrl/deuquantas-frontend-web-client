@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  useEffect,
+} from 'react';
 import { toast } from 'react-hot-toast';
 import { RegisterFormData } from '@/interfaces/register';
 import { ComandaService, ComandaResponse } from '@/services/comanda.service';
@@ -135,7 +141,8 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
     setSelectedItem(null);
   }, []);
 
-  const [isNavigationButtonDisabled, setIsNavigationButtonDisabled] = useState(false);
+  const [isNavigationButtonDisabled, setIsNavigationButtonDisabled] =
+    useState(false);
   const [isCartEmptyErrorOpen, setIsCartEmptyErrorOpen] = useState(false);
 
   const handleAddClick = () => {

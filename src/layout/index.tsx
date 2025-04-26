@@ -14,7 +14,8 @@ import { CartEmptyError } from '@/components/CartEmptyError';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const { bottomNavItems } = useNavigation();
-  const { estabelecimento, handleAddClick, isNavigationButtonDisabled } = useComanda();
+  const { estabelecimento, handleAddClick, isNavigationButtonDisabled } =
+    useComanda();
   const { user, logout } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
   const router = useRouter();
