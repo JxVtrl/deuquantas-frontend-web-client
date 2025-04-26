@@ -10,12 +10,15 @@ import { capitalize, currencyFormatter } from '@/utils/formatters';
 import { CartDrawer } from '@/components/CartDrawer';
 
 const MenuDaConta: React.FC = () => {
-  const { setSelectedItem, clearCart, setItensInCart, tipo, menu } =
+  const { setSelectedItem, clearCart, setItensInCart, tipo, menu, getMenu, estabelecimento } =
     useComanda();
   const [filteredMenu, setFilteredMenu] = useState<Item[]>([]);
 
   useEffect(() => {
     clearCart();
+    if (estabelecimento?.num_cnpj) {
+      getMenu(estabelecimento?.num_cnpj);
+    }
   }, []);
 
   useEffect(() => {

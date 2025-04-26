@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { capitalize, currencyFormatter } from '@/utils/formatters';
 import { Counter } from '../Counter';
-import { DialogDescription, DialogTitle } from '../ui/dialog';
 import { Navigation, Drawer } from '@deuquantas/components';
 import { useNavigation } from '@/hooks/useNavigation';
 
@@ -70,12 +69,12 @@ export const CartDrawer = () => {
           height={100}
         />
         <div>
-          <DialogTitle className='text-[12px] font-[600] leading-[24px] tracking-[0.5px] text-[#000000]'>
+          <h1 className='text-[12px] font-[600] leading-[24px] tracking-[0.5px] text-[#000000]'>
             {capitalize(selectedItem?.nome || '')}
-          </DialogTitle>
-          <DialogDescription className='text-[12px] font-[400] leading-[16px] tracking-[0.5px] text-[#000000]'>
+          </h1>
+          <p className='text-[12px] font-[400] leading-[16px] tracking-[0.5px] text-[#000000]'>
             {selectedItem?.descricao || ''}
-          </DialogDescription>
+          </p>
           <p className='text-[14px] font-[600] leading-[16px] tracking-[0.5px] text-[#272727]'>
             {currencyFormatter(total || 0)}
           </p>

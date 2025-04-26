@@ -7,8 +7,8 @@ import React, { useEffect } from 'react';
 import { currencyFormatter } from '@/utils/formatters';
 
 export const OpenComandas: React.FC = () => {
-  const { user } = useAuth();
-  const { fetchComandaAtiva, comanda } = useComanda();
+  const { user, } = useAuth();
+  const { fetchComandaAtiva, comanda, estabelecimento } = useComanda();
   const router = useRouter();
 
   const checkComandaAtiva = async () => {
@@ -37,15 +37,15 @@ export const OpenComandas: React.FC = () => {
           onClick={handleCardClick}
         >
           <div className='flex items-start justify-between'>
-            <div className='flex items-center gap-3'>
+            <div className='flex items-center gap-2'>
               <div className='p-2 bg-[#F5F5F5] rounded-full'>
                 <ReceiptIcon />
               </div>
               <div>
-                <h2 className='text-[16px] font-[600] text-[#272727] leading-[24px]'>
-                  Comanda {comanda.id}
+                <h2 className='text-[14px] font-[600] text-[#272727] leading-[24px]'>
+                  {estabelecimento?.nome_estab}
                 </h2>
-                <p className='text-[14px] font-[400] text-[#666666] leading-[20px]'>
+                <p className='text-[12px] font-[400] text-[#666666] leading-[20px]'>
                   Mesa {comanda.numMesa}
                 </p>
               </div>

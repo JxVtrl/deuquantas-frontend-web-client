@@ -29,6 +29,7 @@ interface ComandaContextData {
   setTipo: (tipo: string | null) => void;
   menu: Item[];
   setMenu: (menu: Item[]) => void;
+  getMenu: (cnpj: string) => Promise<void>;
 }
 
 const ComandaContext = createContext<ComandaContextData>(
@@ -52,10 +53,13 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
   const getMenu = async (cnpj: string) => {
     try {
       const itens = await MenuService.getItensByEstabelecimento(cnpj);
-      return itens;
+      setMenu(itens.map((item) => ({
+        ...item,
+        quantidade: 0,
+        descricao: item.descricao || '',
+      })));
     } catch (error) {
       console.error(error);
-      return [];
     }
   };
 
@@ -70,19 +74,9 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
         throw new Error('Comanda não encontrada');
       }
 
-      console.log('COMANDA', response.comanda);
-
       setComanda(response.comanda as Comanda);
       setEstabelecimento(response.estabelecimento);
-
-      const menuResponse = await getMenu(response.estabelecimento.num_cnpj);
-      setMenu(
-        menuResponse.map((item) => ({
-          ...item,
-          quantidade: 0,
-          descricao: item.descricao || '',
-        })),
-      );
+      await getMenu(response.estabelecimento.num_cnpj);
     } catch (err) {
       const message =
         err instanceof Error ? err.message : 'Erro ao carregar comanda';
@@ -153,6 +147,7 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
         setTipo,
         menu,
         setMenu,
+        getMenu,
       }}
     >
       {children}
