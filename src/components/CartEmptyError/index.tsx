@@ -32,9 +32,9 @@ export const CartEmptyError = () => {
             className='fixed inset-0 bg-black/50 z-[45] pointer-events-auto '
           />
           <motion.div
-            initial={{ y: '100%' }}
+            initial={{ y: '222px' }}
             animate={{ y: 0 }}
-            exit={{ y: '100%' }}
+            exit={{ y: '222px' }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
             className={`fixed bottom-[132px] left-0 right-0 bg-white p-6 rounded-[8px] z-[46] pointer-events-auto mx-[32px] flex flex-col gap-[12px]`}
           >
