@@ -162,15 +162,15 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
     }
 
     try {
-      const itensFormatados = itensInCart.map(item => ({
+      const itensFormatados = itensInCart.map((item) => ({
         id_item: item.id,
         quantidade: item.quantidade || 1,
-        observacao: item.observacao
+        observacao: item.observacao,
       }));
 
       await comandaService.adicionarItens({
         id_comanda: comanda.id,
-        itens: itensFormatados
+        itens: itensFormatados,
       });
 
       // Limpa o carrinho após adicionar os itens
