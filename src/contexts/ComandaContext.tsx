@@ -11,7 +11,6 @@ import { ComandaService, ComandaResponse } from '@/services/comanda.service';
 import { useAuth } from './AuthContext';
 import { Item, MenuService } from '@/services/menu.service';
 import { useRouter } from 'next/router';
-import { comandaService } from '@/services/api/comanda';
 
 interface ComandaContextData {
   comanda: ComandaResponse | null;
@@ -180,7 +179,7 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
         observacao: item.observacao,
       }));
 
-      await comandaService.adicionarItens({
+      await ComandaService.adicionarItens({
         id_comanda: comanda.id,
         id_cliente: user.usuario.id,
         itens: itensFormatados,

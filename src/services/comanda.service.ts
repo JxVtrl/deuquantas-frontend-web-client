@@ -69,6 +69,18 @@ interface GetComandaResponse {
   estabelecimento: RegisterFormData;
 }
 
+export interface Solicitacao {
+  id: string;
+  comanda: {
+    id: string;
+    numero: string;
+  };
+  estabelecimento: {
+    nome: string;
+  };
+  status: 'PENDENTE' | 'ACEITA' | 'RECUSADA';
+}
+
 export const ComandaService = {
   async getComandaAtivaByCpf(num_cpf: string): Promise<ComandaResponse | null> {
     try {
@@ -106,7 +118,7 @@ export const ComandaService = {
     dto: AdicionarItensComandaDto,
   ): Promise<ComandaResponse> {
     try {
-      const response = await api.post('/comandas/adicionar-itens', dto);
+      const response = await api.post('/comandas/itens', dto);
       return response.data;
     } catch (error) {
       console.error('Erro ao adicionar itens à comanda:', error);
@@ -118,7 +130,7 @@ export const ComandaService = {
     dto: AdicionarClienteComandaDto,
   ): Promise<ComandaResponse> {
     try {
-      const response = await api.post('/comandas/adicionar-cliente', dto);
+      const response = await api.post('/comandas/pessoas', dto);
       return response.data;
     } catch (error) {
       console.error('Erro ao adicionar cliente à comanda:', error);
@@ -147,6 +159,35 @@ export const ComandaService = {
       return response.data;
     } catch (error) {
       console.error('Erro ao listar clientes da comanda:', error);
+      throw error;
+    }
+  },
+
+  async getSolicitacoesPendentes(
+    id_usuario: string,
+  ): Promise<{ data: Solicitacao[] }> {
+    try {
+      const response = await api.get(
+        `/comandas/solicitacoes/pendentes/${id_usuario}`,
+      );
+      return response.data;
+    } catch (error) {
+      console.error('Erro ao buscar solicitações pendentes:', error);
+      throw error;
+    }
+  },
+
+  async responderSolicitacao(dto: {
+    id_solicitacao: string;
+    status: 'ACEITA' | 'RECUSADA';
+  }): Promise<void> {
+    try {
+      await api.post(
+        `/comandas/solicitacoes/${dto.id_solicitacao}/responder`,
+        dto,
+      );
+    } catch (error) {
+      console.error('Erro ao responder solicitação:', error);
       throw error;
     }
   },
