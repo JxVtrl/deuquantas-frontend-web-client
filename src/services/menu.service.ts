@@ -6,7 +6,7 @@ export interface Item {
   descricao: string;
   preco: number;
   quantidade: number;
-  categoria: string;
+  tipo: string;
   imagem?: string;
   observacao?: string;
 }

@@ -47,7 +47,7 @@ const MenuDaConta: React.FC = () => {
     const tiposUnicos = Array.from(new Set(tipos));
     const list = tiposUnicos.map((type) => {
       return {
-        label: capitalize(type),
+        label: capitalize(type || ''),
         isActive: type === tipo,
         onClick: () => {
           if (type === tipo) {
@@ -93,7 +93,7 @@ const MenuDaConta: React.FC = () => {
                 }}
               >
                 <Image
-                  src={item.img || '/products/beer.webp'}
+                  src={item.imagem || '/products/beer.webp'}
                   alt={item.nome}
                   layout='fill'
                   objectFit='cover'
@@ -101,10 +101,10 @@ const MenuDaConta: React.FC = () => {
               </div>
               <div className='flex flex-col gap-y-[4px] p-[4px]'>
                 <span className='text-[12px] font-[600] leading-[16px] tracking-[0.5px] text-[#000000]'>
-                  {capitalize(item.nome)}
+                  {capitalize(item.nome || '')}
                 </span>
                 <span className='text-[11px] font-[500] leading-[14px] tracking-[0.5px] text-[#000000]'>
-                  {currencyFormatter(item.preco)}
+                  {currencyFormatter(item.preco || 0)}
                 </span>
               </div>
             </div>
