@@ -68,14 +68,22 @@ export const ComandaHeader: React.FC = () => {
           </div>
         )}
       </div>
-      <div>
-        <div>
-          <span>TOTAL R$</span>
-          <span>{comanda?.conta?.valTotal}</span>
+      <div className='flex flex-col h-full items-end gap-[24px]'>
+        <div className='flex flex-row items-start gap-[10px]'>
+          <span className='text-[12px] leading-[12px] font-[700] text-[#27272799]'>
+            TOTAL R$
+          </span>
+          <span className='text-[28px] leading-[28px] font-[700] text-[#27272799]'>
+            {comanda?.conta?.valTotal}
+          </span>
         </div>
-        <div>
-          <span>Meu consumo</span>
-          <span>{comanda?.conta?.valTotal}</span>
+        <div className='flex flex-row items-start gap-[10px]'>
+          <span className='text-[10px] leading-[10px] font-[700] text-[#27272799]'>
+            Meu consumo
+          </span>
+          <span className='text-[20px] leading-[20px] font-[700] text-[#27272799]'>
+            {comanda?.conta?.valTotal}
+          </span>
         </div>
       </div>
     </MaxWidthWrapper>
