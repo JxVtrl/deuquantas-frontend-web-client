@@ -1,12 +1,18 @@
+import { useAuth } from '@/contexts/AuthContext';
 import { useComanda } from '@/contexts/ComandaContext';
+import { currencyFormatter } from '@/utils/formatters';
 import { Avatar, MaxWidthWrapper } from '@deuquantas/components';
 import React from 'react';
 
 export const ComandaHeader: React.FC = () => {
+  const { user } = useAuth();
   const { comanda } = useComanda();
 
   const pessoas = comanda?.pessoas;
-
+  const consumo_user =
+    pessoas?.find((pessoa) => {
+      return pessoa.id === user?.usuario.id;
+    })?.valor_total || 0;
   return (
     <MaxWidthWrapper
       style={{
@@ -74,7 +80,9 @@ export const ComandaHeader: React.FC = () => {
             TOTAL R$
           </span>
           <span className='text-[28px] leading-[28px] font-[700] text-[#27272799]'>
-            {comanda?.conta?.valTotal}
+            {currencyFormatter(comanda?.conta?.valTotal || 0, {
+              noPrefix: true,
+            })}
           </span>
         </div>
         <div className='flex flex-row items-start gap-[10px]'>
@@ -82,7 +90,7 @@ export const ComandaHeader: React.FC = () => {
             Meu consumo
           </span>
           <span className='text-[20px] leading-[20px] font-[700] text-[#27272799]'>
-            {comanda?.conta?.valTotal}
+            {currencyFormatter(consumo_user)}
           </span>
         </div>
       </div>

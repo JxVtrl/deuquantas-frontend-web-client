@@ -15,12 +15,12 @@ import { contaNavigationPills } from '@/data/home_navigation_pills';
 const ContaPage = () => {
   const router = useRouter();
   const { id } = router.query;
-  const { comanda, loading, error, fetchComanda } = useComanda();
+  const { comanda, loading, error, fetchComandaAtiva } = useComanda();
 
   useEffect(() => {
     if (!id) return;
-    fetchComanda(id as string);
-  }, [id, fetchComanda]);
+    fetchComandaAtiva();
+  }, [id, fetchComandaAtiva]);
 
   if (loading) {
     return (

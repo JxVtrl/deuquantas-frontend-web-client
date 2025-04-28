@@ -3,7 +3,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useComanda } from '@/contexts/ComandaContext';
 import { MaxWidthWrapper, ReceiptIcon } from '@deuquantas/components';
 import { useRouter } from 'next/navigation';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { currencyFormatter } from '@/utils/formatters';
 import { Button } from '@deuquantas/components';
 import { toast } from 'react-hot-toast';
@@ -23,22 +23,12 @@ interface Solicitacao {
 
 export const OpenComandas: React.FC = () => {
   const { user } = useAuth();
-  const { fetchComanda, comanda, estabelecimento } = useComanda();
+  const { fetchComandaAtiva, comanda, estabelecimento } = useComanda();
   const router = useRouter();
   const [solicitacoes, setSolicitacoes] = useState<Solicitacao[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const checkComandaAtiva = async () => {
-    if (!user?.usuario?.id) return;
-    const comanda = await ComandaService.getComandaAtivaByUsuarioId(
-      user.usuario.id,
-    );
-    if (comanda) {
-      await fetchComanda(comanda.id);
-    }
-  };
-
-  const fetchSolicitacoes = async () => {
+  const fetchSolicitacoes = useCallback(async () => {
     try {
       if (!user?.usuario?.id) return;
       const response = await ComandaService.getSolicitacoesPendentes(
@@ -51,7 +41,7 @@ export const OpenComandas: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user?.usuario?.id]);
 
   const handleResponderSolicitacao = async (
     id: string,
@@ -66,7 +56,7 @@ export const OpenComandas: React.FC = () => {
         `Solicitação ${status === 'ACEITA' ? 'aceita' : 'recusada'} com sucesso!`,
       );
       fetchSolicitacoes();
-      checkComandaAtiva();
+      fetchComandaAtiva();
     } catch (error) {
       console.error('Erro ao responder solicitação:', error);
       toast.error('Erro ao responder solicitação');
@@ -74,17 +64,18 @@ export const OpenComandas: React.FC = () => {
   };
 
   useEffect(() => {
-    checkComandaAtiva();
     fetchSolicitacoes();
+    fetchComandaAtiva();
 
-    // Configura o polling para buscar solicitações a cada 5 segundos
+    // Configura o polling para buscar solicitações a cada 30 segundos
     const intervalId = setInterval(() => {
       fetchSolicitacoes();
-    }, 5000);
+      fetchComandaAtiva();
+    }, 30000);
 
     // Limpa o intervalo quando o componente for desmontado
     return () => clearInterval(intervalId);
-  }, [user?.usuario?.id]);
+  }, [user?.usuario?.id, fetchComandaAtiva, fetchSolicitacoes]);
 
   if (loading) {
     return <div>Carregando...</div>;

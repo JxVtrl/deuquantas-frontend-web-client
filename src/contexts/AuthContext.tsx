@@ -11,17 +11,10 @@ import { RegisterData, LoginData, AuthService } from '@/services/auth.service';
 import { jwtDecode } from 'jwt-decode';
 import Cookies from 'js-cookie';
 import { api } from '@/lib/axios';
-import { User, UserJwt, Cliente } from '@/services/api/types';
+import { User, UserJwt } from '@/services/api/types';
 
 interface AuthContextData {
-  user: {
-    usuario: {
-      id: string;
-      name: string;
-      email: string;
-    };
-    cliente?: Cliente;
-  } | null;
+  user: User | null;
   loading: boolean;
   login: (data: LoginData) => Promise<void>;
   register: (data: RegisterData) => Promise<void>;
@@ -102,16 +95,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
           id: response.usuario.id,
           permission_level: decodedToken.permission_level || 1,
         },
-        cliente: decodedToken.hasCliente
-          ? {
-              num_cpf: response.num_cpf,
-              num_celular: response.num_celular,
-              data_nascimento: response.data_nascimento,
-            }
-          : undefined,
+        cliente: {
+          id: response.id,
+          num_cpf: response.num_cpf,
+          num_celular: response.num_celular,
+          data_nascimento: response.data_nascimento,
+        },
       };
-
-      console.log('Usuário processado:', usr);
 
       setUser(usr);
       return { success: true, user: usr };

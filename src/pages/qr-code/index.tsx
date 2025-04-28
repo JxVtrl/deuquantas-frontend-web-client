@@ -50,6 +50,8 @@ const CustomerQrCode: React.FC = () => {
         if (solicitacao.status === 'aprovado') {
           toast.success('Solicitação aprovada!');
 
+          console.log('user.usuario.id', user.usuario.id);
+
           // Buscar a comanda ativa após a aprovação
           const comanda = await ComandaService.getComandaAtivaByUsuarioId(
             user.usuario.id,
@@ -57,8 +59,10 @@ const CustomerQrCode: React.FC = () => {
 
           console.log('COMANDA ENCONTRADA', JSON.stringify(comanda, null, 2));
 
-          if (comanda?.id) {
-            router.push(`/conta/${comanda.id}`);
+          const firstComanda = comanda?.[0];
+
+          if (firstComanda) {
+            router.push(`/conta/${firstComanda.id}`);
           } else {
             toast.error('Erro ao buscar comanda ativa');
             setError('Erro ao buscar comanda. Tente novamente.');

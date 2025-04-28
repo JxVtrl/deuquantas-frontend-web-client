@@ -17,8 +17,6 @@ interface ComandaContextData {
   estabelecimento: RegisterFormData | null;
   loading: boolean;
   error: string | null;
-  fetchComanda: (id: string) => Promise<void>;
-  fetchComandaAtiva: () => Promise<string | null>;
   clearComanda: () => void;
   updateComanda: (data: Partial<ComandaResponse>) => void;
   selectedItem: Item | null;
@@ -38,16 +36,14 @@ interface ComandaContextData {
   handleAddClick: () => void;
   adicionarUsuario: (id_usuario: string) => Promise<void>;
   removerUsuario: (id_usuario: string) => Promise<void>;
-  clientes: {
+  pessoas: {
     id: string;
-    id_cliente: string;
+    nome: string;
     data_criacao: string;
-    cliente: {
-      id: string;
-      nome: string;
-      num_cpf: string;
-    };
+    valor_total: number;
   }[];
+  fetchComandaAtiva: () => Promise<void>;
+  fetchComandaAtivaId: () => Promise<ComandaResponse[] | null>;
 }
 
 const ComandaContext = createContext<ComandaContextData>(
@@ -68,7 +64,14 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
   const [tipo, setTipo] = useState<string | null>(null);
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
   const [menu, setMenu] = useState<Item[]>([]);
-  const [clientes, setClientes] = useState<ComandaContextData['clientes']>([]);
+  const [pessoas, setPessoas] = useState<
+    {
+      id: string;
+      nome: string;
+      data_criacao: string;
+      valor_total: number;
+    }[]
+  >([]);
 
   const getMenu = async (cnpj: string) => {
     try {
@@ -85,55 +88,46 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
-  const fetchComanda = useCallback(async (id: string) => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      const response = await ComandaService.getComandaById(id);
-
-      if (!response) {
-        throw new Error('Comanda não encontrada');
-      }
-
-      setComanda(response.comanda);
-      setEstabelecimento(response.estabelecimento);
-      await getMenu(response.estabelecimento.num_cnpj);
-    } catch (err) {
-      const message =
-        err instanceof Error ? err.message : 'Erro ao carregar comanda';
-      setError(message);
-      toast.error(message);
-    } finally {
-      setLoading(false);
+  const fetchComandaAtivaId = useCallback(async () => {
+    if (!user?.cliente?.num_cpf) {
+      console.error('CPF do usuário não encontrado');
+      return null;
     }
-  }, []);
+
+    const comandaAtivaId = await ComandaService.getComandaAtivaByUsuarioId(
+      user.usuario.id,
+    );
+
+    return comandaAtivaId;
+  }, [user?.cliente?.num_cpf, user?.usuario?.id]);
 
   const fetchComandaAtiva = useCallback(async () => {
     try {
-      if (!user?.cliente?.num_cpf) {
+      if (!user?.cliente?.num_cpf || !user?.usuario?.id) {
         console.error('CPF do usuário não encontrado');
-        return null;
+        return;
       }
-
-      console.log('user', user);
 
       setLoading(true);
       const comandaAtiva = await ComandaService.getComandaAtivaByUsuarioId(
         user.usuario.id,
       );
 
-      console.log('comandaAtiva', comandaAtiva);
+      const firstComandaAtiva = comandaAtiva?.[0];
 
-      if (comandaAtiva?.id) {
-        fetchComanda(comandaAtiva.id);
-        return comandaAtiva.id;
+      if (firstComandaAtiva) {
+        const response = await ComandaService.getComandaById(
+          firstComandaAtiva.id,
+        );
+
+        if (response) {
+          setComanda(response.comanda);
+          setEstabelecimento(response.estabelecimento);
+          await getMenu(response.estabelecimento.num_cnpj);
+        }
       }
-
-      return null;
     } catch (error) {
       console.error('Erro ao buscar comanda ativa:', error);
-      return null;
     } finally {
       setLoading(false);
     }
@@ -171,8 +165,8 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
       return;
     }
 
-    if (!user?.usuario?.id) {
-      toast.error('Usuário não encontrado');
+    if (!user?.cliente?.id) {
+      toast.error('Cliente não encontrado');
       return;
     }
 
@@ -185,7 +179,7 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
 
       await ComandaService.adicionarItens({
         id_comanda: comanda.id,
-        id_usuario: user.usuario.id,
+        id_cliente: user.cliente.id,
         itens: itensFormatados,
       });
 
@@ -193,7 +187,7 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
       setItensInCart([]);
 
       // Atualiza os dados da comanda
-      await fetchComanda(comanda.id);
+      await fetchComandaAtiva();
 
       // Redireciona para a página da comanda
       router.push(`/conta/${comanda.id}`);
@@ -221,7 +215,7 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
       });
 
       setComanda(response);
-      setClientes(response.clientes);
+      setPessoas(response.pessoas || []);
     } catch (error) {
       console.error('Erro ao adicionar cliente:', error);
       toast.error('Erro ao adicionar cliente à comanda');
@@ -237,7 +231,7 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
         id_usuario,
       );
       setComanda(response);
-      setClientes(response.clientes);
+      setPessoas(response.pessoas || []);
     } catch (error) {
       console.error('Erro ao remover cliente:', error);
       toast.error('Erro ao remover cliente da comanda');
@@ -246,7 +240,7 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
 
   useEffect(() => {
     if (comanda) {
-      setClientes(comanda.clientes);
+      setPessoas(comanda.pessoas || []);
     }
   }, [comanda]);
 
@@ -257,8 +251,6 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
         estabelecimento,
         loading,
         error,
-        fetchComanda,
-        fetchComandaAtiva,
         clearComanda,
         updateComanda,
         itensInCart,
@@ -278,7 +270,9 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
         handleAddClick,
         adicionarUsuario,
         removerUsuario,
-        clientes,
+        pessoas,
+        fetchComandaAtiva,
+        fetchComandaAtivaId,
       }}
     >
       {children}

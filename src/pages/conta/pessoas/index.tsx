@@ -4,12 +4,12 @@ import { useRouter } from 'next/router';
 import { withAuthCustomer } from '@/hoc/withAuth';
 
 const Comanda: React.FC = () => {
-  const { fetchComandaAtiva } = useComanda();
+  const { fetchComandaAtivaId } = useComanda();
   const router = useRouter();
 
   useEffect(() => {
     const checkComandaAtiva = async () => {
-      const comandaId = await fetchComandaAtiva();
+      const comandaId = await fetchComandaAtivaId();
       if (comandaId) {
         router.push(`/conta/pessoas/${comandaId}`);
       } else {
@@ -18,7 +18,7 @@ const Comanda: React.FC = () => {
     };
 
     checkComandaAtiva();
-  }, [fetchComandaAtiva, router]);
+  }, [fetchComandaAtivaId, router]);
 
   return <></>;
 };

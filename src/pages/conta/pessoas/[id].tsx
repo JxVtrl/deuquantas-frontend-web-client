@@ -10,12 +10,12 @@ import { ComandaPessoas } from '@/components/Comanda/Pessoas';
 const PessoasDaContaPage = () => {
   const router = useRouter();
   const { id } = router.query;
-  const { comanda, loading, error, fetchComanda } = useComanda();
+  const { comanda, loading, error, fetchComandaAtiva } = useComanda();
 
   useEffect(() => {
     if (!id) return;
-    fetchComanda(id as string);
-  }, [id, fetchComanda]);
+    fetchComandaAtiva();
+  }, []);
 
   if (loading) {
     return (

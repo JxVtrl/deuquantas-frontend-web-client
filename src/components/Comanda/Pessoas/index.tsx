@@ -7,7 +7,7 @@ import { AdicionarPessoaModal } from './AdicionarPessoaModal';
 import { ExcluirPessoaModal } from './ExcluirPessoaModal';
 
 export const ComandaPessoas = () => {
-  const { comanda, fetchComanda } = useComanda();
+  const { comanda, fetchComandaAtiva } = useComanda();
   const { user } = useAuth();
   const pessoas = comanda?.pessoas;
 
@@ -19,10 +19,10 @@ export const ComandaPessoas = () => {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      fetchComanda(comanda?.id as string);
+      fetchComandaAtiva();
     }, 30000);
     return () => clearInterval(interval);
-  }, [fetchComanda, comanda?.id]);
+  }, [fetchComandaAtiva]);
 
   return (
     <MaxWidthWrapper

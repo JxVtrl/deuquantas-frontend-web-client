@@ -6,6 +6,7 @@ export enum PermissionLevel {
 }
 
 export interface Cliente {
+  id: string;
   num_cpf: string;
   data_nascimento: Date;
   num_celular: string;
@@ -36,7 +37,7 @@ export interface User {
     data_atualizacao: Date;
     permission_level: PermissionLevel;
   };
-  cliente?: Cliente;
+  cliente: Cliente;
   preferences?: UserPreferences;
 }
 

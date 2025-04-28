@@ -7,46 +7,36 @@ export interface CreateComandaDto {
 }
 
 export interface ComandaResponse {
+  id: string;
+  num_cpf: string;
+  num_cnpj: string;
+  numMesa: string;
+  status: 'ativo' | 'finalizado';
+  data_criacao: string;
   conta: {
-    codErro?: number;
-    codFormaPg: number;
-    data_criacao: string;
-    data_fechamento?: string;
-    horPagamento?: string;
     id: string;
     id_comanda: string;
+    valTotal: number;
     valDesconto?: number;
     valServico?: number;
-    valTotal: number;
+    codFormaPg: number;
+    horPagamento?: string;
+    codErro?: number;
+    data_criacao: string;
+    data_fechamento?: string;
   };
+  itens: Item[];
   pessoas?: {
     id: string;
     nome: string;
     data_criacao: string;
     valor_total: number;
   }[];
-  data_criacao: string;
-  id: string;
-  itens: Item[];
-  num_cpf: string;
-  num_cnpj: string;
-  numMesa: string;
-  status: 'ativo' | 'finalizado';
-  clientes: {
-    id: string;
-    id_cliente: string;
-    data_criacao: string;
-    cliente: {
-      id: string;
-      nome: string;
-      num_cpf: string;
-    };
-  }[];
 }
 
 export interface AdicionarItensComandaDto {
   id_comanda: string;
-  id_usuario: string;
+  id_cliente: string;
   itens: {
     id_item: string;
     quantidade: number;
@@ -84,10 +74,10 @@ export interface Solicitacao {
 export const ComandaService = {
   async getComandaAtivaByUsuarioId(
     id_usuario: string,
-  ): Promise<ComandaResponse | null> {
+  ): Promise<ComandaResponse[] | null> {
     try {
       const response = await api.get(`/comandas/ativa/usuario/${id_usuario}`);
-      return response.data?.id ? response.data : null;
+      return response.data;
     } catch (error) {
       console.error('Erro ao buscar comanda ativa por ID de usuário:', error);
       return null;
