@@ -13,21 +13,15 @@ import { Item, MenuService } from '@/services/menu.service';
 import { useRouter } from 'next/router';
 import { comandaService } from '@/services/api/comanda';
 
-type Comanda = ComandaResponse & {
-  status: string;
-  itens: Item[];
-  valor_total: number;
-};
-
 interface ComandaContextData {
-  comanda: Comanda | null;
+  comanda: ComandaResponse | null;
   estabelecimento: RegisterFormData | null;
   loading: boolean;
   error: string | null;
   fetchComanda: (id: string) => Promise<void>;
   fetchComandaAtiva: () => Promise<string | null>;
   clearComanda: () => void;
-  updateComanda: (data: Partial<Comanda>) => void;
+  updateComanda: (data: Partial<ComandaResponse>) => void;
   selectedItem: Item | null;
   setSelectedItem: (item: Item) => void;
   itensInCart: Item[];
@@ -54,7 +48,7 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const router = useRouter();
   const { user } = useAuth();
-  const [comanda, setComanda] = useState<Comanda | null>(null);
+  const [comanda, setComanda] = useState<ComandaResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [estabelecimento, setEstabelecimento] =
@@ -90,7 +84,7 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
         throw new Error('Comanda não encontrada');
       }
 
-      setComanda(response.comanda as Comanda);
+      setComanda(response.comanda);
       setEstabelecimento(response.estabelecimento);
       await getMenu(response.estabelecimento.num_cnpj);
     } catch (err) {
@@ -134,7 +128,7 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
     setError(null);
   }, []);
 
-  const updateComanda = useCallback((data: Partial<Comanda>) => {
+  const updateComanda = useCallback((data: Partial<ComandaResponse>) => {
     setComanda((prev) => (prev ? { ...prev, ...data } : null));
   }, []);
 

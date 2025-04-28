@@ -88,34 +88,36 @@ export const NavigationPills: React.FC<{
           </div>
         </MaxWidthWrapper>
       )}
-      <MaxWidthWrapper
-        style={{
-          borderBottom: hasArrowBack ? 'none' : '1px solid #F0F0F0',
-          marginTop: 20,
-        }}
-        styleContent={{
-          padding: 0,
-        }}
-      >
-        <Carousel
-          slidesPerView={'auto'}
+      {navigationPills.length > 0 && (
+        <MaxWidthWrapper
           style={{
-            padding: hasArrowBack ? '0 0 20px' : '6px 0 12px',
+            borderBottom: hasArrowBack ? 'none' : '1px solid #F0F0F0',
+            marginTop: 20,
           }}
-          spaceBetween={hasArrowBack ? 6 : 8}
+          styleContent={{
+            padding: 0,
+          }}
         >
-          {navigationPills.map((pill) => (
-            <SwiperSlide
-              key={pill.label}
-              style={{
-                width: 'fit-content',
-              }}
-            >
-              <Pill {...pill} hasArrowBack={hasArrowBack} />
-            </SwiperSlide>
-          ))}
-        </Carousel>
-      </MaxWidthWrapper>
+          <Carousel
+            slidesPerView={'auto'}
+            style={{
+              padding: hasArrowBack ? '0 0 20px' : '6px 0 12px',
+            }}
+            spaceBetween={hasArrowBack ? 6 : 8}
+          >
+            {navigationPills.map((pill) => (
+              <SwiperSlide
+                key={pill.label}
+                style={{
+                  width: 'fit-content',
+                }}
+              >
+                <Pill {...pill} hasArrowBack={hasArrowBack} />
+              </SwiperSlide>
+            ))}
+          </Carousel>
+        </MaxWidthWrapper>
+      )}
     </div>
   );
 };
