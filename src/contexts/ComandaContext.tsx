@@ -37,6 +37,18 @@ interface ComandaContextData {
   isCartEmptyErrorOpen: boolean;
   setIsCartEmptyErrorOpen: (isCartEmptyErrorOpen: boolean) => void;
   handleAddClick: () => void;
+  adicionarCliente: (id_cliente: string) => Promise<void>;
+  removerCliente: (id_cliente: string) => Promise<void>;
+  clientes: {
+    id: string;
+    id_cliente: string;
+    data_criacao: string;
+    cliente: {
+      id: string;
+      nome: string;
+      num_cpf: string;
+    };
+  }[];
 }
 
 const ComandaContext = createContext<ComandaContextData>(
@@ -57,6 +69,7 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
   const [tipo, setTipo] = useState<string | null>(null);
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
   const [menu, setMenu] = useState<Item[]>([]);
+  const [clientes, setClientes] = useState<ComandaContextData['clientes']>([]);
 
   const getMenu = async (cnpj: string) => {
     try {
@@ -155,6 +168,11 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
       return;
     }
 
+    if (!user?.usuario?.id) {
+      toast.error('Usuário não encontrado');
+      return;
+    }
+
     try {
       const itensFormatados = itensInCart.map((item) => ({
         id_item: item.id,
@@ -164,6 +182,7 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
 
       await comandaService.adicionarItens({
         id_comanda: comanda.id,
+        id_cliente: user.usuario.id,
         itens: itensFormatados,
       });
 
@@ -177,7 +196,7 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
       router.push(`/conta/${comanda.id}`);
     } catch (error) {
       console.error('Erro ao adicionar itens à comanda:', error);
-      // Aqui você pode adicionar uma notificação de erro para o usuário
+      toast.error('Erro ao adicionar itens à comanda');
     }
   };
 
@@ -188,6 +207,45 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
       setIsNavigationButtonDisabled(false);
     }
   }, [itensInCart, router.pathname]);
+
+  const adicionarCliente = async (id_cliente: string) => {
+    if (!comanda) return;
+
+    try {
+      const response = await ComandaService.adicionarCliente({
+        id_comanda: comanda.id,
+        id_cliente,
+      });
+
+      setComanda(response);
+      setClientes(response.clientes);
+    } catch (error) {
+      console.error('Erro ao adicionar cliente:', error);
+      toast.error('Erro ao adicionar cliente à comanda');
+    }
+  };
+
+  const removerCliente = async (id_cliente: string) => {
+    if (!comanda) return;
+
+    try {
+      const response = await ComandaService.removerCliente(
+        comanda.id,
+        id_cliente,
+      );
+      setComanda(response);
+      setClientes(response.clientes);
+    } catch (error) {
+      console.error('Erro ao remover cliente:', error);
+      toast.error('Erro ao remover cliente da comanda');
+    }
+  };
+
+  useEffect(() => {
+    if (comanda) {
+      setClientes(comanda.clientes);
+    }
+  }, [comanda]);
 
   return (
     <ComandaContext.Provider
@@ -215,6 +273,9 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
         isCartEmptyErrorOpen,
         setIsCartEmptyErrorOpen,
         handleAddClick,
+        adicionarCliente,
+        removerCliente,
+        clientes,
       }}
     >
       {children}

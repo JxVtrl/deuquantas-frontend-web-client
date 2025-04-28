@@ -8,6 +8,7 @@ interface ItemCarrinho {
 
 interface AdicionarItensRequest {
   id_comanda: string;
+  id_cliente: string;
   itens: ItemCarrinho[];
 }
 

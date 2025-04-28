@@ -27,15 +27,32 @@ export interface ComandaResponse {
   num_cnpj: string;
   numMesa: string;
   status: 'ativo' | 'finalizado';
+  clientes: {
+    id: string;
+    id_cliente: string;
+    data_criacao: string;
+    cliente: {
+      id: string;
+      nome: string;
+      num_cpf: string;
+    };
+  }[];
 }
 
 export interface AdicionarItensComandaDto {
   id_comanda: string;
+  id_cliente: string;
   itens: {
     id_item: string;
     quantidade: number;
     observacao?: string;
+    responsavel?: string;
   }[];
+}
+
+export interface AdicionarClienteComandaDto {
+  id_comanda: string;
+  id_cliente: string;
 }
 
 import { api } from '@/lib/axios';
@@ -89,6 +106,43 @@ export const ComandaService = {
       return response.data;
     } catch (error) {
       console.error('Erro ao adicionar itens à comanda:', error);
+      throw error;
+    }
+  },
+
+  async adicionarCliente(
+    dto: AdicionarClienteComandaDto,
+  ): Promise<ComandaResponse> {
+    try {
+      const response = await api.post('/comandas/adicionar-cliente', dto);
+      return response.data;
+    } catch (error) {
+      console.error('Erro ao adicionar cliente à comanda:', error);
+      throw error;
+    }
+  },
+
+  async removerCliente(
+    id_comanda: string,
+    id_cliente: string,
+  ): Promise<ComandaResponse> {
+    try {
+      const response = await api.delete(
+        `/comandas/${id_comanda}/clientes/${id_cliente}`,
+      );
+      return response.data;
+    } catch (error) {
+      console.error('Erro ao remover cliente da comanda:', error);
+      throw error;
+    }
+  },
+
+  async listarClientes(id_comanda: string): Promise<ComandaResponse> {
+    try {
+      const response = await api.get(`/comandas/${id_comanda}/clientes`);
+      return response.data;
+    } catch (error) {
+      console.error('Erro ao listar clientes da comanda:', error);
       throw error;
     }
   },
