@@ -2,21 +2,27 @@ import { useComanda } from '@/contexts/ComandaContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { currencyFormatter } from '@/utils/formatters';
 import { Avatar, Button, MaxWidthWrapper } from '@deuquantas/components';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { AdicionarPessoaModal } from './AdicionarPessoaModal';
 import { ExcluirPessoaModal } from './ExcluirPessoaModal';
 
 export const ComandaPessoas = () => {
-  const { comanda } = useComanda();
+  const { comanda, fetchComanda } = useComanda();
   const { user } = useAuth();
   const pessoas = comanda?.pessoas;
 
   const [isAdicionarModalOpen, setIsAdicionarModalOpen] = useState(false);
   const [isExcluirModalOpen, setIsExcluirModalOpen] = useState(false);
 
-  // Verifica se o usuário atual é o criador da comanda (primeira pessoa)
   const isCriador =
     pessoas && pessoas.length > 0 && pessoas[0].id === user?.usuario?.id;
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchComanda(comanda?.id as string);
+    }, 30000);
+    return () => clearInterval(interval);
+  }, [fetchComanda, comanda?.id]);
 
   return (
     <MaxWidthWrapper

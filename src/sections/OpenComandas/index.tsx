@@ -23,13 +23,19 @@ interface Solicitacao {
 
 export const OpenComandas: React.FC = () => {
   const { user } = useAuth();
-  const { fetchComandaAtiva, comanda, estabelecimento } = useComanda();
+  const { fetchComanda, comanda, estabelecimento } = useComanda();
   const router = useRouter();
   const [solicitacoes, setSolicitacoes] = useState<Solicitacao[]>([]);
   const [loading, setLoading] = useState(true);
 
   const checkComandaAtiva = async () => {
-    await fetchComandaAtiva();
+    if (!user?.usuario?.id) return;
+    const comanda = await ComandaService.getComandaAtivaByUsuarioId(
+      user.usuario.id,
+    );
+    if (comanda) {
+      await fetchComanda(comanda.id);
+    }
   };
 
   const fetchSolicitacoes = async () => {
@@ -38,7 +44,7 @@ export const OpenComandas: React.FC = () => {
       const response = await ComandaService.getSolicitacoesPendentes(
         user.usuario.id,
       );
-      setSolicitacoes(response.data);
+      setSolicitacoes(response);
     } catch (error) {
       console.error('Erro ao buscar solicitações:', error);
       toast.error('Erro ao buscar solicitações');
@@ -60,6 +66,7 @@ export const OpenComandas: React.FC = () => {
         `Solicitação ${status === 'ACEITA' ? 'aceita' : 'recusada'} com sucesso!`,
       );
       fetchSolicitacoes();
+      checkComandaAtiva();
     } catch (error) {
       console.error('Erro ao responder solicitação:', error);
       toast.error('Erro ao responder solicitação');
@@ -89,56 +96,20 @@ export const OpenComandas: React.FC = () => {
         padding: '0 0 20px',
       }}
     >
-      {comanda || solicitacoes.length > 0 ? (
-        <Card
-          className='p-4 cursor-pointer transition-all duration-200 hover:shadow-lg active:scale-[0.98] bg-white'
-          onClick={() => {
-            if (comanda) {
-              router.push(`/conta/${comanda.id}`);
-            }
-          }}
-        >
-          {comanda && (
-            <div className='flex items-start justify-between'>
-              <div className='flex items-center gap-2'>
-                <div className='p-2 bg-[#F5F5F5] rounded-full'>
-                  <ReceiptIcon />
-                </div>
-                <div>
-                  <h2 className='text-[14px] font-[600] text-[#272727] leading-[24px]'>
-                    {estabelecimento?.nome_estab}
-                  </h2>
-                  <p className='text-[12px] font-[400] text-[#666666] leading-[20px]'>
-                    Mesa {comanda.numMesa}
-                  </p>
-                </div>
-              </div>
-              <div className='text-right'>
-                <p className='text-[14px] font-[600] text-[#272727] leading-[20px]'>
-                  {currencyFormatter(comanda.conta?.valTotal || 0)}
-                </p>
-                <p className='text-[12px] font-[400] text-[#666666] leading-[16px]'>
-                  {comanda.itens.length}{' '}
-                  {comanda.itens.length === 1 ? 'item' : 'itens'}
-                </p>
-              </div>
-            </div>
-          )}
-
+      {solicitacoes?.length > 0 ? (
+        <Card className='p-4 cursor-pointer transition-all duration-200 hover:shadow-lg active:scale-[0.98] bg-white'>
           {solicitacoes.map((solicitacao, index) => {
-            console.log('solicitacao', solicitacao);
-
             return (
-              <div key={index} className='flex justify-between items-center'>
-                <div>
+              <div key={index} className='grid grid-cols-[1fr_auto] gap-4'>
+                <div className='flex flex-col gap-1'>
                   <p className='font-medium'>
-                    Comanda #{solicitacao.comanda.numero}
-                  </p>
-                  <p className='text-sm text-gray-600'>
                     {solicitacao.estabelecimento.nome}
                   </p>
+                  <p className='text-sm text-gray-600'>
+                    Comanda #{solicitacao.comanda.numero}
+                  </p>
                 </div>
-                <div className='flex gap-2'>
+                <div className='grid grid-cols-[1fr_1fr] gap-2'>
                   <Button
                     variant='primary'
                     text='Aceitar'
@@ -159,6 +130,40 @@ export const OpenComandas: React.FC = () => {
               </div>
             );
           })}
+        </Card>
+      ) : comanda ? (
+        <Card
+          className='p-4 cursor-pointer transition-all duration-200 hover:shadow-lg active:scale-[0.98] bg-white'
+          onClick={() => {
+            if (comanda) {
+              router.push(`/conta/${comanda.id}`);
+            }
+          }}
+        >
+          <div className='flex items-start justify-between'>
+            <div className='flex items-center gap-2'>
+              <div className='p-2 bg-[#F5F5F5] rounded-full'>
+                <ReceiptIcon />
+              </div>
+              <div>
+                <h2 className='text-[14px] font-[600] text-[#272727] leading-[24px]'>
+                  {estabelecimento?.nome_estab}
+                </h2>
+                <p className='text-[12px] font-[400] text-[#666666] leading-[20px]'>
+                  Mesa {comanda.numMesa}
+                </p>
+              </div>
+            </div>
+            <div className='text-right'>
+              <p className='text-[14px] font-[600] text-[#272727] leading-[20px]'>
+                {currencyFormatter(comanda.conta?.valTotal || 0)}
+              </p>
+              <p className='text-[12px] font-[400] text-[#666666] leading-[16px]'>
+                {comanda.itens.length}{' '}
+                {comanda.itens.length === 1 ? 'item' : 'itens'}
+              </p>
+            </div>
+          </div>
         </Card>
       ) : (
         <div

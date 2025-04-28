@@ -11,10 +11,17 @@ import { RegisterData, LoginData, AuthService } from '@/services/auth.service';
 import { jwtDecode } from 'jwt-decode';
 import Cookies from 'js-cookie';
 import { api } from '@/lib/axios';
-import { User, UserJwt } from '@/services/api/types';
+import { User, UserJwt, Cliente } from '@/services/api/types';
 
 interface AuthContextData {
-  user: User | null;
+  user: {
+    usuario: {
+      id: string;
+      name: string;
+      email: string;
+    };
+    cliente?: Cliente;
+  } | null;
   loading: boolean;
   login: (data: LoginData) => Promise<void>;
   register: (data: RegisterData) => Promise<void>;

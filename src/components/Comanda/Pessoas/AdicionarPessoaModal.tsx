@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Drawer, MaxWidthWrapper } from '@deuquantas/components';
 import { useComanda } from '@/contexts/ComandaContext';
-import { comandaService } from '@/services/api/comanda';
 import { toast } from 'react-hot-toast';
 import { api } from '@/lib/axios';
+import ComandaService from '@/services/comanda.service';
 
 interface AdicionarPessoaModalProps {
   isOpen: boolean;
@@ -56,7 +56,7 @@ export const AdicionarPessoaModal: React.FC<AdicionarPessoaModalProps> = ({
     if (!comanda) return;
 
     try {
-      await comandaService.adicionarPessoa({
+      await ComandaService.adicionarCliente({
         id_comanda: comanda.id,
         id_usuario: busca,
       });

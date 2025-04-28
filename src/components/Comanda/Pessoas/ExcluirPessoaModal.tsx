@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Button, Drawer, MaxWidthWrapper } from '@deuquantas/components';
 import { useComanda } from '@/contexts/ComandaContext';
-import { comandaService } from '@/services/api/comanda';
 import { toast } from 'react-hot-toast';
+import ComandaService from '@/services/comanda.service';
 
 interface ExcluirPessoaModalProps {
   isOpen: boolean;
@@ -21,10 +21,7 @@ export const ExcluirPessoaModal: React.FC<ExcluirPessoaModalProps> = ({
     if (!comanda || !selectedPessoa) return;
 
     try {
-      await comandaService.excluirPessoa({
-        id_comanda: comanda.id,
-        id_usuario: selectedPessoa,
-      });
+      await ComandaService.removerCliente(comanda.id, selectedPessoa);
 
       await fetchComanda(comanda.id);
       toast.success('Pessoa removida com sucesso!');

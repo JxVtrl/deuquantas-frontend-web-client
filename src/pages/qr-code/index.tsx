@@ -51,8 +51,8 @@ const CustomerQrCode: React.FC = () => {
           toast.success('Solicitação aprovada!');
 
           // Buscar a comanda ativa após a aprovação
-          const comanda = await ComandaService.getComandaAtivaByCpf(
-            user.cliente.num_cpf,
+          const comanda = await ComandaService.getComandaAtivaByUsuarioId(
+            user.usuario.id,
           );
 
           console.log('COMANDA ENCONTRADA', JSON.stringify(comanda, null, 2));

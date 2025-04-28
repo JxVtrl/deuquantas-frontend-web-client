@@ -46,7 +46,7 @@ export interface ComandaResponse {
 
 export interface AdicionarItensComandaDto {
   id_comanda: string;
-  id_cliente: string;
+  id_usuario: string;
   itens: {
     id_item: string;
     quantidade: number;
@@ -57,7 +57,7 @@ export interface AdicionarItensComandaDto {
 
 export interface AdicionarClienteComandaDto {
   id_comanda: string;
-  id_cliente: string;
+  id_usuario: string;
 }
 
 import { api } from '@/lib/axios';
@@ -82,12 +82,14 @@ export interface Solicitacao {
 }
 
 export const ComandaService = {
-  async getComandaAtivaByCpf(num_cpf: string): Promise<ComandaResponse | null> {
+  async getComandaAtivaByUsuarioId(
+    id_usuario: string,
+  ): Promise<ComandaResponse | null> {
     try {
-      const response = await api.get(`/comandas/ativa/${num_cpf}`);
+      const response = await api.get(`/comandas/ativa/usuario/${id_usuario}`);
       return response.data?.id ? response.data : null;
     } catch (error) {
-      console.error('Erro ao buscar comanda ativa:', error);
+      console.error('Erro ao buscar comanda ativa por ID de usuário:', error);
       return null;
     }
   },
@@ -140,11 +142,11 @@ export const ComandaService = {
 
   async removerCliente(
     id_comanda: string,
-    id_cliente: string,
+    id_usuario: string,
   ): Promise<ComandaResponse> {
     try {
       const response = await api.delete(
-        `/comandas/${id_comanda}/clientes/${id_cliente}`,
+        `/comandas/${id_comanda}/clientes/${id_usuario}`,
       );
       return response.data;
     } catch (error) {
@@ -163,9 +165,7 @@ export const ComandaService = {
     }
   },
 
-  async getSolicitacoesPendentes(
-    id_usuario: string,
-  ): Promise<{ data: Solicitacao[] }> {
+  async getSolicitacoesPendentes(id_usuario: string): Promise<Solicitacao[]> {
     try {
       const response = await api.get(
         `/comandas/solicitacoes/pendentes/${id_usuario}`,
@@ -182,10 +182,9 @@ export const ComandaService = {
     status: 'ACEITA' | 'RECUSADA';
   }): Promise<void> {
     try {
-      await api.post(
-        `/comandas/solicitacoes/${dto.id_solicitacao}/responder`,
-        dto,
-      );
+      await api.post(`/comandas/solicitacoes/${dto.id_solicitacao}/responder`, {
+        status: dto.status,
+      });
     } catch (error) {
       console.error('Erro ao responder solicitação:', error);
       throw error;

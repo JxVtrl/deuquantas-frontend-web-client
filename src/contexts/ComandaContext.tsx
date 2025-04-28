@@ -36,8 +36,8 @@ interface ComandaContextData {
   isCartEmptyErrorOpen: boolean;
   setIsCartEmptyErrorOpen: (isCartEmptyErrorOpen: boolean) => void;
   handleAddClick: () => void;
-  adicionarCliente: (id_cliente: string) => Promise<void>;
-  removerCliente: (id_cliente: string) => Promise<void>;
+  adicionarUsuario: (id_usuario: string) => Promise<void>;
+  removerUsuario: (id_usuario: string) => Promise<void>;
   clientes: {
     id: string;
     id_cliente: string;
@@ -116,10 +116,14 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
         return null;
       }
 
+      console.log('user', user);
+
       setLoading(true);
-      const comandaAtiva = await ComandaService.getComandaAtivaByCpf(
-        user.cliente.num_cpf,
+      const comandaAtiva = await ComandaService.getComandaAtivaByUsuarioId(
+        user.usuario.id,
       );
+
+      console.log('comandaAtiva', comandaAtiva);
 
       if (comandaAtiva?.id) {
         fetchComanda(comandaAtiva.id);
@@ -181,7 +185,7 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
 
       await ComandaService.adicionarItens({
         id_comanda: comanda.id,
-        id_cliente: user.usuario.id,
+        id_usuario: user.usuario.id,
         itens: itensFormatados,
       });
 
@@ -207,13 +211,13 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }, [itensInCart, router.pathname]);
 
-  const adicionarCliente = async (id_cliente: string) => {
+  const adicionarUsuario = async (id_usuario: string) => {
     if (!comanda) return;
 
     try {
       const response = await ComandaService.adicionarCliente({
         id_comanda: comanda.id,
-        id_cliente,
+        id_usuario,
       });
 
       setComanda(response);
@@ -224,13 +228,13 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
-  const removerCliente = async (id_cliente: string) => {
+  const removerUsuario = async (id_usuario: string) => {
     if (!comanda) return;
 
     try {
       const response = await ComandaService.removerCliente(
         comanda.id,
-        id_cliente,
+        id_usuario,
       );
       setComanda(response);
       setClientes(response.clientes);
@@ -272,8 +276,8 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
         isCartEmptyErrorOpen,
         setIsCartEmptyErrorOpen,
         handleAddClick,
-        adicionarCliente,
-        removerCliente,
+        adicionarUsuario,
+        removerUsuario,
         clientes,
       }}
     >
