@@ -180,7 +180,7 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
       await fetchComanda(comanda.id);
 
       // Redireciona para a página da comanda
-      router.push(`/conta/comanda/${comanda.id}`);
+      router.push(`/conta/${comanda.id}`);
     } catch (error) {
       console.error('Erro ao adicionar itens à comanda:', error);
       // Aqui você pode adicionar uma notificação de erro para o usuário

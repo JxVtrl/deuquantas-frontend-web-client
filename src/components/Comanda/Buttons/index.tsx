@@ -2,7 +2,6 @@ import React from 'react';
 import {
   MaxWidthWrapper,
   Button,
-  ShoppingCartIcon,
   PeopleIcon,
   ReceiptIcon,
   DrinksIcon,

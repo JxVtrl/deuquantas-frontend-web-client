@@ -1,25 +1,26 @@
-import React from 'react';
+import { useComanda } from '@/contexts/ComandaContext';
+import React, { useEffect } from 'react';
+import { useRouter } from 'next/router';
 import { withAuthCustomer } from '@/hoc/withAuth';
-import Layout from '@/layout';
-import { UserPreferences } from '@/components/UserPreferences';
-import { MaxWidthWrapper } from '@deuquantas/components';
-
-// import { Container } from './styles';
 
 const Conta: React.FC = () => {
-  return (
-    <Layout>
-      <MaxWidthWrapper>
-        <div className='py-6'>
-          <h1 className='text-2xl font-bold mb-6'>Minha Conta</h1>
-          <div className='space-y-6'>
-            <UserPreferences />
-            {/* Outros componentes de configuração podem ser adicionados aqui */}
-          </div>
-        </div>
-      </MaxWidthWrapper>
-    </Layout>
-  );
+  const { fetchComandaAtiva } = useComanda();
+  const router = useRouter();
+
+  useEffect(() => {
+    const checkComandaAtiva = async () => {
+      const comandaId = await fetchComandaAtiva();
+      if (comandaId) {
+        router.push(`/conta/${comandaId}`);
+      } else {
+        router.push('/qr-code');
+      }
+    };
+
+    checkComandaAtiva();
+  }, [fetchComandaAtiva, router]);
+
+  return <></>;
 };
 
 export default withAuthCustomer(Conta);

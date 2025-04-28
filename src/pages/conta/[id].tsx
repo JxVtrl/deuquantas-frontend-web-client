@@ -4,11 +4,15 @@ import Layout from '@/layout';
 import { withAuthCustomer } from '@/hoc/withAuth';
 import { useComanda } from '@/contexts/ComandaContext';
 import { NavigationPills } from '@/components/NavigationPills';
-import { ComandaHeader } from '@/components/Comanda/Header';
-import { ComandaList } from '@/components/Comanda/List';
-import { ComandaPayOptions } from '@/components/Comanda/PayOptions';
+import {
+  ComandaButtons,
+  ComandaValueChart,
+  ComandaNotifications,
+  ComandaPayButton,
+} from '@/components/Comanda';
+import { contaNavigationPills } from '@/data/home_navigation_pills';
 
-const ComandaPage = () => {
+const ContaPage = () => {
   const router = useRouter();
   const { id } = router.query;
   const { comanda, loading, error, fetchComanda } = useComanda();
@@ -42,12 +46,13 @@ const ComandaPage = () => {
 
   return (
     <Layout>
-      <NavigationPills hasArrowBack navigationPills={[]} />
-      <ComandaHeader />
-      <ComandaList />
-      <ComandaPayOptions />
+      <NavigationPills navigationPills={contaNavigationPills} />
+      <ComandaButtons />
+      <ComandaValueChart />
+      <ComandaNotifications />
+      <ComandaPayButton />
     </Layout>
   );
 };
 
-export default withAuthCustomer(ComandaPage);
+export default withAuthCustomer(ContaPage);

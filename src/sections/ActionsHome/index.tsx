@@ -8,25 +8,6 @@ import { Carousel } from '@/components/Carousel';
 export const ActionsHome = () => {
   const { actionItems } = useNavigation();
   const router = useRouter();
-
-  // const actionsResolved = actionItems.map((item) => {
-  //     if (item.href === '/qr-code' && comanda) {
-  //         return {
-  //             onClick: () => {
-  //                 router.push('/conta/comanda');
-  //             },
-  //             label: 'Comanda',
-  //             icon: ReceiptIcon as () => React.JSX.Element,
-  //         };
-  //     }
-  //     return {
-  //         onClick: () => {
-  //             router.push(item.href);
-  //         },
-  //         label: item.label,
-  //         icon: item.icon as () => React.JSX.Element,
-  //     };
-  // });
   return (
     <MaxWidthWrapper
       styleContent={{

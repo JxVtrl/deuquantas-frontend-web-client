@@ -1,8 +1,6 @@
-import { useNavigation } from '@/hooks/useNavigation';
 import { useRouter } from 'next/router';
 import React from 'react';
 import { SwiperSlide } from 'swiper/react';
-import { Swiper } from 'swiper/react';
 import { Carousel } from '../Carousel';
 import { MaxWidthWrapper } from '@deuquantas/components';
 
@@ -59,7 +57,7 @@ export const NavigationPills: React.FC<{
         <MaxWidthWrapper>
           <div
             onClick={() => {
-              router.back();
+              router.push('/conta');
             }}
             style={{
               cursor: 'pointer',
