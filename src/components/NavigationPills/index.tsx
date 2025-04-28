@@ -95,14 +95,15 @@ export const NavigationPills: React.FC<{
           borderBottom: hasArrowBack ? 'none' : '1px solid #F0F0F0',
           marginTop: 20,
         }}
+        styleContent={{
+          padding: 0,
+        }}
       >
         <Carousel
           slidesPerView={'auto'}
           style={{
             padding: hasArrowBack ? '0 0 20px' : '6px 0 12px',
           }}
-          slidesOffsetBefore={0}
-          slidesOffsetAfter={0}
           spaceBetween={hasArrowBack ? 6 : 8}
         >
           {navigationPills.map((pill) => (

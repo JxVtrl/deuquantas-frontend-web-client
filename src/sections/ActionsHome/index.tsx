@@ -1,4 +1,4 @@
-import { ActionSquared } from '@deuquantas/components';
+import { ActionSquared, MaxWidthWrapper } from '@deuquantas/components';
 import { SwiperSlide } from 'swiper/react';
 import React from 'react';
 import { useRouter } from 'next/router';
@@ -28,27 +28,33 @@ export const ActionsHome = () => {
   //     };
   // });
   return (
-    <Carousel
-      style={{
-        padding: '20px 0',
+    <MaxWidthWrapper
+      styleContent={{
+        padding: 0,
       }}
-      spaceBetween={15}
     >
-      {actionItems.map((action) => (
-        <SwiperSlide
-          key={action.label}
-          style={{
-            width: 'fit-content',
-          }}
-        >
-          <ActionSquared
-            {...action}
-            onClick={() => {
-              router.push(action.href);
+      <Carousel
+        style={{
+          padding: '20px 0',
+        }}
+        spaceBetween={15}
+      >
+        {actionItems.map((action) => (
+          <SwiperSlide
+            key={action.label}
+            style={{
+              width: 'fit-content',
             }}
-          />
-        </SwiperSlide>
-      ))}
-    </Carousel>
+          >
+            <ActionSquared
+              {...action}
+              onClick={() => {
+                router.push(action.href);
+              }}
+            />
+          </SwiperSlide>
+        ))}
+      </Carousel>
+    </MaxWidthWrapper>
   );
 };

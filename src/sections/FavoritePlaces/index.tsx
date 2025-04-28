@@ -19,26 +19,27 @@ export const FavoritePlaces = () => {
 
   return (
     <>
-      <MaxWidthWrapper
-        backgroundColor='transparent'
-        style={{ marginBottom: 12 }}
-        styleContent={{}}
-      >
+      <MaxWidthWrapper style={{ marginBottom: 12 }}>
         <Title title='Locais favoritos' />
       </MaxWidthWrapper>
-
-      <Carousel>
-        {places.map((place) => (
-          <SwiperSlide
-            key={place.id}
-            style={{
-              width: 'fit-content',
-            }}
-          >
-            <ActionRounded {...place} />
-          </SwiperSlide>
-        ))}
-      </Carousel>
+      <MaxWidthWrapper
+        styleContent={{
+          padding: 0,
+        }}
+      >
+        <Carousel>
+          {places.map((place) => (
+            <SwiperSlide
+              key={place.id}
+              style={{
+                width: 'fit-content',
+              }}
+            >
+              <ActionRounded {...place} />
+            </SwiperSlide>
+          ))}
+        </Carousel>
+      </MaxWidthWrapper>
     </>
   );
 };

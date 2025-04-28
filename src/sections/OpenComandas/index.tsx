@@ -28,7 +28,7 @@ export const OpenComandas: React.FC = () => {
   return (
     <MaxWidthWrapper
       style={{
-        padding: '0 0 110px',
+        padding: '0 0 20px',
       }}
     >
       {comanda ? (

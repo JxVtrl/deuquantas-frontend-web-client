@@ -21,7 +21,7 @@ export const useNavigation = () => {
     setBottomNavItems(
       navigation.map((item) => ({
         ...item,
-        isActive: item.href === router.pathname,
+        isActive: router.pathname.includes(item.href),
         onClick: () => router.push(item.href),
       })),
     );

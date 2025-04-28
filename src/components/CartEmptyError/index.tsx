@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import React from 'react';
 import { useComanda } from '@/contexts/ComandaContext';
 import { AnimatePresence } from 'framer-motion';
+import { MaxWidthWrapper } from '@deuquantas/components';
 
 export const CartEmptyError = () => {
   const { isCartEmptyErrorOpen, setIsCartEmptyErrorOpen } = useComanda();
@@ -36,47 +37,49 @@ export const CartEmptyError = () => {
             animate={{ y: 0 }}
             exit={{ y: '222px' }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className={`fixed bottom-[132px] left-0 right-0 bg-white p-6 rounded-[8px] z-[46] pointer-events-auto mx-[32px] flex flex-col gap-[12px]`}
+            className={`fixed bottom-[132px] left-0 right-0  z-[46] flex flex-col gap-[12px] mx-[32px] `}
           >
-            <div
-              className='absolute top-[21px] right-[21px] cursor-pointer'
-              onClick={() => {
-                setIsCartEmptyErrorOpen(false);
-              }}
-            >
-              <svg
-                width='12'
-                height='12'
-                viewBox='0 0 12 12'
-                fill='none'
-                xmlns='http://www.w3.org/2000/svg'
+            <div className='bg-white p-6 rounded-[8px] max-w-[1024px] mx-[auto] relative w-full'>
+              <div
+                className='absolute top-[21px] right-[21px] cursor-pointer'
+                onClick={() => {
+                  setIsCartEmptyErrorOpen(false);
+                }}
               >
-                <path
-                  d='M11 1L1 11M1 1L11 11'
-                  stroke='#1E1E1E'
-                  stroke-width='1.6'
-                  stroke-linecap='round'
-                  stroke-linejoin='round'
-                />
-              </svg>
-            </div>
-            <h1 className='text-[24px] font-[600] leading-[32px] tracking-[0.5px] text-[#FFCC00]'>
-              Ops!
-            </h1>
-            <p className='text-[14px] font-[600] leading-[16px] tracking-[0.5px] text-[#1E1E1E] '>
-              Você precisa adicionar um item no carrinho para continuar!
-            </p>
+                <svg
+                  width='12'
+                  height='12'
+                  viewBox='0 0 12 12'
+                  fill='none'
+                  xmlns='http://www.w3.org/2000/svg'
+                >
+                  <path
+                    d='M11 1L1 11M1 1L11 11'
+                    stroke='#1E1E1E'
+                    stroke-width='1.6'
+                    stroke-linecap='round'
+                    stroke-linejoin='round'
+                  />
+                </svg>
+              </div>
+              <h1 className='text-[24px] font-[600] leading-[32px] tracking-[0.5px] text-[#FFCC00]'>
+                Ops!
+              </h1>
+              <p className='text-[14px] font-[600] leading-[16px] tracking-[0.5px] text-[#1E1E1E] '>
+                Você precisa adicionar um item no carrinho para continuar!
+              </p>
 
-            <div className='absolute bottom-[-24px] right-[24px]'>
-              <svg
-                width='22'
-                height='38'
-                viewBox='0 0 22 38'
-                fill='none'
-                xmlns='http://www.w3.org/2000/svg'
-              >
-                <path d='M22 38L0 0H22V38Z' fill='white' />
-              </svg>
+              <div className='absolute bottom-[-32px] right-[55px]'>
+                <svg
+                  width='22'
+                  height='38'
+                  viewBox='0 0 22 38'
+                  fill='none'
+                  xmlns='http://www.w3.org/2000/svg'
+                >
+                  <path d='M22 38L0 0H22V38Z' fill='white' />
+                </svg>
+              </div>
             </div>
           </motion.div>
         </>

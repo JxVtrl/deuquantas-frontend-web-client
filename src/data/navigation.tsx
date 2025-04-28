@@ -9,7 +9,7 @@ export const navigation = [
   {
     icon: MoneyIcon,
     label: 'Conta',
-    href: '/conta/comanda',
+    href: '/conta',
   },
   {
     icon: FavoriteIcon,

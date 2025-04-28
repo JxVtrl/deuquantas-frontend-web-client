@@ -3,6 +3,9 @@ import {
   MaxWidthWrapper,
   Button,
   ShoppingCartIcon,
+  PeopleIcon,
+  ReceiptIcon,
+  DrinksIcon,
 } from '@deuquantas/components';
 import { useRouter } from 'next/router';
 
@@ -12,17 +15,17 @@ export const ComandaButtons: React.FC = () => {
   const conta_buttons_navigation = [
     {
       href: '/conta/menu',
-      icon: <ShoppingCartIcon />,
+      icon: <DrinksIcon />,
       title: 'Menu',
     },
     {
       href: '/conta/comanda',
-      icon: <ShoppingCartIcon />,
+      icon: <ReceiptIcon />,
       title: 'Comanda',
     },
     {
       href: '/conta/pessoas',
-      icon: <ShoppingCartIcon />,
+      icon: <PeopleIcon />,
       title: 'Pessoas',
     },
   ];
@@ -41,14 +44,15 @@ export const ComandaButtons: React.FC = () => {
               style={{
                 ...{
                   display: 'flex',
-                  flexDirection: 'column',
+                  flexDirection: 'row',
                   alignItems: 'center',
-                  gap: 0,
+                  gap: 10,
                   justifyContent: 'center',
                   height: '48px',
                   borderColor: 'transparent',
                   borderWidth: '1px',
                   borderStyle: 'solid',
+                  paddingBlock: 0,
                 },
                 ...(isFirst
                   ? {

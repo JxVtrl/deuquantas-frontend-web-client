@@ -1,10 +1,9 @@
 import React from 'react';
 
-import { Card } from '@/components/ui/card';
-import { MaxWidthWrapper } from '@deuquantas/components';
 import Image from 'next/image';
 import { Carousel } from '@/components/Carousel';
 import { SwiperSlide } from 'swiper/react';
+import { MaxWidthWrapper } from '@deuquantas/components';
 export const PromotionSlider: React.FC = () => {
   const [promotions, setPromotions] = React.useState<any[]>([]);
 
@@ -32,33 +31,37 @@ export const PromotionSlider: React.FC = () => {
   }, []);
 
   return (
-    <Carousel
-      style={{
-        padding: '20px 0',
+    <MaxWidthWrapper
+      styleContent={{
+        padding: 0,
       }}
-      slidesPerView={1.2}
-      spaceBetween={10}
     >
-      {promotions.map((promotion, index) => (
-        <SwiperSlide
-          key={index}
-          style={{
-            aspectRatio: '2.28676',
-            height: '100%',
-            maxHeight: '136px',
-            width: '100%',
-            position: 'relative',
-          }}
-        >
-          <Image
-            src={promotion.image}
-            alt='Promotion'
-            layout='fill'
-            objectFit='cover'
-            className='absolute top-0 left-0 w-full h-full z-[-1]'
-          />
-        </SwiperSlide>
-      ))}
-    </Carousel>
+      <Carousel
+        style={{
+          padding: '20px 0 90px',
+        }}
+        spaceBetween={10}
+      >
+        {promotions.map((promotion, index) => (
+          <SwiperSlide
+            key={index}
+            style={{
+              aspectRatio: '2.28676',
+              height: '100%',
+              width: '311px',
+              position: 'relative',
+            }}
+          >
+            <Image
+              src={promotion.image}
+              alt='Promotion'
+              layout='fill'
+              objectFit='cover'
+              className='absolute top-0 left-0 w-full h-full z-[-1]'
+            />
+          </SwiperSlide>
+        ))}
+      </Carousel>
+    </MaxWidthWrapper>
   );
 };

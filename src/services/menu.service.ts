@@ -3,15 +3,12 @@ import { api } from '@/lib/axios';
 export interface Item {
   id: string;
   nome: string;
-  tipo: string;
+  descricao: string;
   preco: number;
-  img?: string;
-  descricao?: string;
-  disponivel: boolean;
-  data_criacao: Date;
-  data_atualizacao: Date;
-  estabelecimento_id: string;
-  quantidade?: number;
+  quantidade: number;
+  categoria: string;
+  imagem?: string;
+  observacao?: string;
 }
 
 export class MenuService {

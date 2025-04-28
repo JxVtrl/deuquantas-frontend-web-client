@@ -11,6 +11,8 @@ import { ComandaService, ComandaResponse } from '@/services/comanda.service';
 import { useAuth } from './AuthContext';
 import { Item, MenuService } from '@/services/menu.service';
 import { useRouter } from 'next/router';
+import { comandaService } from '@/services/api/comanda';
+
 type Comanda = ComandaResponse & {
   status: string;
   itens: Item[];
@@ -145,19 +147,43 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
     useState(false);
   const [isCartEmptyErrorOpen, setIsCartEmptyErrorOpen] = useState(false);
 
-  const handleAddClick = () => {
+  const handleAddClick = async () => {
     if (isNavigationButtonDisabled) {
       setIsCartEmptyErrorOpen(true);
-    } else {
-      // se ele não estiver na comanda e existir uma comanda ativa, ele vai para a comanda
-      if (!router.pathname.includes('/conta/menu') && !!comanda) {
-        router.push('/conta/menu');
-      }
+      return;
+    }
 
-      // se nao exisir uma comanda ativa, ele vai para o qr code
-      if (!comanda) {
-        router.push('/qr-code');
-      }
+    if (!router.pathname.includes('/conta/menu') && !!comanda) {
+      router.push('/conta/menu');
+      return;
+    } else if (!comanda) {
+      router.push('/qr-code');
+      return;
+    }
+
+    try {
+      const itensFormatados = itensInCart.map(item => ({
+        id_item: item.id,
+        quantidade: item.quantidade || 1,
+        observacao: item.observacao
+      }));
+
+      await comandaService.adicionarItens({
+        id_comanda: comanda.id,
+        itens: itensFormatados
+      });
+
+      // Limpa o carrinho após adicionar os itens
+      setItensInCart([]);
+
+      // Atualiza os dados da comanda
+      await fetchComanda(comanda.id);
+
+      // Redireciona para a página da comanda
+      router.push(`/conta/comanda/${comanda.id}`);
+    } catch (error) {
+      console.error('Erro ao adicionar itens à comanda:', error);
+      // Aqui você pode adicionar uma notificação de erro para o usuário
     }
   };
 
