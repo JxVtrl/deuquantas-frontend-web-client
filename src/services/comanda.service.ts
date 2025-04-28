@@ -2,20 +2,17 @@ export interface CreateComandaDto {
   num_cpf: string;
   num_cnpj: string;
   numMesa: string;
-  datApropriacao: string;
-  horPedido: string;
-  codItem: string;
-  numQuant: number;
-  valPreco: number;
+  data_apropriacao: string;
+  status: string;
 }
 
 export interface ComandaResponse {
   conta: {
     codErro?: number;
-    codFormaPg: number;
+    codPagamento: number;
     data_criacao: string;
-    data_fechamento: string;
-    horPagto?: string;
+    data_fechamento?: string;
+    horPagamento?: string;
     id: string;
     id_comanda: string;
     valDesconto?: number;
@@ -30,11 +27,19 @@ export interface ComandaResponse {
     tipItem: string;
     imgItem: string;
   }[];
-
   num_cpf: string;
   num_cnpj: string;
   numMesa: string;
   status: 'ativo' | 'finalizado';
+}
+
+export interface AdicionarItensComandaDto {
+  id_comanda: string;
+  itens: {
+    id_item: string;
+    quantidade: number;
+    observacao?: string;
+  }[];
 }
 
 import { api } from '@/lib/axios';
@@ -74,6 +79,18 @@ export const ComandaService = {
       };
     } catch (error) {
       console.error('Erro ao buscar comanda:', error);
+      throw error;
+    }
+  },
+
+  async adicionarItens(
+    dto: AdicionarItensComandaDto,
+  ): Promise<ComandaResponse> {
+    try {
+      const response = await api.post('/comandas/adicionar-itens', dto);
+      return response.data;
+    } catch (error) {
+      console.error('Erro ao adicionar itens à comanda:', error);
       throw error;
     }
   },

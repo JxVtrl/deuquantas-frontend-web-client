@@ -6,14 +6,15 @@ import { MaxWidthWrapper } from '@deuquantas/components';
 export const ComandaValueChart: React.FC = () => {
   const { comanda } = useComanda();
 
-  if (!comanda) {
+  if (!comanda || !comanda.conta) {
     return null;
   }
 
-  const consumo_user = 100;
-  const limite_user = 250;
-  const consumo_total = 250;
-  const percentage = (consumo_user / consumo_total) * 100;
+  const consumo_user = comanda.conta.valTotal; // TODO: Verificar valor apenas do usuario nessa comanda
+  const limite_user = 250; // TODO: Verificar limite do usuario nas preferências
+  const consumo_total = comanda.conta.valTotal;
+  const percentage =
+    consumo_total > 0 ? (consumo_user / consumo_total) * 100 : 0;
 
   return (
     <MaxWidthWrapper
