@@ -19,7 +19,11 @@ export interface ComandaResponse {
     valServico?: number;
     valTotal: number;
   };
-  pessoas?: User[];
+  pessoas?: {
+    id: string;
+    nome: string;
+    data_criacao: string;
+  }[];
   data_criacao: string;
   id: string;
   itens: Item[];
@@ -58,7 +62,6 @@ export interface AdicionarClienteComandaDto {
 import { api } from '@/lib/axios';
 import { RegisterFormData } from '@/interfaces/register';
 import { Item } from './menu.service';
-import { User } from './api/types';
 
 interface GetComandaResponse {
   comanda: ComandaResponse;

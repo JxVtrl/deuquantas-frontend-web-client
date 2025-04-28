@@ -9,6 +9,10 @@ export interface Item {
   tipo: string;
   imagem?: string;
   observacao?: string;
+  cliente: {
+    id: string;
+    nome: string;
+  };
 }
 
 export class MenuService {

@@ -35,7 +35,7 @@ export const ComandaHeader: React.FC = () => {
                     key={index}
                     className='rounded-full outline outline-[#FFCC00]'
                   >
-                    <Avatar name={pessoa.usuario.name || ''} />
+                    <Avatar name={pessoa.nome || ''} />
                   </div>
                 ))}
               </>
@@ -46,7 +46,7 @@ export const ComandaHeader: React.FC = () => {
                     key={index}
                     className='rounded-full outline outline-[#FFCC00]'
                   >
-                    <Avatar name={pessoa.usuario.name || ''} />
+                    <Avatar name={pessoa.nome || ''} />
                   </div>
                 ))}
                 <div className='relative w-[20px] h-[24px]'>
@@ -59,7 +59,7 @@ export const ComandaHeader: React.FC = () => {
                         zIndex: 1 - index,
                       }}
                     >
-                      <Avatar name={pessoa.usuario.name || ''} />
+                      <Avatar name={pessoa.nome || ''} />
                     </div>
                   ))}
                 </div>
