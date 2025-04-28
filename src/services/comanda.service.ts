@@ -23,6 +23,7 @@ export interface ComandaResponse {
     id: string;
     nome: string;
     data_criacao: string;
+    valor_total: number;
   }[];
   data_criacao: string;
   id: string;

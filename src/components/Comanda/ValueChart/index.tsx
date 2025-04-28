@@ -2,15 +2,20 @@ import React from 'react';
 import { currencyFormatter } from '@/utils/formatters';
 import { useComanda } from '@/contexts/ComandaContext';
 import { MaxWidthWrapper } from '@deuquantas/components';
+import { useAuth } from '@/contexts/AuthContext';
 
 export const ComandaValueChart: React.FC = () => {
   const { comanda } = useComanda();
+  const { user } = useAuth();
 
   if (!comanda || !comanda.conta) {
     return null;
   }
 
-  const consumo_user = comanda.conta.valTotal; // TODO: Verificar valor apenas do usuario nessa comanda
+  const consumo_user =
+    comanda.pessoas?.find((pessoa) => {
+      return pessoa.id === user?.usuario.id;
+    })?.valor_total || 0;
   const limite_user = 250; // TODO: Verificar limite do usuario nas preferências
   const consumo_total = comanda.conta.valTotal;
   const percentage =
