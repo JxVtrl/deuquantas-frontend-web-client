@@ -3,14 +3,14 @@ import React, { useState, useEffect } from 'react';
 import Layout from '@/layout';
 import { useRouter } from 'next/router';
 import { useAuth } from '@/contexts/AuthContext';
-import QrCodeInput from '@/components/InputQrCode';
 import { toast } from 'react-hot-toast';
 import { MesaService } from '@/services/mesa.service';
 import { ComandaService } from '@/services/comanda.service';
 import dynamic from 'next/dynamic';
-import { Button, ConfirmLottie } from '@deuquantas/components';
+import { Button } from '@deuquantas/components';
+import { InputCodigoMesa } from '@/components/InputCodigoMesa';
 
-const QrCodeScanner = dynamic(() => import('@/components/QrCodeScanner'), {
+const QrCodeScanner = dynamic(() => import('@/components/QRCodeScanner'), {
   ssr: false,
   loading: () => (
     <div className='flex flex-col items-center justify-center h-full'>
@@ -118,32 +118,13 @@ const CustomerQrCode: React.FC = () => {
     }
   }, [solicitacaoId, router, user]);
 
-  const processarQrCode = async (qrCode: string) => {
+  const processarSolicitacao = async (num_cnpj: string, numMesa: string) => {
     try {
       setIsLoading(true);
       setError(null);
       setSuccessMessage(null);
       setShowScanner(false);
-      setTimeoutSeconds(300);
 
-      // Validar formato do QR Code (estabelecimento:CNPJ:mesa:NUMERO)
-      const partes = qrCode.split(':');
-      if (
-        partes.length !== 4 ||
-        partes[0] !== 'estabelecimento' ||
-        partes[2] !== 'mesa'
-      ) {
-        throw new Error('QR Code inválido');
-      }
-
-      const num_cnpj = partes[1];
-      const numMesa = partes[3];
-
-      if (!user?.cliente?.num_cpf) {
-        throw new Error('Usuário não autenticado');
-      }
-
-      // Verificar disponibilidade da mesa
       const disponivel = await MesaService.verificarDisponibilidadeMesa(
         num_cnpj,
         numMesa,
@@ -153,18 +134,19 @@ const CustomerQrCode: React.FC = () => {
         throw new Error('Mesa não está disponível');
       }
 
-      // Solicitar mesa
       const solicitacao = await MesaService.solicitarMesa(
         num_cnpj,
         numMesa,
-        user.cliente.num_cpf,
+        user?.cliente?.num_cpf || '',
       );
 
-      if (!solicitacao?.id) {
+      console.log('SOLICITACAO', JSON.stringify(solicitacao, null, 2));
+
+      if (!solicitacao.success || !solicitacao.data?.id) {
         throw new Error('Erro ao criar solicitação');
       }
 
-      setSolicitacaoId(solicitacao.id);
+      setSolicitacaoId(solicitacao.data.id);
       setSuccessMessage(
         'Solicitação enviada. Aguardando aprovação do estabelecimento...',
       );
@@ -178,6 +160,43 @@ const CustomerQrCode: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const processarQrCode = async (qrCode: string) => {
+    // Validar formato do QR Code (estabelecimento:CNPJ:mesa:NUMERO)
+    const partes = qrCode.split(':');
+    if (
+      partes.length !== 4 ||
+      partes[0] !== 'estabelecimento' ||
+      partes[2] !== 'mesa'
+    ) {
+      throw new Error('QR Code inválido');
+    }
+
+    const num_cnpj = partes[1];
+    const numMesa = partes[3];
+
+    processarSolicitacao(num_cnpj, numMesa);
+  };
+
+  const processarCodigoMesa = async (codigo: string) => {
+    // Buscar mesa pelo código
+    const response = await MesaService.buscarMesaPorCodigo(codigo);
+
+    if (!response.success || !response.data) {
+      throw new Error(response.message || 'Mesa não encontrada');
+    }
+
+    const mesa = response.data;
+
+    console.log('MESA', JSON.stringify(mesa, null, 2));
+
+    // Verificar disponibilidade da mesa
+    if (mesa.status !== 'disponivel') {
+      throw new Error('Mesa não está disponível');
+    }
+
+    processarSolicitacao(mesa.num_cnpj, mesa.numMesa);
   };
 
   const handleCancel = () => {
@@ -219,7 +238,7 @@ const CustomerQrCode: React.FC = () => {
           <div className='w-full max-w-md'>
             <QrCodeScanner onResult={processarQrCode} onError={setError} />
             <div className='mt-4'>
-              <QrCodeInput onScan={processarQrCode} />
+              <InputCodigoMesa onCodigoCompleto={processarCodigoMesa} />
             </div>
           </div>
         ) : (

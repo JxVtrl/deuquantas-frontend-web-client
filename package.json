@@ -12,7 +12,7 @@
     "env": "node -e \"console.log(process.env)\""
   },
   "dependencies": {
-    "@deuquantas/components": "^1.0.77",
+    "@deuquantas/components": "1.0.83",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@radix-ui/react-avatar": "^1.1.3",
