@@ -6,7 +6,7 @@ export const ComandaPayOptions: React.FC = () => {
   return (
     <MaxWidthWrapper
       style={{
-        paddingBottom: '90px',
+        paddingBottom: '110px',
       }}
     >
       <Button

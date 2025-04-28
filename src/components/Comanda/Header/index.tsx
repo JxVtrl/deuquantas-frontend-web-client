@@ -24,7 +24,7 @@ export const ComandaHeader: React.FC = () => {
         </h2>
         <p className='text-[14px] font-[300]'>
           <span className='font-[500]'>Grupo</span> - {pessoas?.length || 1}{' '}
-          pessoas
+          {pessoas?.length === 1 ? 'pessoa' : 'pessoas'}
         </p>
         {pessoas?.length && (
           <div className='flex items-center gap-[8px] mt-[12px]'>

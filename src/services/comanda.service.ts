@@ -9,7 +9,7 @@ export interface CreateComandaDto {
 export interface ComandaResponse {
   conta: {
     codErro?: number;
-    codPagamento: number;
+    codFormaPg: number;
     data_criacao: string;
     data_fechamento?: string;
     horPagamento?: string;
