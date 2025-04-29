@@ -33,7 +33,6 @@ export const ComandaHeader: React.FC = () => {
       return pessoa.id === user?.usuario.id;
     })?.valor_total || 0;
 
-
   return (
     <MaxWidthWrapper
       style={{

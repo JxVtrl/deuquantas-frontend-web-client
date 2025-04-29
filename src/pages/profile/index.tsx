@@ -36,11 +36,15 @@ const ProfilePage: React.FC = () => {
       const formData = new FormData();
       formData.append('image', selectedImage);
 
-      const response = await api.post(`/clientes/${user?.cliente?.id}/avatar`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
+      const response = await api.post(
+        `/clientes/${user?.cliente?.id}/avatar`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
         },
-      });
+      );
 
       if (response.data) {
         // Atualiza o avatar no estado do usuário
@@ -121,9 +125,7 @@ const ProfilePage: React.FC = () => {
                     />
                   </label>
                   {selectedImage && (
-                    <Button onClick={handleImageUpload}>
-                      Salvar foto
-                    </Button>
+                    <Button onClick={handleImageUpload}>Salvar foto</Button>
                   )}
                 </div>
               </div>
