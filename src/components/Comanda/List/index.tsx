@@ -2,9 +2,11 @@ import { useComanda } from '@/contexts/ComandaContext';
 import { Avatar, Button, MaxWidthWrapper } from '@deuquantas/components';
 import { currencyFormatter } from '@/utils/formatters';
 import React from 'react';
+import { useAuth } from '@/contexts/AuthContext';
 
 export const ComandaList: React.FC = () => {
   const { comanda } = useComanda();
+  const { user } = useAuth();
 
   const itens = comanda?.itens;
 
@@ -38,7 +40,13 @@ export const ComandaList: React.FC = () => {
               </span>
             </div>
             <div className='flex items-center gap-[12px]'>
-              <Avatar name={item?.cliente?.nome} src={item.imagem} />
+              <Avatar
+                name={item?.cliente?.nome}
+                src={item.imagem}
+                bgColor={
+                  item.cliente.id === user?.cliente.id ? '#FFCC00' : 'muted'
+                }
+              />
               <span className='text-[14px] font-[500] text-[#272727] leading-[14px]'>
                 {currencyFormatter(item.preco)}
               </span>

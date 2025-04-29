@@ -8,11 +8,31 @@ export const ComandaHeader: React.FC = () => {
   const { user } = useAuth();
   const { comanda } = useComanda();
 
-  const pessoas = comanda?.pessoas;
+  if (!user) {
+    return null;
+  }
+
+  const myself = comanda?.pessoas?.find((pessoa) => {
+    return pessoa.id === user.usuario.id;
+  });
+
+  if (!myself) {
+    return null;
+  }
+
+  const pessoas = comanda?.pessoas?.filter((pessoa) => {
+    return pessoa.id !== user.usuario.id;
+  });
+
+  if (pessoas) {
+    pessoas.unshift(myself);
+  }
+
   const consumo_user =
     pessoas?.find((pessoa) => {
       return pessoa.id === user?.usuario.id;
     })?.valor_total || 0;
+
   return (
     <MaxWidthWrapper
       style={{
@@ -34,29 +54,39 @@ export const ComandaHeader: React.FC = () => {
         </p>
         {pessoas?.length && (
           <div className='flex items-center gap-[8px] mt-[12px]'>
-            {pessoas?.length <= 4 ? (
+            {pessoas.length <= 4 ? (
               <>
-                {pessoas?.map((pessoa, index) => (
+                {pessoas.map((pessoa, index) => (
                   <div
                     key={index}
                     className='rounded-full outline outline-[#FFCC00]'
                   >
-                    <Avatar name={pessoa.nome || ''} />
+                    <Avatar
+                      name={pessoa.nome}
+                      bgColor={
+                        pessoa.id === user.usuario.id ? '#FFCC00' : 'muted'
+                      }
+                    />
                   </div>
                 ))}
               </>
             ) : (
               <>
-                {pessoas?.slice(0, 4).map((pessoa, index) => (
+                {pessoas.slice(0, 4).map((pessoa, index) => (
                   <div
                     key={index}
                     className='rounded-full outline outline-[#FFCC00]'
                   >
-                    <Avatar name={pessoa.nome || ''} />
+                    <Avatar
+                      name={pessoa.nome}
+                      bgColor={
+                        pessoa.id === user.usuario.id ? '#FFCC00' : 'muted'
+                      }
+                    />
                   </div>
                 ))}
                 <div className='relative w-[20px] h-[24px]'>
-                  {pessoas?.slice(4, 8).map((pessoa, index) => (
+                  {pessoas.slice(4, 8).map((pessoa, index) => (
                     <div
                       key={index}
                       className='absolute inset-0 rounded-full outline outline-[#FFCC00] w-[24px] h-[24px]'
@@ -65,7 +95,12 @@ export const ComandaHeader: React.FC = () => {
                         zIndex: 1 - index,
                       }}
                     >
-                      <Avatar name={pessoa.nome || ''} />
+                      <Avatar
+                        name={pessoa.nome}
+                        bgColor={
+                          pessoa.id === user.usuario.id ? '#FFCC00' : 'muted'
+                        }
+                      />
                     </div>
                   ))}
                 </div>

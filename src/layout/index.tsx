@@ -38,7 +38,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         <div className='flex-none'>
           <StatusBar variant='client' />
           <Header
-            name={!establishmentName ? user?.usuario?.name : establishmentName}
+            nome={user?.usuario?.name}
+            nome_estab={establishmentName}
             variant='client'
             text_variant={!establishmentName ? 'welcome' : 'on-establishment'}
             menuOpen={menuOpen}
