@@ -104,7 +104,7 @@ export const OpenComandas: React.FC = () => {
                   <Button
                     variant='primary'
                     text='Aceitar'
-                    onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                    onClick={(e: React.FormEvent<Element>) => {
                       e.preventDefault();
                       handleResponderSolicitacao(solicitacao.id, 'ACEITA');
                     }}
@@ -112,7 +112,7 @@ export const OpenComandas: React.FC = () => {
                   <Button
                     variant='secondary'
                     text='Recusar'
-                    onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                    onClick={(e: React.FormEvent<Element>) => {
                       e.preventDefault();
                       handleResponderSolicitacao(solicitacao.id, 'RECUSADA');
                     }}
