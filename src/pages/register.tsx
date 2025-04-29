@@ -8,7 +8,9 @@ export default function RegisterRedirect() {
     router.replace('/auth?register=true');
   }, [router]);
 
-  return <>
-    <SeoHead title='Registro - DeuQuantas' />
-  </>;
+  return (
+    <>
+      <SeoHead title='Registro - DeuQuantas' />
+    </>
+  );
 }

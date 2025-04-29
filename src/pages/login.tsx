@@ -8,7 +8,9 @@ export default function LoginRedirect() {
     router.replace('/auth');
   }, [router]);
 
-  return <>
-  <SeoHead title='Login - DeuQuantas' />
-  </>;
+  return (
+    <>
+      <SeoHead title='Login - DeuQuantas' />
+    </>
+  );
 }

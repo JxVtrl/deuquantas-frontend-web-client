@@ -23,7 +23,7 @@ const Comanda: React.FC = () => {
 
   return (
     <>
-    <SeoHead title="Carregando comanda - DeuQuantas" />
+      <SeoHead title='Carregando comanda - DeuQuantas' />
     </>
   );
 };

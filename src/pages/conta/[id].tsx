@@ -11,7 +11,7 @@ import {
   ComandaPayButton,
 } from '@/components/Comanda';
 import { contaNavigationPills } from '@/data/home_navigation_pills';
-import SeoHead from '@/components/SeoHead'; 
+import SeoHead from '@/components/SeoHead';
 const ContaPage = () => {
   const router = useRouter();
   const { id } = router.query;
@@ -25,12 +25,12 @@ const ContaPage = () => {
   if (loading) {
     return (
       <>
-      <SeoHead title="Carregando comanda - DeuQuantas" />
-      <Layout>
-        <div className='flex justify-center items-center h-screen'>
-          <div className='animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#FFCC00]'></div>
-        </div>
-      </Layout>
+        <SeoHead title='Carregando comanda - DeuQuantas' />
+        <Layout>
+          <div className='flex justify-center items-center h-screen'>
+            <div className='animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#FFCC00]'></div>
+          </div>
+        </Layout>
       </>
     );
   }
@@ -38,28 +38,28 @@ const ContaPage = () => {
   if (error || !comanda) {
     return (
       <>
-      <SeoHead title="Erro ao carregar comanda - DeuQuantas" />
-      <Layout>
-        <div className='flex justify-center items-center h-screen'>
-          <div className='bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded'>
-            {error}
+        <SeoHead title='Erro ao carregar comanda - DeuQuantas' />
+        <Layout>
+          <div className='flex justify-center items-center h-screen'>
+            <div className='bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded'>
+              {error}
+            </div>
           </div>
-        </div>
-      </Layout>
+        </Layout>
       </>
     );
   }
 
   return (
     <>
-    <SeoHead title="Comanda - DeuQuantas" />
-    <Layout>
-      <NavigationPills navigationPills={contaNavigationPills} />
-      <ComandaButtons />
-      <ComandaValueChart />
-      <ComandaNotifications />
-      <ComandaPayButton />
-    </Layout>
+      <SeoHead title='Comanda - DeuQuantas' />
+      <Layout>
+        <NavigationPills navigationPills={contaNavigationPills} />
+        <ComandaButtons />
+        <ComandaValueChart />
+        <ComandaNotifications />
+        <ComandaPayButton />
+      </Layout>
     </>
   );
 };

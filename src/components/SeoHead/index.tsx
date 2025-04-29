@@ -11,7 +11,7 @@ interface SeoHeadProps {
 export default function SeoHead({
   title,
   description = 'Comanda transparente em tempo real para bares e restaurantes.',
-  image = '/images/og-image.png',
+  image = '/og-image.webp',
   url = 'https://deuquantas.com.br',
 }: SeoHeadProps) {
   const router = useRouter();
@@ -24,21 +24,21 @@ export default function SeoHead({
   return (
     <Head>
       <title>{finalTitle}</title>
-      <meta name="description" content={description} />
-      
+      <meta name='description' content={description} />
+
       {/* Open Graph */}
-      <meta property="og:type" content="website" />
-      <meta property="og:url" content={`${url}${router.asPath}`} />
-      <meta property="og:title" content={finalTitle} />
-      <meta property="og:description" content={description} />
-      <meta property="og:image" content={image} />
+      <meta property='og:type' content='website' />
+      <meta property='og:url' content={`${url}${router.asPath}`} />
+      <meta property='og:title' content={finalTitle} />
+      <meta property='og:description' content={description} />
+      <meta property='og:image' content={image} />
 
       {/* Twitter */}
-      <meta name="twitter:card" content="summary_large_image" />
-      <meta name="twitter:url" content={`${url}${router.asPath}`} />
-      <meta name="twitter:title" content={finalTitle} />
-      <meta name="twitter:description" content={description} />
-      <meta name="twitter:image" content={image} />
+      <meta name='twitter:card' content='summary_large_image' />
+      <meta name='twitter:url' content={`${url}${router.asPath}`} />
+      <meta name='twitter:title' content={finalTitle} />
+      <meta name='twitter:description' content={description} />
+      <meta name='twitter:image' content={image} />
     </Head>
   );
 }

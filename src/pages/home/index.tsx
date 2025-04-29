@@ -12,14 +12,14 @@ import SeoHead from '@/components/SeoHead';
 const CustomerHome: React.FC = () => {
   return (
     <>
-    <SeoHead title="Home - DeuQuantas" />
-    <Layout>
-      <NavigationPills navigationPills={customerNavigationPills} />
-      <ActionsHome />
-      <OpenComandas />
-      <FavoritePlaces />
-      <PromotionSlider />
-    </Layout>
+      <SeoHead title='Home - DeuQuantas' />
+      <Layout>
+        <NavigationPills navigationPills={customerNavigationPills} />
+        <ActionsHome />
+        <OpenComandas />
+        <FavoritePlaces />
+        <PromotionSlider />
+      </Layout>
     </>
   );
 };

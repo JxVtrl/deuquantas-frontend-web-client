@@ -20,9 +20,11 @@ const Conta: React.FC = () => {
     checkComandaAtiva();
   }, [fetchComandaAtivaId, router]);
 
-  return <>
-  <SeoHead title="Carregando comanda - DeuQuantas" />
-  </>;
+  return (
+    <>
+      <SeoHead title='Carregando comanda - DeuQuantas' />
+    </>
+  );
 };
 
 export default withAuthCustomer(Conta);

@@ -217,52 +217,52 @@ const CustomerQrCode: React.FC = () => {
 
   return (
     <>
-    <SeoHead title="QR Code - DeuQuantas" />
-    <Layout>
-      <div className='flex flex-col items-center mt-[10vh] min-h-screen p-4'>
-        {error && (
-          <div className='mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded'>
-            {error}
-          </div>
-        )}
-
-        {successMessage && (
-          <div className='mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded'>
-            {successMessage}
-            <p className='mt-2'>
-              Tempo restante: {Math.floor(timeoutSeconds / 60)}:
-              {(timeoutSeconds % 60).toString().padStart(2, '0')}
-            </p>
-          </div>
-        )}
-
-        {isLoading ? (
-          <div className='flex flex-col items-center'>
-            {/* <ConfirmLottie /> */}
-            <p className='mt-4'>Processando QR Code...</p>
-          </div>
-        ) : showScanner ? (
-          <div className='w-full max-w-md'>
-            <QrCodeScanner onResult={processarQrCode} onError={setError} />
-            <div className='mt-4'>
-              <InputCodigoMesa onCodigoCompleto={processarCodigoMesa} />
+      <SeoHead title='QR Code - DeuQuantas' />
+      <Layout>
+        <div className='flex flex-col items-center mt-[10vh] min-h-screen p-4'>
+          {error && (
+            <div className='mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded'>
+              {error}
             </div>
-          </div>
-        ) : (
-          <div className='flex flex-col items-center'>
-            {/* <ConfirmLottie /> */}
-            <p className='mt-4'>Aguardando resposta do estabelecimento...</p>
-            <div className='mt-4'>
-              <Button
-                text='Cancelar'
-                onClick={handleCancel}
-                variant='primary'
-              />
+          )}
+
+          {successMessage && (
+            <div className='mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded'>
+              {successMessage}
+              <p className='mt-2'>
+                Tempo restante: {Math.floor(timeoutSeconds / 60)}:
+                {(timeoutSeconds % 60).toString().padStart(2, '0')}
+              </p>
             </div>
-          </div>
-        )}
-      </div>
-    </Layout>
+          )}
+
+          {isLoading ? (
+            <div className='flex flex-col items-center'>
+              {/* <ConfirmLottie /> */}
+              <p className='mt-4'>Processando QR Code...</p>
+            </div>
+          ) : showScanner ? (
+            <div className='w-full max-w-md'>
+              <QrCodeScanner onResult={processarQrCode} onError={setError} />
+              <div className='mt-4'>
+                <InputCodigoMesa onCodigoCompleto={processarCodigoMesa} />
+              </div>
+            </div>
+          ) : (
+            <div className='flex flex-col items-center'>
+              {/* <ConfirmLottie /> */}
+              <p className='mt-4'>Aguardando resposta do estabelecimento...</p>
+              <div className='mt-4'>
+                <Button
+                  text='Cancelar'
+                  onClick={handleCancel}
+                  variant='primary'
+                />
+              </div>
+            </div>
+          )}
+        </div>
+      </Layout>
     </>
   );
 };

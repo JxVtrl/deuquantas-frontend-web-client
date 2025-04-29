@@ -14,46 +14,46 @@ const Configuração: React.FC = () => {
 
   return (
     <>
-    <SeoHead title="Configurações - DeuQuantas" />
-    <Layout>
-      <div className='max-w-4xl mx-auto p-6 overflow-y-scroll h-[calc(100vh-120px)]'>
-        <h1 className='text-2xl font-bold mb-6'>Configurações</h1>
+      <SeoHead title='Configurações - DeuQuantas' />
+      <Layout>
+        <div className='max-w-4xl mx-auto p-6 overflow-y-scroll h-[calc(100vh-120px)]'>
+          <h1 className='text-2xl font-bold mb-6'>Configurações</h1>
 
-        <Card className='mb-6'>
-          <CardHeader>
-            <CardTitle>Preferências de Interface</CardTitle>
-          </CardHeader>
-          <CardContent className='space-y-4'>
-            <div className='flex items-center justify-between'>
-              <div>
-                <h3 className='font-medium'>Modo Canhoto</h3>
-                <p className='text-sm text-gray-500'>
-                  Posiciona o botão de adicionar à esquerda
-                </p>
+          <Card className='mb-6'>
+            <CardHeader>
+              <CardTitle>Preferências de Interface</CardTitle>
+            </CardHeader>
+            <CardContent className='space-y-4'>
+              <div className='flex items-center justify-between'>
+                <div>
+                  <h3 className='font-medium'>Modo Canhoto</h3>
+                  <p className='text-sm text-gray-500'>
+                    Posiciona o botão de adicionar à esquerda
+                  </p>
+                </div>
+                <IOSSwitch
+                  checked={preferences.isLeftHanded}
+                  onChange={() => toggleLeftHanded()}
+                />
               </div>
-              <IOSSwitch
-                checked={preferences.isLeftHanded}
-                onChange={() => toggleLeftHanded()}
-              />
-            </div>
 
-            <Separator />
+              <Separator />
 
-            <div className='flex items-center justify-between'>
-              <div>
-                <h3 className='font-medium'>Idioma</h3>
-                <p className='text-sm text-gray-500'>
-                  Altera o idioma da aplicação
-                </p>
+              <div className='flex items-center justify-between'>
+                <div>
+                  <h3 className='font-medium'>Idioma</h3>
+                  <p className='text-sm text-gray-500'>
+                    Altera o idioma da aplicação
+                  </p>
+                </div>
+                <Button variant='outline' onClick={() => toggleLanguage()}>
+                  {preferences.language === 'pt' ? 'Português' : 'English'}
+                </Button>
               </div>
-              <Button variant='outline' onClick={() => toggleLanguage()}>
-                {preferences.language === 'pt' ? 'Português' : 'English'}
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    </Layout>
+            </CardContent>
+          </Card>
+        </div>
+      </Layout>
     </>
   );
 };

@@ -12,7 +12,6 @@ function AuthPageContent() {
   const { isLogin } = useAuthFormContext();
 
   return (
-
     <div
       style={{ backgroundColor: '#FFCC00' }}
       className='min-h-screen flex items-center justify-center p-4 transition-all duration-300'
@@ -43,8 +42,12 @@ export default function AuthPage() {
 
   return (
     <>
-      <SeoHead title="DeuQuantas - Sua Comanda Sem Surpresas" />
-      <AuthFormProvider login={login} register={register} onSuccess={() => null}>
+      <SeoHead title='DeuQuantas - Sua Comanda Sem Surpresas' />
+      <AuthFormProvider
+        login={login}
+        register={register}
+        onSuccess={() => null}
+      >
         <AuthPageContent />
       </AuthFormProvider>
     </>
