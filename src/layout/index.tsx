@@ -34,8 +34,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
   return (
     <>
-      <div className='flex flex-col h-screen fixed inset-0'>
-        <div className='flex-1 overflow-y-auto relative'>
+      <div className='flex flex-col h-screen fixed inset-0 overflow-hidden'>
+        <div className='absolute inset-0 overflow-y-auto'>
           <StatusBar variant='client' />
           <Header
             nome={user?.usuario?.name}
@@ -46,10 +46,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             setMenuOpen={setMenuOpen}
             onLogoClick={() => router.push('/home')}
           />
-          <div className='absolute inset-0 overflow-y-auto'>
-            {children}
-            <CartEmptyError />
-          </div>
+          {children}
+          <CartEmptyError />
         </div>
         <div className='flex-none'>
           <NavigationMenu
