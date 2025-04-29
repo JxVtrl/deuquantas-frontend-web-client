@@ -1,12 +1,14 @@
 import { PurchaseHistoryItem } from '@/interfaces/purchase';
 import { HomeTabList } from '@/interfaces/tab';
-import { createContext, ReactNode, useContext, useState } from 'react';
+import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
+import Bowser from 'bowser';
 
 interface CustomerContextData {
   activeHomeTab: HomeTabList;
   setActiveHomeTab: (tab: HomeTabList) => void;
   purchaseHistory: PurchaseHistoryItem[];
   setPurchaseHistory: (history: PurchaseHistoryItem[]) => void;
+  isSafari: boolean;
 }
 
 export const CustomerContext = createContext<CustomerContextData>(
@@ -19,6 +21,14 @@ export const CustomerProvider = ({ children }: { children: ReactNode }) => {
   const [purchaseHistory, setPurchaseHistory] = useState<PurchaseHistoryItem[]>(
     [],
   );
+  const [isSafari, setIsSafari] = useState(false);
+
+  useEffect(() => {
+    const browser = Bowser.getParser(window.navigator.userAgent);
+    const isSafari = browser.getBrowserName() === 'Safari';
+    console.log('isSafari', isSafari);
+    setIsSafari(isSafari);
+  }, []);
 
   return (
     <CustomerContext.Provider
@@ -27,6 +37,7 @@ export const CustomerProvider = ({ children }: { children: ReactNode }) => {
         setActiveHomeTab,
         purchaseHistory,
         setPurchaseHistory,
+        isSafari,
       }}
     >
       {children}

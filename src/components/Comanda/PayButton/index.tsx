@@ -4,7 +4,7 @@ export const ComandaPayButton = () => {
   return (
     <MaxWidthWrapper
       style={{
-        paddingBottom: '90px',
+        paddingBottom: '81px',
       }}
     >
       <Button

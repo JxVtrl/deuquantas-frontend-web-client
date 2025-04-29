@@ -96,7 +96,7 @@ export const ComandaValueChart: React.FC = () => {
                 x2='132'
                 y2='1'
                 stroke='black'
-                stroke-opacity='0.1'
+                strokeOpacity='0.1'
               />
             </svg>
 

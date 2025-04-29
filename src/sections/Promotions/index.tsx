@@ -4,8 +4,13 @@ import Image from 'next/image';
 import { Carousel } from '@/components/Carousel';
 import { SwiperSlide } from 'swiper/react';
 import { MaxWidthWrapper } from '@deuquantas/components';
+
+interface Promotion {
+  image: string;
+}
+
 export const PromotionSlider: React.FC = () => {
-  const [promotions, setPromotions] = React.useState<any[]>([]);
+  const [promotions, setPromotions] = React.useState<Promotion[]>([]);
 
   const promotionsFallback = [
     {
@@ -38,7 +43,7 @@ export const PromotionSlider: React.FC = () => {
     >
       <Carousel
         style={{
-          padding: '20px 0 90px',
+          padding: '20px 0 81px',
         }}
         spaceBetween={10}
       >

@@ -11,8 +11,11 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { useComanda } from '@/contexts/ComandaContext';
 import { CartEmptyError } from '@/components/CartEmptyError';
+import { useCustomerContext } from '@/contexts/CustomerContext';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
+  const { isSafari } = useCustomerContext();
+
   const { bottomNavItems } = useNavigation();
   const { estabelecimento, handleAddClick, isNavigationButtonDisabled } =
     useComanda();
@@ -35,7 +38,12 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <>
       <div className='flex flex-col h-screen fixed inset-0 overflow-hidden'>
-        <div className='absolute inset-0 overflow-y-auto'>
+        <div
+          className='absolute inset-0 overflow-y-auto'
+          style={{
+            paddingBottom: isSafari ? '81px' : '0px',
+          }}
+        >
           <StatusBar variant='client' />
           <Header
             nome={user?.usuario?.name}
