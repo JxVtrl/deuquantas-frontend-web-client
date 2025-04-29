@@ -45,7 +45,11 @@ export const ComandaPessoas = () => {
               className='flex items-center justify-between gap-[8px] border-t border-[#E0E0E0] py-[10px]'
             >
               <div className='flex items-center gap-[12px]'>
-                <Avatar name={pessoa.nome} />
+                <Avatar 
+                  name={pessoa.nome} 
+                  src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${pessoa.avatar}`}
+                  bgColor={pessoa.id === user?.usuario?.id ? '#FFCC00' : 'muted'}
+                />
                 <span className='text-[16px] font-[500] text-[#000000] leading-[16px]'>
                   {pessoa.nome}
                 </span>

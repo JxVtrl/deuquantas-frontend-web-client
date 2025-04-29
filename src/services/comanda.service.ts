@@ -31,6 +31,7 @@ export interface ComandaResponse {
     nome: string;
     data_criacao: string;
     valor_total: number;
+    avatar: string;
   }[];
 }
 

@@ -12,6 +12,7 @@ export interface Item {
   cliente: {
     id: string;
     nome: string;
+    avatar: string;
   };
 }
 

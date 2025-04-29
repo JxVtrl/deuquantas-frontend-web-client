@@ -33,6 +33,7 @@ export const ComandaHeader: React.FC = () => {
       return pessoa.id === user?.usuario.id;
     })?.valor_total || 0;
 
+
   return (
     <MaxWidthWrapper
       style={{
@@ -66,6 +67,7 @@ export const ComandaHeader: React.FC = () => {
                       bgColor={
                         pessoa.id === user.usuario.id ? '#FFCC00' : 'muted'
                       }
+                      src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${pessoa.avatar}`}
                     />
                   </div>
                 ))}
@@ -82,6 +84,7 @@ export const ComandaHeader: React.FC = () => {
                       bgColor={
                         pessoa.id === user.usuario.id ? '#FFCC00' : 'muted'
                       }
+                      src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${pessoa.avatar}`}
                     />
                   </div>
                 ))}
@@ -100,6 +103,7 @@ export const ComandaHeader: React.FC = () => {
                         bgColor={
                           pessoa.id === user.usuario.id ? '#FFCC00' : 'muted'
                         }
+                        src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${pessoa.avatar}`}
                       />
                     </div>
                   ))}

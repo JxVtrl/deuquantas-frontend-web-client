@@ -27,8 +27,6 @@ export const ComandaList: React.FC = () => {
       </div>
 
       {itens?.map((item) => {
-        console.log('item', item);
-
         return (
           <div
             key={item.id}
@@ -42,7 +40,7 @@ export const ComandaList: React.FC = () => {
             <div className='flex items-center gap-[12px]'>
               <Avatar
                 name={item?.cliente?.nome}
-                src={item.imagem}
+                src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${item.cliente.avatar}`}
                 bgColor={
                   item.cliente.id === user?.cliente.id ? '#FFCC00' : 'muted'
                 }

@@ -47,6 +47,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           <StatusBar variant='client' />
           <Header
             nome={user?.usuario?.name}
+            avatar={user?.cliente?.avatar}
             nome_estab={establishmentName}
             variant='client'
             text_variant={!establishmentName ? 'welcome' : 'on-establishment'}

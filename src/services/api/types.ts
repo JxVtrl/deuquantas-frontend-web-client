@@ -10,6 +10,7 @@ export interface Cliente {
   num_cpf: string;
   data_nascimento: Date;
   num_celular: string;
+  avatar: string;
 }
 
 export interface UserPreferences {

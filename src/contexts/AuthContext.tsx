@@ -21,6 +21,7 @@ interface AuthContextData {
   logout: () => void;
   isAuthenticated: boolean;
   clearSession: () => void;
+  setUser: (user: User | null) => void;
 }
 
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
@@ -100,6 +101,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
           num_cpf: response.num_cpf,
           num_celular: response.num_celular,
           data_nascimento: response.data_nascimento,
+          avatar: `${process.env.NEXT_PUBLIC_API_URL}/uploads/${response.avatar}`,
         },
       };
 
@@ -221,6 +223,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         logout,
         isAuthenticated,
         clearSession,
+        setUser,
       }}
     >
       {children}
