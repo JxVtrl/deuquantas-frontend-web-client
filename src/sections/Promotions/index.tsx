@@ -62,7 +62,6 @@ export const PromotionSlider: React.FC = () => {
               alt='Promotion'
               layout='fill'
               objectFit='cover'
-              className='absolute top-0 left-0 w-full h-full z-[-1]'
             />
           </SwiperSlide>
         ))}

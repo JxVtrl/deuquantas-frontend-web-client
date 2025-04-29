@@ -1,6 +1,12 @@
 import { PurchaseHistoryItem } from '@/interfaces/purchase';
 import { HomeTabList } from '@/interfaces/tab';
-import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
+import {
+  createContext,
+  ReactNode,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 import Bowser from 'bowser';
 
 interface CustomerContextData {

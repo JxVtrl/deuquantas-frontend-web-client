@@ -91,13 +91,7 @@ export const ComandaValueChart: React.FC = () => {
               fill='none'
               xmlns='http://www.w3.org/2000/svg'
             >
-              <line
-                y1='1'
-                x2='132'
-                y2='1'
-                stroke='black'
-                strokeOpacity='0.1'
-              />
+              <line y1='1' x2='132' y2='1' stroke='black' strokeOpacity='0.1' />
             </svg>
 
             <p className='text-[10px] text-[#272727] font-[500] leading-[10px] my-[8px]'>
