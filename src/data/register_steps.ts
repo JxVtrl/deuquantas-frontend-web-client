@@ -34,34 +34,3 @@ export const register_steps: Step[] = [
     ],
   },
 ];
-
-export const registerSteps = [
-  {
-    id: 'account-type',
-    title: 'Tipo de Conta',
-    fields: ['accountType'],
-  },
-  {
-    id: 'user',
-    title: 'Dados do Usuário',
-    fields: ['email', 'password', 'confirmPassword'],
-  },
-  {
-    id: 'address',
-    title: 'Endereço',
-    fields: [
-      'endereco',
-      'numero',
-      'complemento',
-      'bairro',
-      'cidade',
-      'estado',
-      'cep',
-    ],
-  },
-  {
-    id: 'logo',
-    title: 'Logo',
-    fields: ['imgLogo'],
-  },
-];

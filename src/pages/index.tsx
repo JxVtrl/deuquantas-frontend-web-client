@@ -1,6 +1,4 @@
 import { useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import Link from 'next/link';
 import {
   Instagram,
   Facebook,
@@ -14,11 +12,14 @@ import {
   BarChart4,
   Users,
   Shield,
-  Check,
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+import { motion } from 'framer-motion';
+import { Button, Logo } from '@deuquantas/components';
+import { useRouter } from 'next/router';
 
 export default function Home() {
+  const router = useRouter();
   // Smooth scroll for anchor links
   useEffect(() => {
     const handleAnchorClick = (e: MouseEvent) => {
@@ -48,29 +49,12 @@ export default function Home() {
       {/* Header */}
       <header className='fixed top-0 left-0 right-0 z-50 transition-all duration-300 py-4 px-6 bg-white/80 backdrop-blur-md shadow-sm dark:bg-black/80'>
         <div className='container mx-auto flex items-center justify-between'>
-          <Link href='/' className='flex items-center'>
-            <svg
-              xmlns='http://www.w3.org/2000/svg'
-              width='112'
-              height='48'
-              viewBox='0 0 56 24'
-              fill='none'
-              className='mb-0'
-            >
-              <path
-                d='M8.39967 21.3432C3.46054 21.3432 0 18.1845 0 13.4908C0 8.47233 3.99535 5.99262 7.64464 5.99262C9.6895 5.99262 11.3883 6.76015 12.4265 8.23616V0H16.6735V13.5203C16.6735 18.3616 13.213 21.3432 8.39967 21.3432ZM8.36821 17.6236C10.7906 17.6236 12.4265 16 12.4265 13.6679C12.4265 11.3358 10.7906 9.71218 8.36821 9.71218C5.94583 9.71218 4.30994 11.3358 4.30994 13.6679C4.30994 16 5.94583 17.6236 8.36821 17.6236Z'
-                fill='#FFCC00'
-              />
-              <path
-                d='M41.6648 24H36.474L34.0831 20.7823C32.9191 21.1365 31.6293 21.3432 30.2451 21.3432C23.8273 21.3432 19.2972 17.0923 19.2972 11.3063C19.2972 5.5203 23.8273 1.26937 30.2451 1.26937C36.6628 1.26937 41.1929 5.5203 41.1929 11.3063C41.1929 14.3469 39.9346 16.9742 37.8268 18.7454L41.6648 24ZM30.2451 17.3579C30.6855 17.3579 31.0945 17.3284 31.5034 17.2694L28.5462 13.2546H33.8L35.2156 15.203C36.065 14.1697 36.5369 12.8413 36.5369 11.3063C36.5369 7.79336 34.0202 5.25461 30.2451 5.25461C26.4699 5.25461 23.9532 7.79336 23.9532 11.3063C23.9532 14.8192 26.4699 17.3579 30.2451 17.3579Z'
-                fill='#FFCC00'
-              />
-              <path
-                d='M46.5936 14.6125V14.3764C46.5936 11.3653 48.3239 10.3026 49.7396 9.41697C50.8092 8.73801 51.7215 8.17712 51.7215 6.99631C51.7215 5.72694 50.8092 4.98893 49.425 4.98893C48.1666 4.98893 47.1284 5.72694 47.1284 7.11439V7.35055H43.1016V6.96679C43.1016 3.4834 45.8386 1.26937 49.5508 1.26937C53.2945 1.26937 56 3.42435 56 6.96679C56 10.0074 54.2697 10.952 52.7597 11.7786C51.5957 12.428 50.5575 12.9889 50.5575 14.3764V14.6125H46.5936ZM48.6385 21.3432C47.0655 21.3432 45.8701 20.2214 45.8701 18.7454C45.8701 17.2694 47.0655 16.1476 48.6385 16.1476C50.2115 16.1476 51.4069 17.2694 51.4069 18.7454C51.4069 20.2214 50.2115 21.3432 48.6385 21.3432Z'
-                fill='#FFCC00'
-              />
-            </svg>
-          </Link>
+          <Logo
+            size='medium'
+            onClick={() => {
+              router.push('/home');
+            }}
+          />
 
           <nav className='hidden md:flex items-center space-x-8'>
             {['Início', 'Funcionalidades', 'Como Funciona', 'Contato'].map(
@@ -87,93 +71,174 @@ export default function Home() {
           </nav>
 
           <div className='flex items-center gap-4'>
-            <Link
-              href={`${process.env.NODE_ENV === 'development' ? 'http://localhost:3000/login' : 'https://deuquantas.com.br/login'}`}
-            >
-              <Button
-                className='bg-brand-yellow hover:bg-brand-yellow/90'
-                variant='default'
-              >
-                Entrar
-              </Button>
-            </Link>
-            <Link
-              href={`${process.env.NODE_ENV === 'development' ? 'http://localhost:3000/register' : 'https://deuquantas.com.br/register'}`}
-            >
-              <Button variant='outline'>Cadastrar</Button>
-            </Link>
+            <Button variant='primary' text='Cadastrar' href='/register' />
+            <Button variant='secondary' text='Entrar' href='/login' />
           </div>
         </div>
       </header>
 
-      <main className='relative flex flex-col min-h-screen'>
+      <main className='relative flex  flex-col min-h-screen overflow-x-hidden overflow-y-auto'>
         {/* Hero Section */}
         <section
-          className='min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-b from-white to-brand-gray dark:from-brand-dark dark:to-gray-900 pt-20'
+          className='min-h-[calc(140vh)] flex flex-col justify-center 
+            relative overflow-hidden bg-gradient-to-b from-white to-brand-gray 
+            dark:from-brand-dark dark:to-gray-900 
+            pt-16 sm:pt-20 pb-12 sm:pb-16 px-4 sm:px-6'
           id='início'
         >
-          <div className='absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-white via-white to-transparent dark:from-brand-dark dark:via-brand-dark dark:to-transparent opacity-70 z-0'></div>
+          {/* Background Gradient */}
+          <div
+            className='absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] 
+            from-white via-white to-transparent dark:from-brand-dark dark:via-brand-dark 
+            dark:to-transparent opacity-70 z-0'
+          />
 
-          <div className='container max-w-7xl mx-auto px-4 sm:px-6 relative z-10 flex flex-col items-center text-center'>
-            <h2 className='text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-6 tracking-tight dark:text-white'>
-              SUA MESA VALE OURO, NÃO A DEIXE PARADA
-            </h2>
-            <p className='text-xl md:text-2xl text-neutral-600 dark:text-neutral-300 max-w-3xl mb-10'>
-              Com o DeuQuantas, seus clientes pagam direto do celular. Você gira
-              mesas mais rápido, fatura mais e ainda vira referência em
-              atendimento moderno.
-            </p>
+          <div className='container max-w-7xl mx-auto relative z-10'>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{
+                opacity: 1,
+                y: 0,
+                transition: {
+                  type: 'spring',
+                  duration: 1,
+                  bounce: 0.3,
+                },
+              }}
+              viewport={{ once: true }}
+              className='flex flex-col items-center text-center'
+            >
+              {/* Título Principal */}
+              <h1
+                className='text-3xl pt-30  md:text-4xl lg:text-4xl xl:text-5xl
+                font-bold tracking-tight text-neutral-900 dark:text-white
+                leading-[1.2] sm:leading-[1.2] mb-6 sm:mb-8 max-w-[18ch]'
+              >
+                <span className='inline-block mb-2'>SUA MESA</span>
+                <br className='hidden sm:block' />
+                <span className='inline-block mb-2'>VALE OURO.</span>
+                <br className='hidden sm:block' />
+                <span className='inline-block'>NÃO A DEIXE PARADA.</span>
+              </h1>
 
-            {/* 
-              Quero adicionaro seguinte abaixo ✅ Sem fila pra pagar ✅ Sem
-              chamar garçom ✅ Sem confusão na conta
-            */}
+              {/* Subtítulo */}
+              <p
+                className='text-base sm:text-lg md:text-xl text-neutral-600 
+                dark:text-neutral-300 max-w-2xl mx-auto mb-12 sm:mb-16
+                leading-relaxed px-4'
+              >
+                Com o DeuQuantas, seus clientes pagam direto do celular.
+                <br className='hidden sm:block' />
+                Você gira mesas mais rápido, fatura mais e ainda vira referência
+                em atendimento moderno.
+              </p>
 
-            <div className='w-full max-w-xl mb-24'>
-              <div className='flex flex-col sm:flex-row items-center gap-3'>
-                <div className='w-12 h-12 rounded-full flex items-center justify-center text-brand-yellow'>
-                  <Check size={24} />
+              {/* Benefits Cards */}
+              <div className='w-full max-w-5xl mx-auto mb-12 sm:mb-16'>
+                <div className='grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 px-4 sm:px-0'>
+                  {[
+                    {
+                      icon: Clock,
+                      text: 'Sem fila pra pagar',
+                      description: 'Pagamento rápido e sem espera',
+                    },
+                    {
+                      icon: Users,
+                      text: 'Sem chamar garçom',
+                      description: 'Autonomia total para os clientes',
+                    },
+                    {
+                      icon: CreditCard,
+                      text: 'Sem confusão na conta',
+                      description: 'Divisão automática e transparente',
+                    },
+                  ].map((benefit, index) => (
+                    <motion.div
+                      key={benefit.text}
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{
+                        opacity: 1,
+                        y: 0,
+                        transition: {
+                          type: 'spring',
+                          duration: 0.8,
+                          delay: index * 0.2,
+                          bounce: 0.3,
+                        },
+                      }}
+                      viewport={{ once: true }}
+                      className='group relative overflow-hidden rounded-xl 
+                        bg-white/80 dark:bg-neutral-800/80 backdrop-blur-sm
+                        shadow-lg hover:shadow-xl
+                        border border-neutral-200/30 dark:border-neutral-700/30
+                        transition-all duration-300
+                        p-4 sm:p-6'
+                    >
+                      {/* Icon Container */}
+                      <div className='flex items-center gap-4'>
+                        <div
+                          className='w-10 h-10 sm:w-12 sm:h-12 rounded-full 
+                          bg-gradient-to-br from-brand-yellow to-brand-yellow/70
+                          flex items-center justify-center shrink-0
+                          transform group-hover:scale-110 group-hover:rotate-3
+                          transition-all duration-300'
+                        >
+                          <benefit.icon className='w-5 h-5 sm:w-6 sm:h-6 text-brand-dark' />
+                        </div>
+
+                        <div>
+                          <h3
+                            className='text-base sm:text-lg font-semibold 
+                            text-neutral-800 dark:text-white
+                            group-hover:text-brand-yellow transition-colors'
+                          >
+                            {benefit.text}
+                          </h3>
+                          <p
+                            className='text-sm text-neutral-600 dark:text-neutral-300 
+                            mt-1 leading-relaxed hidden sm:block'
+                          >
+                            {benefit.description}
+                          </p>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
                 </div>
-                <p className='text-lg  mt-3 text-neutral-600 text-nowrap  dark:text-neutral-300'>
-                  Sem fila pra pagar
-                </p>
-                <div className='w-12 ml-3 h-12 rounded-full flex items-center justify-center  text-brand-yellow'>
-                  <Check size={24} />
-                </div>
-                <p className='text-lg  mt-3 text-nowrap dark:text-neutral-300'>
-                  Sem chamar garçom
-                </p>
-                <div className='w-12 ml-3 h-12 rounded-full flex items-center justify-center text-brand-yellow'>
-                  <Check size={24} />
-                </div>
-                <p className='text-lg  mt-3 text-nowrap dark:text-neutral-300'>
-                  Sem confusão na conta
-                </p>
               </div>
-            </div>
 
-            <div className='w-full max-w-xl mb-24'>
-              <form className='flex flex-col sm:flex-row items-center gap-3'>
-                <div className='w-full sm:min-w-[320px]'>
+              {/* CTA Form */}
+              <div className='w-full max-w-xl mx-auto px-4 sm:px-0'>
+                <form className='flex flex-col md:flex-row gap-4'>
                   <Input
-                    variant='underline'
-                    placeholder='Seu email para entrar na lista de espera'
-                    className='h-12 text-lg bg-transparent'
+                    placeholder='Seu email para lista de espera'
+                    type='email'
+                    required
+                    className='w-full md:w-[50%] shrink-0'
                   />
-                </div>
-                <Button
-                  type='submit'
-                  className='bg-brand-yellow hover:bg-brand-yellow/90 text-brand-dark font-medium text-sm rounded-full px-8 py-6 w-full sm:w-auto whitespace-nowrap'
-                >
-                  Quero testar no meu restaurante
-                </Button>
-              </form>
-            </div>
+
+                  <Button
+                    variant='primary'
+                    text='Quero testar'
+                    type='submit'
+                    style={{
+                      width: '100%',
+                    }}
+                  />
+                </form>
+              </div>
+            </motion.div>
           </div>
 
-          {/* Decorative elements */}
-          <div className='absolute -bottom-20 -left-20 w-64 h-64 bg-brand-yellow/10 rounded-full blur-3xl'></div>
-          <div className='absolute top-40 -right-20 w-80 h-80 bg-brand-yellow/5 rounded-full blur-3xl'></div>
+          {/* Decorative Elements */}
+          <div
+            className='absolute -bottom-20 -left-20 w-48 h-48 sm:w-64 sm:h-64 
+            bg-brand-yellow/10 rounded-full blur-3xl opacity-75'
+          />
+          <div
+            className='absolute top-40 -right-20 w-56 h-56 sm:w-80 sm:h-80 
+            bg-brand-yellow/5 rounded-full blur-3xl opacity-75'
+          />
         </section>
 
         {/* Features Section */}
@@ -308,7 +373,7 @@ export default function Home() {
 
         {/* Process Section */}
         <section
-          className='py-24 bg-white dark:bg-neutral-900'
+          className='py-24 bg-white dark:bg-neutral-800'
           id='como-funciona'
         >
           <div className='container max-w-7xl mx-auto px-4 sm:px-6'>
@@ -325,59 +390,56 @@ export default function Home() {
               </p>
             </div>
 
-            <div className='grid md:grid-cols-2 lg:grid-cols-3 gap-10 mb-16'>
+            <div className='grid md:grid-cols-3 gap-10 mb-12'>
               {[
                 {
-                  number: '1',
-                  title: 'Escaneie o QR Code',
-                  description:
-                    'Cliente escaneia o QR Code na mesa e faz login no sistema.',
+                  icon: QrCode,
+                  title: 'Escaneie e Comece',
+                  description: 'Nada de baixar app. É instantâneo.',
                 },
                 {
-                  number: '2',
-                  title: 'Verificação',
-                  description:
-                    'O sistema verifica cadastro e método de pagamento, garantindo segurança.',
+                  icon: BarChart4,
+                  title: 'Acompanhe em Tempo Real',
+                  description: 'Mais transparência e controle.',
                 },
                 {
-                  number: '3',
-                  title: 'Acesso ao Cardápio',
-                  description:
-                    'Cliente acessa o cardápio digital e faz pedidos pelo aplicativo.',
+                  icon: CreditCard,
+                  title: 'Pague sem Complicação',
+                  description: 'Divida e pague direto pelo celular.',
                 },
-                {
-                  number: '4',
-                  title: 'Processamento do Pedido',
-                  description:
-                    'Sistema direciona pedidos automaticamente para cozinha/bar.',
-                },
-                {
-                  number: '5',
-                  title: 'Acompanhamento',
-                  description:
-                    'Cliente acompanha consumo em tempo real e pode solicitar a conta.',
-                },
-                {
-                  number: '6',
-                  title: 'Pagamento Seguro',
-                  description:
-                    'Cliente autoriza o pagamento e pode personalizar a gorjeta.',
-                },
-              ].map((step, index) => (
-                <div
-                  key={index}
-                  className='bg-white dark:bg-neutral-800 p-8 rounded-xl relative'
+              ].map((feature, index) => (
+                <motion.div
+                  key={feature.title}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{
+                    opacity: 1,
+                    y: 0,
+                    transition: {
+                      type: 'spring',
+                      duration: 1,
+                      delay: index * 0.2,
+                    },
+                  }}
+                  viewport={{ once: true, margin: '-50px' }}
+                  className='text-center'
                 >
-                  <div className='text-4xl font-bold text-brand-yellow mb-4'>
-                    {step.number}
+                  <div className='mb-6 inline-block'>
+                    <div
+                      className='w-16 h-16 rounded-full 
+                      bg-brand-yellow/10 
+                      flex items-center justify-center
+                      transform transition-all duration-300'
+                    >
+                      <feature.icon className='w-8 h-8 text-brand-yellow' />
+                    </div>
                   </div>
-                  <h3 className='text-xl font-semibold mb-2 dark:text-white'>
-                    {step.title}
-                  </h3>
+                  <h4 className='text-xl font-bold mb-4 dark:text-white'>
+                    {feature.title}
+                  </h4>
                   <p className='text-neutral-600 dark:text-neutral-300'>
-                    {step.description}
+                    {feature.description}
                   </p>
-                </div>
+                </motion.div>
               ))}
             </div>
 
@@ -391,9 +453,7 @@ export default function Home() {
                   transformando a experiência dos seus clientes.
                 </p>
               </div>
-              <Button className='bg-brand-yellow hover:bg-brand-yellow/90 text-black font-medium rounded-full px-8 py-6 whitespace-nowrap'>
-                Começar Agora
-              </Button>
+              <Button variant='primary' text='Começar Agora' />
             </div>
           </div>
         </section>
@@ -414,37 +474,27 @@ export default function Home() {
 
               <form className='space-y-6'>
                 <Input
-                  variant='underline'
                   placeholder='Nome do restaurante'
-                  className='h-12 text-lg bg-transparent'
+                  className='h-12 text-md bg-transparent'
                 />
                 <Input
-                  variant='underline'
                   placeholder='Seu nome'
-                  className='h-12 text-lg bg-transparent'
+                  className='h-12 text-md bg-transparent'
                 />
                 <Input
-                  variant='underline'
                   placeholder='WhatsApp'
-                  className='h-12 text-lg bg-transparent'
+                  className='h-12 text-md bg-transparent'
                 />
                 <Input
-                  variant='underline'
                   placeholder='E-mail'
-                  className='h-12 text-lg bg-transparent'
+                  className='h-12 text-md bg-transparent'
                 />
                 <Input
-                  variant='underline'
                   placeholder='Cidade/Estado'
-                  className='h-12 text-lg bg-transparent'
+                  className='h-12 text-md bg-transparent'
                 />
 
-                <Button
-                  type='submit'
-                  className='w-full bg-brand-yellow hover:bg-brand-yellow/90 text-brand-dark font-medium text-lg h-12 mt-8'
-                >
-                  Quero fazer parte
-                </Button>
+                <Button variant='primary' text='Quero fazer parte' />
               </form>
             </div>
           </div>
@@ -561,17 +611,12 @@ export default function Home() {
                     placeholder='Seu email'
                     className='bg-white/10 mr-2 dark:bg-white/5 rounded-l-lg py-2 px-4 w-full focus:outline-none focus:ring-1 focus:ring-brand-yellow text-white placeholder-neutral-400 dark:placeholder-neutral-500'
                   />
-                  <Button
-                    type='submit'
-                    className='bg-brand-yellow ml-2 text-black font-medium px-4 rounded-r-lg hover:bg-brand-yellow/90 transition-colors'
-                  >
-                    Enviar
-                  </Button>
+                  <Button variant='primary' text='Enviar' />
                 </form>
               </div>
             </div>
 
-            <div className='border-t border-white/10 dark:border-white/5 mt-12 pt-8 text-center text-neutral-500 dark:text-neutral-600 text-sm'>
+            <div className='border-t pb-5 border-white/10 dark:border-white/5 mt-12 pt-8 text-center text-neutral-500 dark:text-neutral-600 text-sm'>
               <p>
                 &copy; {new Date().getFullYear()} Deu Quantas? Todos os direitos
                 reservados.

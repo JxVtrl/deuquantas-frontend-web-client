@@ -20,7 +20,6 @@ interface AuthContextData {
   register: (data: RegisterData) => Promise<void>;
   logout: () => void;
   isAuthenticated: boolean;
-  processLogin: (token: string) => void;
   clearSession: () => void;
 }
 
@@ -36,7 +35,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
   const processToken = useCallback(async (token: string) => {
     try {
-      console.log('Processando token:', token);
       if (!token) {
         throw new Error('Token não fornecido');
       }
@@ -44,7 +42,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       // Remove "Bearer " se existir
       const cleanToken = token.replace('Bearer ', '');
       const decodedToken = jwtDecode<UserJwt>(cleanToken);
-      console.log('Token decodificado:', decodedToken);
 
       // Salva o token no cookie
       Cookies.set('token', cleanToken, {
@@ -60,22 +57,17 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
       // Verificar se é cliente ou estabelecimento
       if (decodedToken.hasCliente) {
-        console.log('Usuário é cliente');
         try {
-          const clienteResponse = await api.get(
-            `/clientes/usuario/${decodedToken.sub}`,
-          );
-          if (!clienteResponse.data.success) {
-            throw new Error('Erro ao buscar dados do cliente');
+          const res = await api.get(`/clientes/usuario/${decodedToken.sub}`);
+          if (!res.data.success) {
+            throw new Error('Erro ao buscar dados');
           }
-          response = clienteResponse.data.data;
-          console.log('Dados do cliente:', response);
+          response = res.data.data;
         } catch (error) {
-          console.error('Erro ao buscar cliente:', error);
-          throw new Error('Erro ao buscar dados do cliente');
+          console.error('Erro ao buscar dados:', error);
+          throw new Error('Erro ao buscar dados');
         }
       } else if (decodedToken.hasEstabelecimento) {
-        console.log('Usuário é estabelecimento');
         throw new Error('Usuário é estabelecimento');
       }
 
@@ -103,16 +95,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
           id: response.usuario.id,
           permission_level: decodedToken.permission_level || 1,
         },
-        cliente: decodedToken.hasCliente
-          ? {
-              num_cpf: response.num_cpf,
-              num_celular: response.num_celular,
-              data_nascimento: response.data_nascimento,
-            }
-          : undefined,
+        cliente: {
+          id: response.id,
+          num_cpf: response.num_cpf,
+          num_celular: response.num_celular,
+          data_nascimento: response.data_nascimento,
+        },
       };
-
-      console.log('Usuário processado:', usr);
 
       setUser(usr);
       return { success: true, user: usr };
@@ -128,10 +117,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   const redirectTo = useCallback(
     (user: User | null) => {
       try {
-        console.log('Usuário no redirectTo:', user);
-        console.log('É cliente?', !!user?.cliente);
-        console.log('Permission level:', user?.usuario?.permission_level);
-
         // Se não houver usuário, redireciona para login
         if (!user) {
           console.warn('Usuário não autenticado, redirecionando para login');
@@ -148,9 +133,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
         // Determina a rota baseada no tipo de usuário
         const route = !!user.cliente ? '/home' : '/login';
-
-        console.log('Rota de destino:', route);
-        console.log('Rota atual:', router.pathname);
 
         // Verifica se a rota atual é diferente da rota de destino
         if (router.pathname !== route) {
@@ -194,6 +176,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   const isAuthenticated = !!user;
 
   const login = async (data: LoginData) => {
+    console.log('Login:', data);
     try {
       const response = await AuthService.login(data);
       const token = response.token;
@@ -228,10 +211,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     AuthService.setDefaultHeaderToken('');
   };
 
-  const processLogin = async (token: string) => {
-    await processToken(token);
-  };
-
   return (
     <AuthContext.Provider
       value={{
@@ -241,7 +220,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         register,
         logout,
         isAuthenticated,
-        processLogin,
         clearSession,
       }}
     >

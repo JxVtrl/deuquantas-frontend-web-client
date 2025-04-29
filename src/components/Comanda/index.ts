@@ -1,2 +1,4 @@
-export { ComandaCards } from './ComandaCards';
-export { ComandaConfirm } from './ComandaConfirm';
+export * from './Buttons';
+export * from './ValueChart';
+export * from './Notifications';
+export * from './PayButton';

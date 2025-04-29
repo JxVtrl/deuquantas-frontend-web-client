@@ -1,36 +1,28 @@
 import { withAuthCustomer } from '@/hoc/withAuth';
-import React, { useState, useEffect, useRef } from 'react';
-import { CustomerLayout } from '@/layout';
+import React, { useState, useEffect } from 'react';
+import Layout from '@/layout';
 import { useRouter } from 'next/router';
-import { ComandaService } from '@/services/comanda.service';
 import { useAuth } from '@/contexts/AuthContext';
-import QrCodeInput from '@/components/InputQrCode';
 import { toast } from 'react-hot-toast';
-import { mesaService, SolicitacaoMesa } from '@/services/mesa.service';
-import LoadingLottie from '@/components/LoadingLottie';
-import Button from '@/components/Button';
+import { MesaService } from '@/services/mesa.service';
+import { ComandaService } from '@/services/comanda.service';
 import dynamic from 'next/dynamic';
+import { Button } from '@deuquantas/components';
+import { InputCodigoMesa } from '@/components/InputCodigoMesa';
 
-const QrCodeScanner = dynamic(() => import('@/components/QrCodeScanner'), {
+const QrCodeScanner = dynamic(() => import('@/components/QRCodeScanner'), {
   ssr: false,
   loading: () => (
-    <div
-      style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        height: '100vh',
-      }}
-    >
-      <LoadingLottie />
-      <p style={{ marginTop: '1rem' }}>Carregando câmera...</p>
+    <div className='flex flex-col items-center justify-center h-full'>
+      {/* <ConfirmLottie /> */}
+      <p className='mt-4'>Carregando câmera...</p>
     </div>
   ),
 });
 
-/**
- * Componente para escaneamento de QR Code
- */
+const POLLING_INTERVAL = 5000; // 5 segundos
+const MAX_POLLING_TIME = 300000; // 5 minutos
+
 const CustomerQrCode: React.FC = () => {
   const router = useRouter();
   const { user } = useAuth();
@@ -38,289 +30,236 @@ const CustomerQrCode: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [showScanner, setShowScanner] = useState(true);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const [socketError, setSocketError] = useState(false);
-  const [timeoutSeconds, setTimeoutSeconds] = useState<number>(300); // 5 minutos em segundos
-  const [mounted, setMounted] = useState(false);
+  const [solicitacaoId, setSolicitacaoId] = useState<string | null>(null);
+  const [timeoutSeconds, setTimeoutSeconds] = useState(300); // 5 minutos
 
-  const processarQrCode = async (qrCode: string) => {
+  useEffect(() => {
+    let pollingInterval: NodeJS.Timeout;
+    let timeoutTimer: NodeJS.Timeout;
+    let countdownInterval: NodeJS.Timeout;
+
+    const verificarStatusSolicitacao = async () => {
+      if (!solicitacaoId || !user?.cliente?.num_cpf) return;
+
+      try {
+        const solicitacao =
+          await MesaService.verificarStatusSolicitacao(solicitacaoId);
+
+        console.log('SOLICITACAO', JSON.stringify(solicitacao, null, 2));
+
+        if (solicitacao.status === 'aprovado') {
+          toast.success('Solicitação aprovada!');
+
+          console.log('user.usuario.id', user.usuario.id);
+
+          // Buscar a comanda ativa após a aprovação
+          const comanda = await ComandaService.getComandaAtivaByUsuarioId(
+            user.usuario.id,
+          );
+
+          console.log('COMANDA ENCONTRADA', JSON.stringify(comanda, null, 2));
+
+          const firstComanda = comanda?.[0];
+
+          if (firstComanda) {
+            router.push(`/conta/${firstComanda.id}`);
+          } else {
+            toast.error('Erro ao buscar comanda ativa');
+            setError('Erro ao buscar comanda. Tente novamente.');
+            setShowScanner(true);
+            setSolicitacaoId(null);
+            setSuccessMessage(null);
+          }
+        } else if (solicitacao.status === 'rejeitado') {
+          toast.error('Solicitação rejeitada pelo estabelecimento');
+          setError('Solicitação rejeitada. Tente novamente.');
+          setShowScanner(true);
+          setSolicitacaoId(null);
+          setSuccessMessage(null);
+        }
+      } catch (error) {
+        console.error('Erro ao verificar status:', error);
+        setError('Erro ao verificar status da solicitação');
+        setShowScanner(true);
+        setSolicitacaoId(null);
+        setSuccessMessage(null);
+      }
+    };
+
+    if (solicitacaoId) {
+      // Inicia o polling
+      pollingInterval = setInterval(
+        verificarStatusSolicitacao,
+        POLLING_INTERVAL,
+      );
+
+      // Configura o timeout
+      timeoutTimer = setTimeout(() => {
+        clearInterval(pollingInterval);
+        clearInterval(countdownInterval);
+        setError('Tempo de espera excedido. Tente novamente.');
+        setShowScanner(true);
+        setSolicitacaoId(null);
+        setSuccessMessage(null);
+      }, MAX_POLLING_TIME);
+
+      // Inicia a contagem regressiva
+      countdownInterval = setInterval(() => {
+        setTimeoutSeconds((prev) => {
+          if (prev <= 1) {
+            clearInterval(countdownInterval);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+
+      return () => {
+        clearInterval(pollingInterval);
+        clearTimeout(timeoutTimer);
+        clearInterval(countdownInterval);
+      };
+    }
+  }, [solicitacaoId, router, user]);
+
+  const processarSolicitacao = async (num_cnpj: string, numMesa: string) => {
     try {
       setIsLoading(true);
       setError(null);
       setSuccessMessage(null);
       setShowScanner(false);
-      setSocketError(false);
-      setTimeoutSeconds(300); // Reset para 5 minutos
 
-      // Validar formato do QR Code
-      const partes = qrCode.split(':');
-      if (
-        partes.length !== 4 ||
-        partes[0] !== 'estabelecimento' ||
-        partes[2] !== 'mesa'
-      ) {
-        setError('QR Code inválido. Tente novamente.');
-        setShowScanner(true);
-        setIsLoading(false);
-        return;
-      }
-
-      const estabelecimentoId = partes[1];
-      const mesaId = partes[3];
-
-      // Verificar disponibilidade da mesa
-      const disponivel = await ComandaService.verificarDisponibilidadeMesa(
-        estabelecimentoId,
-        mesaId,
+      const disponivel = await MesaService.verificarDisponibilidadeMesa(
+        num_cnpj,
+        numMesa,
       );
+
       if (!disponivel) {
-        setError('Mesa não está disponível no momento.');
-        setShowScanner(true);
-        setIsLoading(false);
-        return;
+        throw new Error('Mesa não está disponível');
       }
 
-      if (!user?.cliente?.num_cpf) {
-        setError('Usuário não autenticado. Faça login novamente.');
-        setShowScanner(true);
-        setIsLoading(false);
-        return;
+      const solicitacao = await MesaService.solicitarMesa(
+        num_cnpj,
+        numMesa,
+        user?.cliente?.num_cpf || '',
+      );
+
+      console.log('SOLICITACAO', JSON.stringify(solicitacao, null, 2));
+
+      if (!solicitacao.success || !solicitacao.data?.id) {
+        throw new Error('Erro ao criar solicitação');
       }
 
-      // Solicitar mesa
-      try {
-        await mesaService.solicitarMesa(
-          estabelecimentoId,
-          parseInt(mesaId),
-          user.cliente.num_cpf.toString(),
-        );
-        setSuccessMessage(
-          'Solicitação enviada. Aguardando aprovação do estabelecimento...',
-        );
-
-        // Iniciar contagem regressiva
-        const countdownInterval = setInterval(() => {
-          setTimeoutSeconds((prev) => {
-            if (prev <= 1) {
-              clearInterval(countdownInterval);
-              setError('Tempo de espera excedido. Tente novamente.');
-              setShowScanner(true);
-              setSuccessMessage(null);
-              setIsLoading(false);
-              return 0;
-            }
-            return prev - 1;
-          });
-        }, 1000);
-
-        // Configurar timeout de 5 minutos
-        if (timeoutRef.current) {
-          clearTimeout(timeoutRef.current);
-        }
-        timeoutRef.current = setTimeout(() => {
-          clearInterval(countdownInterval);
-          setError('Tempo de espera excedido. Tente novamente.');
-          setShowScanner(true);
-          setSuccessMessage(null);
-          setIsLoading(false);
-        }, 300000); // 5 minutos
-      } catch (socketErr) {
-        console.error('Erro ao conectar com o socket:', socketErr);
-        setSocketError(true);
-        setError(
-          'Erro ao conectar com o servidor. Tente novamente mais tarde.',
-        );
-        return;
-      }
-    } catch (err) {
-      console.error('Erro ao processar QR Code:', err);
-      setError('Erro ao processar QR Code. Tente novamente.');
+      setSolicitacaoId(solicitacao.data.id);
+      setSuccessMessage(
+        'Solicitação enviada. Aguardando aprovação do estabelecimento...',
+      );
+    } catch (error) {
+      setError(
+        error instanceof Error ? error.message : 'Erro ao processar QR Code',
+      );
       setShowScanner(true);
+      setSolicitacaoId(null);
+      setSuccessMessage(null);
+    } finally {
       setIsLoading(false);
     }
   };
 
-  const handleCancel = () => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
+  const processarQrCode = async (qrCode: string) => {
+    // Validar formato do QR Code (estabelecimento:CNPJ:mesa:NUMERO)
+    const partes = qrCode.split(':');
+    if (
+      partes.length !== 4 ||
+      partes[0] !== 'estabelecimento' ||
+      partes[2] !== 'mesa'
+    ) {
+      throw new Error('QR Code inválido');
     }
-    // Desconectar do socket
-    mesaService.disconnect();
+
+    const num_cnpj = partes[1];
+    const numMesa = partes[3];
+
+    processarSolicitacao(num_cnpj, numMesa);
+  };
+
+  const processarCodigoMesa = async (codigo: string) => {
+    // Buscar mesa pelo código
+    const response = await MesaService.buscarMesaPorCodigo(codigo);
+
+    if (!response.success || !response.data) {
+      throw new Error(response.message || 'Mesa não encontrada');
+    }
+
+    const mesa = response.data;
+
+    console.log('MESA', JSON.stringify(mesa, null, 2));
+
+    // Verificar disponibilidade da mesa
+    if (mesa.status !== 'disponivel') {
+      throw new Error('Mesa não está disponível');
+    }
+
+    processarSolicitacao(mesa.num_cnpj, mesa.numMesa);
+  };
+
+  const handleCancel = () => {
+    if (solicitacaoId) {
+      // TODO: Implementar cancelamento da solicitação no backend
+      setShowScanner(true);
+      setSolicitacaoId(null);
+      setSuccessMessage(null);
+      setTimeoutSeconds(300);
+    }
     router.push('/home');
   };
 
-  useEffect(() => {
-    const { num_cnpj, numMesa } = router.query;
-
-    // Se tivermos os parâmetros na URL, processar a solicitação
-    if (num_cnpj && numMesa && user?.cliente?.num_cpf) {
-      const solicitarMesa = async () => {
-        try {
-          setIsLoading(true);
-          setShowScanner(false);
-          await mesaService.solicitarMesa(
-            num_cnpj as string,
-            parseInt(numMesa as string),
-            user?.cliente?.num_cpf as string,
-          );
-        } catch (error) {
-          console.error(error);
-          toast.error('Erro ao solicitar mesa');
-          router.push('//home');
-        } finally {
-          setIsLoading(false);
-        }
-      };
-
-      solicitarMesa();
-    }
-  }, [router.query, user?.cliente?.num_cpf]);
-
-  useEffect(() => {
-    const handleAtualizacaoSolicitacao = (solicitacao: SolicitacaoMesa) => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-
-      if (solicitacao.status === 'aprovado') {
-        console.log('[DEBUG] Solicitação aprovada');
-        toast.success('Sua solicitação foi aprovada!');
-        router.push(`/comanda/${solicitacao.numMesa}`);
-      } else if (solicitacao.status === 'rejeitado') {
-        console.log('[DEBUG] Solicitação rejeitada');
-        toast.error('Sua solicitação foi rejeitada');
-        setShowScanner(true);
-        setSuccessMessage(null);
-        setIsLoading(false);
-      }
-    };
-
-    mesaService.onSolicitacaoUpdate(handleAtualizacaoSolicitacao);
-
-    return () => {
-      mesaService.removeAllListeners();
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-      mesaService.disconnect();
-    };
-  }, []);
-
-  useEffect(() => {
-    setMounted(true);
-    return () => setMounted(false);
-  }, []);
-
-  const handleScanError = (errorMessage: string) => {
-    setError(errorMessage);
-  };
-
-  if (!mounted) {
-    return (
-      <CustomerLayout>
-        <div className='flex items-center justify-center min-h-screen'>
-          <LoadingLottie />
-        </div>
-      </CustomerLayout>
-    );
-  }
-
   return (
-    <CustomerLayout>
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: '100vh',
-        }}
-      >
+    <Layout>
+      <div className='flex flex-col items-center mt-[10vh] min-h-screen p-4'>
         {error && (
-          <div
-            style={{
-              backgroundColor: '#fee2e2',
-              border: '1px solid #f87171',
-              color: '#b91c1c',
-              padding: '0.75rem 1rem',
-              borderRadius: '0.375rem',
-            }}
-          >
-            <span>{error}</span>
+          <div className='mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded'>
+            {error}
           </div>
         )}
 
         {successMessage && (
-          <div
-            style={{
-              backgroundColor: '#dcfce7',
-              border: '1px solid #22c55e',
-              color: '#16a34a',
-              padding: '0.75rem 1rem',
-              borderRadius: '0.375rem',
-            }}
-          >
-            <span>{successMessage}</span>
+          <div className='mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded'>
+            {successMessage}
+            <p className='mt-2'>
+              Tempo restante: {Math.floor(timeoutSeconds / 60)}:
+              {(timeoutSeconds % 60).toString().padStart(2, '0')}
+            </p>
           </div>
         )}
 
         {isLoading ? (
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              height: '100vh',
-            }}
-          >
-            <LoadingLottie />
-            <p style={{ marginTop: '1rem' }}>
-              {socketError
-                ? 'Erro ao conectar com o servidor'
-                : 'Processando QR Code...'}
-            </p>
-            {!socketError && (
-              <p style={{ marginTop: '1rem' }}>
-                Tempo restante: {Math.floor(timeoutSeconds / 60)}:
-                {(timeoutSeconds % 60).toString().padStart(2, '0')}
-              </p>
-            )}
-            <Button text='Cancelar' onClick={handleCancel} variant='primary' />
+          <div className='flex flex-col items-center'>
+            {/* <ConfirmLottie /> */}
+            <p className='mt-4'>Processando QR Code...</p>
           </div>
         ) : showScanner ? (
-          <>
-            <QrCodeScanner
-              onResult={processarQrCode}
-              onError={handleScanError}
-            />
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                height: '100vh',
-              }}
-            >
-              <QrCodeInput onScan={processarQrCode} />
+          <div className='w-full max-w-md'>
+            <QrCodeScanner onResult={processarQrCode} onError={setError} />
+            <div className='mt-4'>
+              <InputCodigoMesa onCodigoCompleto={processarCodigoMesa} />
             </div>
-          </>
+          </div>
         ) : (
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              height: '100vh',
-            }}
-          >
-            <LoadingLottie />
-            <p style={{ marginTop: '1rem' }}>
-              Aguardando resposta do estabelecimento...
-            </p>
-            <Button text='Cancelar' onClick={handleCancel} variant='primary' />
+          <div className='flex flex-col items-center'>
+            {/* <ConfirmLottie /> */}
+            <p className='mt-4'>Aguardando resposta do estabelecimento...</p>
+            <div className='mt-4'>
+              <Button
+                text='Cancelar'
+                onClick={handleCancel}
+                variant='primary'
+              />
+            </div>
           </div>
         )}
       </div>
-    </CustomerLayout>
+    </Layout>
   );
 };
 

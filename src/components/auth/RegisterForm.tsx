@@ -13,12 +13,12 @@ import { useAuthFormContext } from '@/contexts/AuthFormContext';
 import { register_steps } from '@/data/register_steps';
 import { RegisterFormData } from '@/interfaces/register';
 import { getFieldLabel, getFieldType } from '@/utils/registerFieldsFuncs';
-import { PasswordStrengthIndicator } from '@/components/PasswordStrengthIndicator';
 import { RegisterService } from '@/services/register.service';
 import { DocumentService } from '@/services/document.service';
 import { EmailService } from '@/services/email.service';
 import { PasswordService } from '@/services/password.service';
 import { AddressService } from '@/services/address.service';
+import { PasswordStrengthIndicator } from '@deuquantas/components';
 
 const RegisterForm: React.FC = () => {
   const {

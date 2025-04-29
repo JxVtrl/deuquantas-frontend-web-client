@@ -3,27 +3,23 @@ import Cookies from 'js-cookie';
 
 const isDocker = process.env.NEXT_PUBLIC_DOCKER_ENV === 'true';
 const baseURL = isDocker
-  ? process.env.NEXT_PUBLIC_API_URL || 'http://backend:3010'
-  : process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3010';
+  ? process.env.NEXT_PUBLIC_API_URL || 'http://backend:8080'
+  : process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
 
 export const api = axios.create({
   baseURL,
   headers: {
     'Content-Type': 'application/json',
+    Accept: 'application/json',
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Credentials': 'true',
   },
-  withCredentials: true, // Importante para CORS
+  withCredentials: true,
 });
 
 // Interceptor para adicionar o token de autenticação em todas as requisições
 api.interceptors.request.use(
   (config) => {
-    console.log('Request Config:', {
-      method: config.method,
-      url: config.url,
-      headers: config.headers,
-      data: config.data,
-    });
-
     const token = Cookies.get('token');
     if (token) {
       const formattedToken = token.startsWith('Bearer ')
