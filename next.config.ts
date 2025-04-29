@@ -34,6 +34,16 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  images: {
+    remotePatterns: [
+      {
+        hostname: 'localhost',
+      },
+      {
+        hostname: 'deuquantasapi-901874097670.southamerica-east1.run.app',
+      },
+    ],
+  },
 };
 
 export default nextConfig;

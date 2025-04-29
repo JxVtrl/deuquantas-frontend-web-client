@@ -95,7 +95,7 @@ const MenuDaConta: React.FC = () => {
                   }}
                 >
                   <Image
-                    src={item.imagem || '/products/beer.webp'}
+                    src={item.img}
                     alt={item.nome}
                     layout='fill'
                     objectFit='cover'

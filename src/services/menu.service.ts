@@ -7,7 +7,7 @@ export interface Item {
   preco: number;
   quantidade: number;
   tipo: string;
-  imagem?: string;
+  img: string;
   observacao?: string;
   cliente: {
     id: string;

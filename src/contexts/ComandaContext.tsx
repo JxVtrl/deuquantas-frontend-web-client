@@ -81,6 +81,9 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
           ...item,
           quantidade: 0,
           descricao: item.descricao || '',
+          img: item.img
+            ? `${process.env.NEXT_PUBLIC_API_URL}/uploads/${item.img}`
+            : '/products/fallback.webp',
         })),
       );
     } catch (error) {

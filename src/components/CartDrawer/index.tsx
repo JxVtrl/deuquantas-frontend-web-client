@@ -16,6 +16,15 @@ export const CartDrawer = () => {
     );
   }, [selectedItem]);
 
+  useEffect(() => {
+    setTotal(
+      itensInCart.reduce(
+        (acc, item) => acc + item.preco * (item.quantidade || 0),
+        0,
+      ),
+    );
+  }, [itensInCart]);
+
   const handleQuantidadeChange = (value: number) => {
     setQuantidade(value);
 
@@ -30,14 +39,9 @@ export const CartDrawer = () => {
     }
   };
 
-  useEffect(() => {
-    setTotal(
-      itensInCart.reduce(
-        (acc, item) => acc + item.preco * (item.quantidade || 0),
-        0,
-      ),
-    );
-  }, [itensInCart]);
+  if (!selectedItem) {
+    return null;
+  }
 
   return (
     <Drawer isOpen={!!selectedItem} onClose={clearCart}>
@@ -66,8 +70,8 @@ export const CartDrawer = () => {
 
         <div className='flex gap-[8px] mb-[81px] py-6'>
           <Image
-            src='/products/beer.webp'
-            alt={selectedItem?.nome || ''}
+            src={selectedItem.img}
+            alt={selectedItem.nome}
             width={100}
             height={100}
           />
