@@ -9,7 +9,7 @@ import { MaxWidthWrapper } from '@deuquantas/components';
 import { capitalize, currencyFormatter } from '@/utils/formatters';
 import { CartDrawer } from '@/components/CartDrawer';
 import { NavigationPill } from '@/data/home_navigation_pills';
-
+import SeoHead from '@/components/SeoHead';
 const MenuDaConta: React.FC = () => {
   const {
     setSelectedItem,
@@ -62,7 +62,8 @@ const MenuDaConta: React.FC = () => {
     setNavigationPills(list);
   }, []);
 
-  return (
+  return (<>
+  <SeoHead title="Menu - DeuQuantas" />
     <Layout>
       <NavigationPills navigationPills={navigationPills} hasArrowBack />
 
@@ -113,6 +114,7 @@ const MenuDaConta: React.FC = () => {
       </MaxWidthWrapper>
       <CartDrawer />
     </Layout>
+  </>
   );
 };
 

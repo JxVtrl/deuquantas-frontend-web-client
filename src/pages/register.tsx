@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
-
+import SeoHead from '@/components/SeoHead';
 export default function RegisterRedirect() {
   const router = useRouter();
 
@@ -8,5 +8,7 @@ export default function RegisterRedirect() {
     router.replace('/auth?register=true');
   }, [router]);
 
-  return <></>;
+  return <>
+    <SeoHead title='Registro - DeuQuantas' />
+  </>;
 }

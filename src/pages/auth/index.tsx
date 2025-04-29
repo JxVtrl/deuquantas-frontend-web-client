@@ -6,11 +6,13 @@ import RegisterForm from '@/components/auth/RegisterForm';
 import { AuthFormProvider } from '@/contexts/AuthFormContext';
 import { useAuthFormContext } from '@/contexts/AuthFormContext';
 import { Logo } from '@deuquantas/components';
+import SeoHead from '@/components/SeoHead';
 
 function AuthPageContent() {
   const { isLogin } = useAuthFormContext();
 
   return (
+
     <div
       style={{ backgroundColor: '#FFCC00' }}
       className='min-h-screen flex items-center justify-center p-4 transition-all duration-300'
@@ -40,8 +42,11 @@ export default function AuthPage() {
   const { login, register } = useAuth();
 
   return (
-    <AuthFormProvider login={login} register={register} onSuccess={() => null}>
-      <AuthPageContent />
-    </AuthFormProvider>
+    <>
+      <SeoHead title="DeuQuantas - Sua Comanda Sem Surpresas" />
+      <AuthFormProvider login={login} register={register} onSuccess={() => null}>
+        <AuthPageContent />
+      </AuthFormProvider>
+    </>
   );
 }

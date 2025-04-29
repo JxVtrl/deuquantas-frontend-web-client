@@ -9,6 +9,7 @@ import { ComandaService } from '@/services/comanda.service';
 import dynamic from 'next/dynamic';
 import { Button } from '@deuquantas/components';
 import { InputCodigoMesa } from '@/components/InputCodigoMesa';
+import SeoHead from '@/components/SeoHead';
 
 const QrCodeScanner = dynamic(() => import('@/components/QRCodeScanner'), {
   ssr: false,
@@ -215,6 +216,8 @@ const CustomerQrCode: React.FC = () => {
   };
 
   return (
+    <>
+    <SeoHead title="QR Code - DeuQuantas" />
     <Layout>
       <div className='flex flex-col items-center mt-[10vh] min-h-screen p-4'>
         {error && (
@@ -260,6 +263,7 @@ const CustomerQrCode: React.FC = () => {
         )}
       </div>
     </Layout>
+    </>
   );
 };
 

@@ -4,11 +4,13 @@ import { withAuthCustomer } from '@/hoc/withAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import Layout from '@/layout';
-
+import SeoHead from '@/components/SeoHead';
 const ProfilePage: React.FC = () => {
   const { user } = useAuth();
 
   return (
+    <>
+    <SeoHead title="Perfil - DeuQuantas" />
     <Layout>
       <div className='max-w-4xl mx-auto p-6 overflow-y-scroll h-[calc(100vh-120px)]'>
         <h1 className='text-2xl font-bold mb-6'>Meu Perfil</h1>
@@ -81,6 +83,7 @@ const ProfilePage: React.FC = () => {
         </Card>
       </div>
     </Layout>
+    </>
   );
 };
 

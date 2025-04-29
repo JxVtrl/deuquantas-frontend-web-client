@@ -6,12 +6,15 @@ import { IOSSwitch } from '@/components/ui/ios-switch';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
+import SeoHead from '@/components/SeoHead';
 
 const Configuração: React.FC = () => {
   const { preferences, toggleLeftHanded, toggleLanguage } =
     useUserPreferences();
 
   return (
+    <>
+    <SeoHead title="Configurações - DeuQuantas" />
     <Layout>
       <div className='max-w-4xl mx-auto p-6 overflow-y-scroll h-[calc(100vh-120px)]'>
         <h1 className='text-2xl font-bold mb-6'>Configurações</h1>
@@ -51,6 +54,7 @@ const Configuração: React.FC = () => {
         </Card>
       </div>
     </Layout>
+    </>
   );
 };
 

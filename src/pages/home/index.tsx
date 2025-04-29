@@ -7,9 +7,12 @@ import { FavoritePlaces } from '@/sections/FavoritePlaces';
 import { ActionsHome } from '@/sections/ActionsHome';
 import { OpenComandas } from '@/sections/OpenComandas';
 import { customerNavigationPills } from '@/data/home_navigation_pills';
+import SeoHead from '@/components/SeoHead';
 
 const CustomerHome: React.FC = () => {
   return (
+    <>
+    <SeoHead title="Home - DeuQuantas" />
     <Layout>
       <NavigationPills navigationPills={customerNavigationPills} />
       <ActionsHome />
@@ -17,6 +20,7 @@ const CustomerHome: React.FC = () => {
       <FavoritePlaces />
       <PromotionSlider />
     </Layout>
+    </>
   );
 };
 

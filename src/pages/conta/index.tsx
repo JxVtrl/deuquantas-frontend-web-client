@@ -2,7 +2,7 @@ import { useComanda } from '@/contexts/ComandaContext';
 import React, { useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { withAuthCustomer } from '@/hoc/withAuth';
-
+import SeoHead from '@/components/SeoHead';
 const Conta: React.FC = () => {
   const { fetchComandaAtivaId } = useComanda();
   const router = useRouter();
@@ -20,7 +20,9 @@ const Conta: React.FC = () => {
     checkComandaAtiva();
   }, [fetchComandaAtivaId, router]);
 
-  return <></>;
+  return <>
+  <SeoHead title="Carregando comanda - DeuQuantas" />
+  </>;
 };
 
 export default withAuthCustomer(Conta);
