@@ -64,7 +64,7 @@ export const CartDrawer = () => {
           </svg>
         </button>
 
-        <div className='flex gap-[8px] pb-[81px] py-6'>
+        <div className='flex gap-[8px] mb-[81px] py-6'>
           <Image
             src='/products/beer.webp'
             alt={selectedItem?.nome || ''}

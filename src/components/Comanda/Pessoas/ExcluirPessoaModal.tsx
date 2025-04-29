@@ -46,7 +46,7 @@ export const ExcluirPessoaModal: React.FC<ExcluirPessoaModalProps> = ({
       <MaxWidthWrapper>
         <form
           onSubmit={handleSubmit}
-          className='flex flex-col gap-4 pb-[81px] py-6'
+          className='flex flex-col gap-4 mb-[81px] py-6'
         >
           <select
             value={selectedPessoa}

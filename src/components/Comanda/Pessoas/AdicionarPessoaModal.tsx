@@ -74,7 +74,7 @@ export const AdicionarPessoaModal: React.FC<AdicionarPessoaModalProps> = ({
       <MaxWidthWrapper>
         <form
           onSubmit={handleSubmit}
-          className='flex flex-col gap-4 pb-[81px] py-6'
+          className='flex flex-col gap-4 mb-[81px] py-6'
         >
           <div className='relative'>
             <input
