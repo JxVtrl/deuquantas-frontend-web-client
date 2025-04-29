@@ -3,8 +3,8 @@ import Cookies from 'js-cookie';
 
 const isDocker = process.env.NEXT_PUBLIC_DOCKER_ENV === 'true';
 const baseURL = isDocker
-  ? process.env.NEXT_PUBLIC_API_URL || 'http://backend:3010'
-  : process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3010';
+  ? process.env.NEXT_PUBLIC_API_URL || 'http://backend:8080'
+  : process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
 
 export const api = axios.create({
   baseURL,

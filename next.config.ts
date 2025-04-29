@@ -18,7 +18,7 @@ const nextConfig: NextConfig = {
     if (!isServer) {
       config.resolve.alias = {
         ...config.resolve.alias,
-        'react': path.resolve('./node_modules/react'),
+        react: path.resolve('./node_modules/react'),
         'react-dom': path.resolve('./node_modules/react-dom'),
       };
     }
@@ -29,8 +29,8 @@ const nextConfig: NextConfig = {
       {
         source: '/api/proxy/:path*',
         destination: isDocker
-          ? 'http://backend:3010/:path*'
-          : 'http://localhost:3010/:path*',
+          ? 'http://backend:8080/:path*'
+          : 'http://localhost:8080/:path*',
       },
     ];
   },
