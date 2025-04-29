@@ -11,7 +11,7 @@ interface SeoHeadProps {
 export default function SeoHead({
   title,
   description = 'Comanda transparente em tempo real para bares e restaurantes.',
-  image = '/og-image.webp',
+  image = '/og-image.png',
   url = 'https://deuquantas.com.br',
 }: SeoHeadProps) {
   const router = useRouter();
@@ -32,6 +32,8 @@ export default function SeoHead({
       <meta property='og:title' content={finalTitle} />
       <meta property='og:description' content={description} />
       <meta property='og:image' content={image} />
+      <meta property='og:image:width' content='1024' />
+      <meta property='og:image:height' content='1024' />
 
       {/* Twitter */}
       <meta name='twitter:card' content='summary_large_image' />

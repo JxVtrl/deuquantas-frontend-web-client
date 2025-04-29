@@ -32,8 +32,8 @@ export default function Document() {
         />
         <meta
           property='og:image'
-          content='https://deuquantas.com.br/og-image.webp'
-        />{' '}
+          content='https://deuquantas.com.br/og-image.png'
+        />
         {/* Imagem para redes sociais */}
         {/* Twitter Card */}
         <meta name='twitter:card' content='summary_large_image' />
@@ -49,7 +49,7 @@ export default function Document() {
         />
         <meta
           name='twitter:image'
-          content='https://deuquantas.com.br/twitter-card.webp'
+          content='https://deuquantas.com.br/twitter-card.png'
         />
         {/* Extra SEO (opcional, ajuda bastante) */}
         <meta name='robots' content='index, follow' />
