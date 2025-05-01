@@ -37,10 +37,11 @@ export class MesaService {
   static async verificarDisponibilidadeMesa(
     num_cnpj: string,
     numMesa: string,
+    num_cpf: string,
   ): Promise<boolean> {
     try {
       const response = await api.get(
-        `/qr-code/mesa/${num_cnpj}/${numMesa}/disponibilidade`,
+        `/qr-code/mesa/${num_cnpj}/${numMesa}/disponibilidade?num_cpf=${num_cpf}`,
       );
       return response.data.disponivel;
     } catch (error) {

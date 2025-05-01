@@ -133,6 +133,7 @@ const CustomerQrCode: React.FC = () => {
       const disponivel = await MesaService.verificarDisponibilidadeMesa(
         num_cnpj,
         numMesa,
+        user?.cliente?.num_cpf || '',
       );
 
       if (!disponivel) {

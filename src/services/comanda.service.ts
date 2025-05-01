@@ -33,6 +33,9 @@ export interface ComandaResponse {
     valor_total: number;
     avatar: string;
   }[];
+  estabelecimento?: {
+    nome: string;
+  };
 }
 
 export interface AdicionarItensComandaDto {
@@ -69,20 +72,29 @@ export interface Solicitacao {
   estabelecimento: {
     nome: string;
   };
+  cliente: {
+    id: string;
+    nome: string;
+  };
   status: 'PENDENTE' | 'ACEITA' | 'RECUSADA';
 }
 
 export const ComandaService = {
+  async getComandasAtivas(id_usuario: string): Promise<ComandaResponse[]> {
+    try {
+      const response = await api.get(`/comandas/ativas/usuario/${id_usuario}`);
+      return response.data;
+    } catch (error) {
+      console.error('Erro ao buscar comandas ativas:', error);
+      throw error;
+    }
+  },
+
   async getComandaAtivaByUsuarioId(
     id_usuario: string,
   ): Promise<ComandaResponse[] | null> {
-    try {
-      const response = await api.get(`/comandas/ativa/usuario/${id_usuario}`);
-      return response.data;
-    } catch (error) {
-      console.error('Erro ao buscar comanda ativa por ID de usuário:', error);
-      return null;
-    }
+    console.warn('Método deprecated. Use getComandasAtivas() em seu lugar.');
+    return this.getComandasAtivas(id_usuario).catch(() => null);
   },
 
   async getComandaById(id: string): Promise<GetComandaResponse | null> {

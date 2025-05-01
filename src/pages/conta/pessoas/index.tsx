@@ -4,21 +4,21 @@ import { useRouter } from 'next/router';
 import { withAuthCustomer } from '@/hoc/withAuth';
 import SeoHead from '@/components/SeoHead';
 const Comanda: React.FC = () => {
-  const { fetchComandaAtivaId } = useComanda();
+  const { fetchComandasAtivas, comandasAtivas } = useComanda();
   const router = useRouter();
 
   useEffect(() => {
     const checkComandaAtiva = async () => {
-      const comandaId = await fetchComandaAtivaId();
-      if (comandaId) {
-        router.push(`/conta/pessoas/${comandaId}`);
+      await fetchComandasAtivas();
+      if (comandasAtivas.length > 0) {
+        router.push(`/conta/pessoas/${comandasAtivas[0].id}`);
       } else {
         router.push('/qr-code');
       }
     };
 
     checkComandaAtiva();
-  }, [fetchComandaAtivaId, router]);
+  }, [fetchComandasAtivas, router]);
 
   return (
     <>

@@ -14,6 +14,7 @@ import { useRouter } from 'next/router';
 
 interface ComandaContextData {
   comanda: ComandaResponse | null;
+  comandasAtivas: ComandaResponse[];
   estabelecimento: RegisterFormData | null;
   loading: boolean;
   error: string | null;
@@ -43,7 +44,8 @@ interface ComandaContextData {
     valor_total: number;
   }[];
   fetchComandaAtiva: () => Promise<void>;
-  fetchComandaAtivaId: () => Promise<ComandaResponse[] | null>;
+  fetchComandasAtivas: () => Promise<void>;
+  setComandaAtiva: (comanda: ComandaResponse) => void;
 }
 
 const ComandaContext = createContext<ComandaContextData>(
@@ -56,6 +58,7 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
   const router = useRouter();
   const { user } = useAuth();
   const [comanda, setComanda] = useState<ComandaResponse | null>(null);
+  const [comandasAtivas, setComandasAtivas] = useState<ComandaResponse[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [estabelecimento, setEstabelecimento] =
@@ -91,38 +94,20 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
-  const fetchComandaAtivaId = useCallback(async () => {
-    if (!user?.cliente?.num_cpf) {
-      console.error('CPF do usuário não encontrado');
-      return null;
-    }
-
-    const comandaAtivaId = await ComandaService.getComandaAtivaByUsuarioId(
-      user.usuario.id,
-    );
-
-    return comandaAtivaId;
-  }, [user?.cliente?.num_cpf, user?.usuario?.id]);
-
-  const fetchComandaAtiva = useCallback(async () => {
+  const fetchComandasAtivas = useCallback(async () => {
     try {
-      if (!user?.cliente?.num_cpf || !user?.usuario?.id) {
-        console.error('CPF do usuário não encontrado');
+      if (!user?.usuario?.id) {
+        console.error('ID do usuário não encontrado');
         return;
       }
 
       setLoading(true);
-      const comandaAtiva = await ComandaService.getComandaAtivaByUsuarioId(
-        user.usuario.id,
-      );
+      const comandas = await ComandaService.getComandasAtivas(user.usuario.id);
+      setComandasAtivas(comandas);
 
-      const firstComandaAtiva = comandaAtiva?.[0];
-
-      if (firstComandaAtiva) {
-        const response = await ComandaService.getComandaById(
-          firstComandaAtiva.id,
-        );
-
+      // Se não houver comanda ativa selecionada, seleciona a primeira
+      if (!comanda && comandas.length > 0) {
+        const response = await ComandaService.getComandaById(comandas[0].id);
         if (response) {
           setComanda(response.comanda);
           setEstabelecimento(response.estabelecimento);
@@ -130,11 +115,42 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
         }
       }
     } catch (error) {
+      console.error('Erro ao buscar comandas ativas:', error);
+      setError('Erro ao buscar comandas ativas');
+    } finally {
+      setLoading(false);
+    }
+  }, [user?.usuario?.id, comanda]);
+
+  const fetchComandaAtiva = useCallback(async () => {
+    try {
+      if (!user?.usuario?.id) {
+        console.error('ID do usuário não encontrado');
+        return;
+      }
+
+      setLoading(true);
+      await fetchComandasAtivas();
+    } catch (error) {
       console.error('Erro ao buscar comanda ativa:', error);
     } finally {
       setLoading(false);
     }
-  }, [user?.cliente?.num_cpf]);
+  }, [user?.usuario?.id, fetchComandasAtivas]);
+
+  const setComandaAtiva = useCallback(async (comandaAtiva: ComandaResponse) => {
+    try {
+      const response = await ComandaService.getComandaById(comandaAtiva.id);
+      if (response) {
+        setComanda(response.comanda);
+        setEstabelecimento(response.estabelecimento);
+        await getMenu(response.estabelecimento.num_cnpj);
+      }
+    } catch (error) {
+      console.error('Erro ao selecionar comanda:', error);
+      toast.error('Erro ao selecionar comanda');
+    }
+  }, []);
 
   const clearComanda = useCallback(() => {
     setComanda(null);
@@ -251,6 +267,7 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
     <ComandaContext.Provider
       value={{
         comanda,
+        comandasAtivas,
         estabelecimento,
         loading,
         error,
@@ -275,7 +292,8 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
         removerUsuario,
         pessoas,
         fetchComandaAtiva,
-        fetchComandaAtivaId,
+        fetchComandasAtivas,
+        setComandaAtiva,
       }}
     >
       {children}

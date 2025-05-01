@@ -5,21 +5,21 @@ import { withAuthCustomer } from '@/hoc/withAuth';
 import SeoHead from '@/components/SeoHead';
 
 const Comanda: React.FC = () => {
-  const { fetchComandaAtivaId } = useComanda();
+  const { fetchComandasAtivas, comandasAtivas } = useComanda();
   const router = useRouter();
 
   useEffect(() => {
     const checkComandaAtiva = async () => {
-      const comandaId = await fetchComandaAtivaId();
-      if (comandaId) {
-        router.push(`/conta/comanda/${comandaId}`);
+      await fetchComandasAtivas();
+      if (comandasAtivas.length > 0) {
+        router.push(`/conta/comanda/${comandasAtivas[0].id}`);
       } else {
         router.push('/qr-code');
       }
     };
 
     checkComandaAtiva();
-  }, [fetchComandaAtivaId, router]);
+  }, [fetchComandasAtivas, router]);
 
   return (
     <>

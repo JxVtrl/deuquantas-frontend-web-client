@@ -108,11 +108,11 @@ const QrCodeScanner: React.FC<QrCodeScannerProps> = ({ onResult, onError }) => {
   }, []);
 
   return (
-    <div className='relative w-full max-w-md mx-auto'>
+    <div className='relative w-full max-w-md mx-auto flex items-center flex-col justify-center'>
       <div
         id={QR_SCANNER_ID}
         className='overflow-hidden rounded-lg bg-black'
-        style={{ minHeight: '300px', minWidth: '300px' }}
+        style={{ height: '300px', width: '300px' }}
       />
       <p className='text-center mt-4 text-sm text-gray-600'>
         Posicione o QR Code no centro da câmera
