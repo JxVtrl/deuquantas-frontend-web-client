@@ -42,8 +42,7 @@ export const ComandaHeader: React.FC = () => {
       0,
     ) || 0;
 
-  const valorTotal =
-    (comanda?.conta?.valTotal || 0) - valorPagoTotal;
+  const valorTotal = (comanda?.conta?.valTotal || 0) - valorPagoTotal;
 
   return (
     <MaxWidthWrapper

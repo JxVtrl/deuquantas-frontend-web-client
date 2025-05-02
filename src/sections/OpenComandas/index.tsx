@@ -220,10 +220,13 @@ export const OpenComandas: React.FC = () => {
               {comandasAtivas.map((comanda) => {
                 console.log(comanda);
                 // Soma do valor já pago por todos
-                const valorPago = comanda.clientes?.reduce((acc, cliente) => acc + (Number(cliente.valor_pago) || 0), 0) || 0;
+                const valorPago =
+                  comanda.clientes?.reduce(
+                    (acc, cliente) => acc + (Number(cliente.valor_pago) || 0),
+                    0,
+                  ) || 0;
 
-                const valorTotal =
-                  (comanda?.conta?.valTotal || 0) - valorPago;
+                const valorTotal = (comanda?.conta?.valTotal || 0) - valorPago;
 
                 return (
                   <Card
@@ -267,7 +270,7 @@ export const OpenComandas: React.FC = () => {
                       </div>
                     </div>
                   </Card>
-                )
+                );
               })}
             </div>
           </div>
