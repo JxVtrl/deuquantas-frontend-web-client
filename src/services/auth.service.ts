@@ -78,14 +78,7 @@ export class AuthService {
   }
 
   logout(): void {
-    console.log('=== INÍCIO DO PROCESSO DE LOGOUT ===');
-    // Remove o token dos cookies
     Cookies.remove('token');
-    console.log('Token removido dos cookies');
-
-    // Remove o token do header das requisições
     delete api.defaults.headers.common['Authorization'];
-    console.log('Token removido do header das requisições');
-    console.log('=== FIM DO PROCESSO DE LOGOUT ===');
   }
 }

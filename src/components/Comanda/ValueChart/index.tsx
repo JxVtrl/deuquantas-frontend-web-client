@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { currencyFormatter } from '@/utils/formatters';
 import { useComanda } from '@/contexts/ComandaContext';
 import { MaxWidthWrapper } from '@deuquantas/components';
@@ -7,19 +7,29 @@ import { useAuth } from '@/contexts/AuthContext';
 export const ComandaValueChart: React.FC = () => {
   const { comanda } = useComanda();
   const { user } = useAuth();
+  const [consumo_user, setConsumoUser] = useState<number>(0);
+  const [consumo_total, setConsumoTotal] = useState<number>(0);
+  const [percentage, setPercentage] = useState<number>(0);
+  const [limite_user, setLimiteUser] = useState<number>(0);
 
-  if (!comanda || !comanda.conta) {
-    return null;
-  }
+  useEffect(() => {
+    if (!comanda || !comanda.conta) {
+      return;
+    }
+    const consumo_t = comanda.conta.valTotal;
+    const consumo =
+      comanda.pessoas?.find((pessoa) => {
+        return pessoa.id === user?.usuario.id;
+      })?.valor_total || 0;
+    const limite = 250; // TODO: Verificar limite do usuario nas preferências
+    const per =
+      consumo_t > 0 ? (consumo / consumo_t) * 100 : 0;
 
-  const consumo_user =
-    comanda.pessoas?.find((pessoa) => {
-      return pessoa.id === user?.usuario.id;
-    })?.valor_total || 0;
-  const limite_user = 250; // TODO: Verificar limite do usuario nas preferências
-  const consumo_total = comanda.conta.valTotal;
-  const percentage =
-    consumo_total > 0 ? (consumo_user / consumo_total) * 100 : 0;
+    setConsumoUser(consumo);
+    setConsumoTotal(consumo_t);
+    setPercentage(per);
+    setLimiteUser(limite);
+  }, [comanda]);
 
   return (
     <MaxWidthWrapper

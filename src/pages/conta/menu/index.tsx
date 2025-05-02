@@ -30,16 +30,19 @@ const MenuDaConta: React.FC = () => {
     }
   }, []);
 
-  useEffect(() => {
+  const filterMenu = (menuList: Item[]) => {
     if (tipo) {
-      const filteredMenu = menu.filter(
+      return menuList.filter(
         (item) => item.tipo.toLowerCase() === tipo.toLowerCase(),
       );
-      setFilteredMenu(filteredMenu);
-    } else {
-      setFilteredMenu(menu);
     }
-  }, [tipo]);
+    return menuList;
+  };
+
+  useEffect(() => {
+    setFilteredMenu(filterMenu(menu));
+  }, [menu, tipo]);
+
   const [navigationPills, setNavigationPills] = useState<NavigationPill[]>([]);
 
   useEffect(() => {

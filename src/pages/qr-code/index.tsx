@@ -46,19 +46,13 @@ const CustomerQrCode: React.FC = () => {
         const solicitacao =
           await MesaService.verificarStatusSolicitacao(solicitacaoId);
 
-        console.log('SOLICITACAO', JSON.stringify(solicitacao, null, 2));
-
         if (solicitacao.status === 'aprovado') {
           toast.success('Solicitação aprovada!');
-
-          console.log('user.usuario.id', user.usuario.id);
 
           // Buscar a comanda ativa após a aprovação
           const comanda = await ComandaService.getComandaAtivaByUsuarioId(
             user.usuario.id,
           );
-
-          console.log('COMANDA ENCONTRADA', JSON.stringify(comanda, null, 2));
 
           const firstComanda = comanda?.[0];
 
@@ -146,8 +140,6 @@ const CustomerQrCode: React.FC = () => {
         user?.cliente?.num_cpf || '',
       );
 
-      console.log('SOLICITACAO', JSON.stringify(solicitacao, null, 2));
-
       if (!solicitacao.success || !solicitacao.data?.id) {
         throw new Error('Erro ao criar solicitação');
       }
@@ -195,8 +187,6 @@ const CustomerQrCode: React.FC = () => {
 
     const mesa = response.data;
 
-    console.log('MESA', JSON.stringify(mesa, null, 2));
-
     // Verificar disponibilidade da mesa
     if (mesa.status !== 'disponivel') {
       throw new Error('Mesa não está disponível');
@@ -221,12 +211,6 @@ const CustomerQrCode: React.FC = () => {
       <SeoHead title='QR Code - DeuQuantas' />
       <Layout>
         <div className='flex flex-col items-center mt-[10vh] min-h-screen p-4'>
-          {error && (
-            <div className='mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded'>
-              {error}
-            </div>
-          )}
-
           {successMessage && (
             <div className='mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded'>
               {successMessage}
@@ -242,26 +226,40 @@ const CustomerQrCode: React.FC = () => {
               {/* <ConfirmLottie /> */}
               <p className='mt-4'>Processando QR Code...</p>
             </div>
-          ) : showScanner ? (
-            <div className='w-full max-w-md'>
-              <QrCodeScanner onResult={processarQrCode} onError={setError} />
-              <div className='mt-4'>
-                <InputCodigoMesa onCodigoCompleto={processarCodigoMesa} />
+          ) :
+            showScanner ? (
+              <div className='w-full max-w-md'>
+                {error ? (
+                  <div>
+                    <div className='mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded'>
+                      {error}
+                    </div>
+
+                    <Button
+                      text='Voltar para a home'
+                      variant='primary'
+                      onClick={handleCancel}
+                    />
+                  </div>
+                ) :
+                  <QrCodeScanner onResult={processarQrCode} onError={setError} />
+                }
+                <div className='mt-4'>
+                  <InputCodigoMesa onCodigoCompleto={processarCodigoMesa} />
+                </div>
               </div>
-            </div>
-          ) : (
-            <div className='flex flex-col items-center'>
-              {/* <ConfirmLottie /> */}
-              <p className='mt-4'>Aguardando resposta do estabelecimento...</p>
-              <div className='mt-4'>
-                <Button
-                  text='Cancelar'
-                  onClick={handleCancel}
-                  variant='primary'
-                />
+            ) : (
+              <div className='flex flex-col items-center'>
+                <p className='mt-4'>Aguardando resposta do estabelecimento...</p>
+                <div className='mt-4'>
+                  <Button
+                    text='Cancelar'
+                    onClick={handleCancel}
+                    variant='primary'
+                  />
+                </div>
               </div>
-            </div>
-          )}
+            )}
         </div>
       </Layout>
     </>

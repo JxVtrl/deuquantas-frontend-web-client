@@ -7,7 +7,7 @@ import { AdicionarPessoaModal } from './AdicionarPessoaModal';
 import { ExcluirPessoaModal } from './ExcluirPessoaModal';
 
 export const ComandaPessoas = () => {
-  const { comanda, fetchComandaAtiva } = useComanda();
+  const { comanda, fetchComandasAtivas } = useComanda();
   const { user } = useAuth();
   const pessoas = comanda?.pessoas;
 
@@ -19,10 +19,10 @@ export const ComandaPessoas = () => {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      fetchComandaAtiva();
+      fetchComandasAtivas();
     }, 30000);
     return () => clearInterval(interval);
-  }, [fetchComandaAtiva]);
+  }, [fetchComandasAtivas]);
 
   return (
     <MaxWidthWrapper
@@ -45,18 +45,25 @@ export const ComandaPessoas = () => {
               className='flex items-center justify-between gap-[8px] border-t border-[#E0E0E0] py-[10px]'
             >
               <div className='flex items-center gap-[12px]'>
-                <Avatar
-                  name={pessoa.nome}
-                  src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${pessoa.avatar}`}
-                  bgColor={
-                    pessoa.id === user?.usuario?.id ? '#FFCC00' : 'muted'
-                  }
-                />
-                <span className='text-[16px] font-[500] text-[#000000] leading-[16px]'>
+                <div style={{ opacity: pessoa.status === 'pago' ? 0.5 : 1 }}>
+
+                  <Avatar
+                    name={pessoa.nome}
+                    src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${pessoa.avatar}`}
+                    bgColor={
+                      pessoa.id === user?.usuario?.id ? '#FFCC00' : 'muted'
+                    }
+                  />
+                </div>
+                <span className='text-[16px] font-[500] text-[#000000] leading-[16px]' style={{
+                  color: pessoa.status === 'pago' ? 'rgb(21, 128, 61)' : '#000000'
+                }}>
                   {pessoa.nome}
                 </span>
               </div>
-              <span className='text-[16px] font-[500] text-[#737373] leading-[16px]'>
+              <span className='text-[16px] font-[500] leading-[16px]' style={{
+                color: pessoa.status === 'pago' ? 'rgb(21, 128, 61)' : '#737373'
+              }}>
                 {currencyFormatter(pessoa.valor_total)}
               </span>
             </div>

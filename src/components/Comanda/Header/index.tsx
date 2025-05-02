@@ -8,6 +8,8 @@ export const ComandaHeader: React.FC = () => {
   const { user } = useAuth();
   const { comanda } = useComanda();
 
+  console.log('comanda', JSON.stringify(comanda, null, 2));
+
   if (!user) {
     return null;
   }
@@ -31,7 +33,10 @@ export const ComandaHeader: React.FC = () => {
   const consumo_user =
     pessoas?.find((pessoa) => {
       return pessoa.id === user?.usuario.id;
-    })?.valor_total || 0;
+    })?.valor_total_consumido || 0;
+
+  // Soma do valor já pago por todos
+  const valorPagoTotal = comanda?.pessoas?.reduce((acc, pessoa) => acc + (pessoa.valor_pago || 0), 0) || 0;
 
   return (
     <MaxWidthWrapper
@@ -59,7 +64,7 @@ export const ComandaHeader: React.FC = () => {
                 {pessoas.map((pessoa, index) => (
                   <div
                     key={index}
-                    className='rounded-full outline outline-[#FFCC00]'
+                    className={`rounded-full outline outline-[#FFCC00] ${pessoa.status === 'pago' ? 'opacity-40' : ''}`}
                   >
                     <Avatar
                       name={pessoa.nome}
@@ -76,7 +81,7 @@ export const ComandaHeader: React.FC = () => {
                 {pessoas.slice(0, 4).map((pessoa, index) => (
                   <div
                     key={index}
-                    className='rounded-full outline outline-[#FFCC00]'
+                    className={`rounded-full outline outline-[#FFCC00] ${pessoa.status === 'pago' ? 'opacity-40' : ''}`}
                   >
                     <Avatar
                       name={pessoa.nome}
@@ -91,7 +96,7 @@ export const ComandaHeader: React.FC = () => {
                   {pessoas.slice(4, 8).map((pessoa, index) => (
                     <div
                       key={index}
-                      className='absolute inset-0 rounded-full outline outline-[#FFCC00] w-[24px] h-[24px]'
+                      className={`absolute inset-0 rounded-full outline outline-[#FFCC00] w-[24px] h-[24px] ${pessoa.status === 'pago' ? 'opacity-40' : ''}`}
                       style={{
                         left: index * 10,
                         zIndex: 1 - index,
@@ -112,7 +117,7 @@ export const ComandaHeader: React.FC = () => {
           </div>
         )}
       </div>
-      <div className='flex flex-col h-full items-end gap-[24px]'>
+      <div className='flex flex-col h-full items-end gap-[16px]'>
         <div className='flex flex-row items-start gap-[10px]'>
           <span className='text-[12px] leading-[12px] font-[700] text-[#27272799]'>
             TOTAL R$
@@ -121,6 +126,14 @@ export const ComandaHeader: React.FC = () => {
             {currencyFormatter(comanda?.conta?.valTotal || 0, {
               noPrefix: true,
             })}
+          </span>
+        </div>
+        <div className='flex flex-row items-start gap-[10px]'>
+          <span className='text-[10px] leading-[10px] font-[700] text-[#27272799]'>
+            Valor já pago
+          </span>
+          <span className='text-[16px] leading-[16px] font-[700] text-green-700'>
+            {currencyFormatter(valorPagoTotal)}
           </span>
         </div>
         <div className='flex flex-row items-start gap-[10px]'>

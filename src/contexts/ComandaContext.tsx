@@ -7,7 +7,7 @@ import React, {
 } from 'react';
 import { toast } from 'react-hot-toast';
 import { RegisterFormData } from '@/interfaces/register';
-import { ComandaService, ComandaResponse } from '@/services/comanda.service';
+import { ComandaResponse, ComandaService, ComandaPessoa } from '@/services/comanda.service';
 import { useAuth } from './AuthContext';
 import { Item, MenuService } from '@/services/menu.service';
 import { useRouter } from 'next/router';
@@ -37,14 +37,9 @@ interface ComandaContextData {
   handleAddClick: () => void;
   adicionarUsuario: (id_usuario: string) => Promise<void>;
   removerUsuario: (id_usuario: string) => Promise<void>;
-  pessoas: {
-    id: string;
-    nome: string;
-    data_criacao: string;
-    valor_total: number;
-  }[];
-  fetchComandaAtiva: () => Promise<void>;
+  pessoas: ComandaPessoa[];
   fetchComandasAtivas: () => Promise<void>;
+  fetchComanda: (id: string) => Promise<void>;
   setComandaAtiva: (comanda: ComandaResponse) => void;
 }
 
@@ -67,14 +62,7 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
   const [tipo, setTipo] = useState<string | null>(null);
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
   const [menu, setMenu] = useState<Item[]>([]);
-  const [pessoas, setPessoas] = useState<
-    {
-      id: string;
-      nome: string;
-      data_criacao: string;
-      valor_total: number;
-    }[]
-  >([]);
+  const [pessoas, setPessoas] = useState<ComandaPessoa[]>([]);
 
   const getMenu = async (cnpj: string) => {
     try {
@@ -94,26 +82,21 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
+  const fetchComanda = useCallback(async (id: string) => {
+    const response = await ComandaService.getComandaById(id);
+    if (response) {
+      setComanda(response.comanda);
+      setEstabelecimento(response.estabelecimento);
+    }
+  }, []);
+
   const fetchComandasAtivas = useCallback(async () => {
     try {
-      if (!user?.usuario?.id) {
-        console.error('ID do usuário não encontrado');
-        return;
-      }
-
       setLoading(true);
-      const comandas = await ComandaService.getComandasAtivas(user.usuario.id);
+      const comandas = await ComandaService.getComandasAtivas(
+        user?.usuario.id || '',
+      );
       setComandasAtivas(comandas);
-
-      // Se não houver comanda ativa selecionada, seleciona a primeira
-      if (!comanda && comandas.length > 0) {
-        const response = await ComandaService.getComandaById(comandas[0].id);
-        if (response) {
-          setComanda(response.comanda);
-          setEstabelecimento(response.estabelecimento);
-          await getMenu(response.estabelecimento.num_cnpj);
-        }
-      }
     } catch (error) {
       console.error('Erro ao buscar comandas ativas:', error);
       setError('Erro ao buscar comandas ativas');
@@ -121,22 +104,6 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
       setLoading(false);
     }
   }, [user?.usuario?.id, comanda]);
-
-  const fetchComandaAtiva = useCallback(async () => {
-    try {
-      if (!user?.usuario?.id) {
-        console.error('ID do usuário não encontrado');
-        return;
-      }
-
-      setLoading(true);
-      await fetchComandasAtivas();
-    } catch (error) {
-      console.error('Erro ao buscar comanda ativa:', error);
-    } finally {
-      setLoading(false);
-    }
-  }, [user?.usuario?.id, fetchComandasAtivas]);
 
   const setComandaAtiva = useCallback(async (comandaAtiva: ComandaResponse) => {
     try {
@@ -206,7 +173,7 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
       setItensInCart([]);
 
       // Atualiza os dados da comanda
-      await fetchComandaAtiva();
+      await fetchComandasAtivas();
 
       // Redireciona para a página da comanda
       router.push(`/conta/${comanda.id}`);
@@ -291,8 +258,8 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
         adicionarUsuario,
         removerUsuario,
         pessoas,
-        fetchComandaAtiva,
         fetchComandasAtivas,
+        fetchComanda,
         setComandaAtiva,
       }}
     >

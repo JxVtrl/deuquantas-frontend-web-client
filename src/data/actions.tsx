@@ -31,7 +31,7 @@ export const actions: ActionItem[] = [
   {
     icon: OrdersIcon,
     label: 'Pedidos',
-    href: '/home/orders',
+    href: '/pedidos',
   },
   {
     icon: LocationIcon,

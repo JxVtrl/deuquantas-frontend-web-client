@@ -10,12 +10,17 @@ import SeoHead from '@/components/SeoHead';
 const PessoasDaContaPage = () => {
   const router = useRouter();
   const { id } = router.query;
-  const { comanda, loading, error, fetchComandaAtiva } = useComanda();
+  const { comanda, loading, error, fetchComandasAtivas, fetchComanda } = useComanda();
 
   useEffect(() => {
-    if (!id) return;
-    fetchComandaAtiva();
+    fetchComandasAtivas();
   }, []);
+
+  useEffect(() => {
+    if (id) {
+      fetchComanda(id as string);
+    }
+  }, [id, fetchComanda]);
 
   if (loading) {
     return (

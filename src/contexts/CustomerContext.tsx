@@ -32,7 +32,6 @@ export const CustomerProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const browser = Bowser.getParser(window.navigator.userAgent);
     const isSafari = browser.getBrowserName() === 'Safari';
-    console.log('isSafari', isSafari);
     setIsSafari(isSafari);
   }, []);
 

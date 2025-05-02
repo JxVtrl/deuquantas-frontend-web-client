@@ -23,7 +23,7 @@ export const AdicionarPessoaModal: React.FC<AdicionarPessoaModalProps> = ({
   isOpen,
   onClose,
 }) => {
-  const { comanda, fetchComandaAtiva } = useComanda();
+  const { comanda, fetchComandasAtivas } = useComanda();
   const [busca, setBusca] = useState('');
   const [usuarios, setUsuarios] = useState<Usuario[]>([]);
   const [loading, setLoading] = useState(false);
@@ -61,7 +61,7 @@ export const AdicionarPessoaModal: React.FC<AdicionarPessoaModalProps> = ({
         id_usuario: busca,
       });
 
-      await fetchComandaAtiva();
+      await fetchComandasAtivas();
       toast.success('Pessoa adicionada com sucesso!');
       onClose();
     } catch {

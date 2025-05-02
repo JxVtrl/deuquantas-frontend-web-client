@@ -13,7 +13,7 @@ export const ExcluirPessoaModal: React.FC<ExcluirPessoaModalProps> = ({
   isOpen,
   onClose,
 }) => {
-  const { comanda, fetchComandaAtiva } = useComanda();
+  const { comanda, fetchComandasAtivas } = useComanda();
   const [selectedPessoa, setSelectedPessoa] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -23,7 +23,7 @@ export const ExcluirPessoaModal: React.FC<ExcluirPessoaModalProps> = ({
     try {
       await ComandaService.removerCliente(comanda.id, selectedPessoa);
 
-      await fetchComandaAtiva();
+      await fetchComandasAtivas();
       toast.success('Pessoa removida com sucesso!');
       onClose();
     } catch {

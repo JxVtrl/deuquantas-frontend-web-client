@@ -178,13 +178,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   const isAuthenticated = !!user;
 
   const login = async (data: LoginData) => {
-    console.log('Login:', data);
     try {
       const response = await AuthService.login(data);
       const token = response.token;
       const { success, user: processedUser } = await processToken(token);
-
-      console.log('Login:', { success, processedUser });
       if (success && processedUser) {
         redirectTo(processedUser);
       }
