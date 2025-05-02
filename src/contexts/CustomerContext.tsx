@@ -15,6 +15,8 @@ interface CustomerContextData {
   purchaseHistory: PurchaseHistoryItem[];
   setPurchaseHistory: (history: PurchaseHistoryItem[]) => void;
   isSafari: boolean;
+  solicitacaoId: string | null;
+  setSolicitacaoId: (id: string | null) => void;
 }
 
 export const CustomerContext = createContext<CustomerContextData>(
@@ -28,6 +30,7 @@ export const CustomerProvider = ({ children }: { children: ReactNode }) => {
     [],
   );
   const [isSafari, setIsSafari] = useState(false);
+  const [solicitacaoId, setSolicitacaoId] = useState<string | null>(null);
 
   useEffect(() => {
     const browser = Bowser.getParser(window.navigator.userAgent);
@@ -43,6 +46,8 @@ export const CustomerProvider = ({ children }: { children: ReactNode }) => {
         purchaseHistory,
         setPurchaseHistory,
         isSafari,
+        solicitacaoId,
+        setSolicitacaoId,
       }}
     >
       {children}

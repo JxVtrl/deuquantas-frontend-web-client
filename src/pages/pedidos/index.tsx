@@ -55,7 +55,7 @@ const OrdersPage = () => {
           </div>
         )}
         <div className='grid gap-8'>
-          {comandas.map((comanda) => (
+          {comandas.sort((a, b) => new Date(b.conta?.data_criacao || '').getTime() - new Date(a.conta?.data_criacao || '').getTime()).map((comanda) => (
             <div
               key={comanda.id}
               className='rounded-xl shadow-lg border border-gray-100 bg-white p-6 flex flex-col gap-3 hover:shadow-2xl transition-shadow'

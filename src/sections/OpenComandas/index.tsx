@@ -8,6 +8,8 @@ import { currencyFormatter } from '@/utils/formatters';
 import { Button } from '@deuquantas/components';
 import { toast } from 'react-hot-toast';
 import ComandaService, { ComandaResponse } from '@/services/comanda.service';
+import { useCustomerContext } from '@/contexts/CustomerContext';
+import { MesaService } from '@/services/mesa.service';
 
 interface Solicitacao {
   id: string;
@@ -31,6 +33,8 @@ export const OpenComandas: React.FC = () => {
   const router = useRouter();
   const [solicitacoes, setSolicitacoes] = useState<Solicitacao[]>([]);
   const [loading, setLoading] = useState(true);
+  const { solicitacaoId } = useCustomerContext();
+  const [solicitacaoAguardando, setSolicitacaoAguardando] = useState<any>(null);
 
   const fetchSolicitacoes = useCallback(async () => {
     try {
@@ -44,6 +48,19 @@ export const OpenComandas: React.FC = () => {
       toast.error('Erro ao buscar solicitações');
     }
   }, [user?.usuario?.id]);
+
+  const fetchSolicitacaoAguardando = useCallback(async () => {
+    if (!solicitacaoId) {
+      setSolicitacaoAguardando(null);
+      return;
+    }
+    try {
+      const response = await MesaService.verificarStatusSolicitacao(solicitacaoId);
+      setSolicitacaoAguardando(response);
+    } catch (error) {
+      setSolicitacaoAguardando(null);
+    }
+  }, [solicitacaoId]);
 
   const handleResponderSolicitacao = async (
     id: string,
@@ -74,7 +91,11 @@ export const OpenComandas: React.FC = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        await Promise.all([fetchSolicitacoes(), fetchComandasAtivas()]);
+        await Promise.all([
+          fetchSolicitacoes(),
+          fetchComandasAtivas(),
+          fetchSolicitacaoAguardando(),
+        ]);
       } finally {
         setLoading(false);
       }
@@ -82,15 +103,16 @@ export const OpenComandas: React.FC = () => {
 
     fetchData();
 
-    // Configura o polling para buscar solicitações e comandas a cada 30 segundos
+    // Configura o polling para buscar solicitações, comandas e status da solicitação a cada 30 segundos
     const intervalId = setInterval(() => {
       fetchSolicitacoes();
       fetchComandasAtivas();
+      fetchSolicitacaoAguardando();
     }, 30000);
 
     // Limpa o intervalo quando o componente for desmontado
     return () => clearInterval(intervalId);
-  }, [user?.usuario?.id, fetchSolicitacoes, fetchComandasAtivas]);
+  }, [user?.usuario?.id, fetchSolicitacoes, fetchComandasAtivas, fetchSolicitacaoAguardando]);
 
   if (loading) {
     return <div>Carregando...</div>;
@@ -103,6 +125,20 @@ export const OpenComandas: React.FC = () => {
       }}
     >
       <div className='flex flex-col gap-4'>
+        {/* Card de Aguardando Aprovação */}
+        {solicitacaoAguardando && solicitacaoAguardando.status === 'pendente' && (
+          <Card className='p-4 bg-yellow-50 border border-yellow-300 mb-4'>
+            <div className='flex flex-col items-center'>
+              <h2 className='text-lg font-semibold text-yellow-800 mb-2'>
+                Aguardando aprovação do estabelecimento
+              </h2>
+              <p className='text-yellow-700'>
+                Sua solicitação para a mesa #{solicitacaoAguardando.numMesa} está aguardando aprovação.
+              </p>
+              {/* Botão de cancelar pode ser implementado aqui se desejar */}
+            </div>
+          </Card>
+        )}
         {/* Seção de Solicitações Pendentes */}
         {solicitacoes?.length > 0 && (
           <div>

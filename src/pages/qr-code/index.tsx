@@ -10,6 +10,7 @@ import dynamic from 'next/dynamic';
 import { Button } from '@deuquantas/components';
 import { InputCodigoMesa } from '@/components/InputCodigoMesa';
 import SeoHead from '@/components/SeoHead';
+import { useCustomerContext } from '@/contexts/CustomerContext';
 
 const QrCodeScanner = dynamic(() => import('@/components/QRCodeScanner'), {
   ssr: false,
@@ -21,108 +22,19 @@ const QrCodeScanner = dynamic(() => import('@/components/QRCodeScanner'), {
   ),
 });
 
-const POLLING_INTERVAL = 5000; // 5 segundos
-const MAX_POLLING_TIME = 300000; // 5 minutos
 
 const CustomerQrCode: React.FC = () => {
   const router = useRouter();
   const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const [showScanner, setShowScanner] = useState(true);
-  const [solicitacaoId, setSolicitacaoId] = useState<string | null>(null);
-  const [timeoutSeconds, setTimeoutSeconds] = useState(300); // 5 minutos
 
-  useEffect(() => {
-    let pollingInterval: NodeJS.Timeout;
-    let timeoutTimer: NodeJS.Timeout;
-    let countdownInterval: NodeJS.Timeout;
-
-    const verificarStatusSolicitacao = async () => {
-      if (!solicitacaoId || !user?.cliente?.num_cpf) return;
-
-      try {
-        const solicitacao =
-          await MesaService.verificarStatusSolicitacao(solicitacaoId);
-
-        if (solicitacao.status === 'aprovado') {
-          toast.success('Solicitação aprovada!');
-
-          // Buscar a comanda ativa após a aprovação
-          const comanda = await ComandaService.getComandaAtivaByUsuarioId(
-            user.usuario.id,
-          );
-
-          const firstComanda = comanda?.[0];
-
-          if (firstComanda) {
-            router.push(`/conta/${firstComanda.id}`);
-          } else {
-            toast.error('Erro ao buscar comanda ativa');
-            setError('Erro ao buscar comanda. Tente novamente.');
-            setShowScanner(true);
-            setSolicitacaoId(null);
-            setSuccessMessage(null);
-          }
-        } else if (solicitacao.status === 'rejeitado') {
-          toast.error('Solicitação rejeitada pelo estabelecimento');
-          setError('Solicitação rejeitada. Tente novamente.');
-          setShowScanner(true);
-          setSolicitacaoId(null);
-          setSuccessMessage(null);
-        }
-      } catch (error) {
-        console.error('Erro ao verificar status:', error);
-        setError('Erro ao verificar status da solicitação');
-        setShowScanner(true);
-        setSolicitacaoId(null);
-        setSuccessMessage(null);
-      }
-    };
-
-    if (solicitacaoId) {
-      // Inicia o polling
-      pollingInterval = setInterval(
-        verificarStatusSolicitacao,
-        POLLING_INTERVAL,
-      );
-
-      // Configura o timeout
-      timeoutTimer = setTimeout(() => {
-        clearInterval(pollingInterval);
-        clearInterval(countdownInterval);
-        setError('Tempo de espera excedido. Tente novamente.');
-        setShowScanner(true);
-        setSolicitacaoId(null);
-        setSuccessMessage(null);
-      }, MAX_POLLING_TIME);
-
-      // Inicia a contagem regressiva
-      countdownInterval = setInterval(() => {
-        setTimeoutSeconds((prev) => {
-          if (prev <= 1) {
-            clearInterval(countdownInterval);
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-
-      return () => {
-        clearInterval(pollingInterval);
-        clearTimeout(timeoutTimer);
-        clearInterval(countdownInterval);
-      };
-    }
-  }, [solicitacaoId, router, user]);
+  const { setSolicitacaoId } = useCustomerContext();
 
   const processarSolicitacao = async (num_cnpj: string, numMesa: string) => {
     try {
       setIsLoading(true);
       setError(null);
-      setSuccessMessage(null);
-      setShowScanner(false);
 
       const disponivel = await MesaService.verificarDisponibilidadeMesa(
         num_cnpj,
@@ -145,16 +57,12 @@ const CustomerQrCode: React.FC = () => {
       }
 
       setSolicitacaoId(solicitacao.data.id);
-      setSuccessMessage(
-        'Solicitação enviada. Aguardando aprovação do estabelecimento...',
-      );
+      router.push('/home');
     } catch (error) {
       setError(
         error instanceof Error ? error.message : 'Erro ao processar QR Code',
       );
-      setShowScanner(true);
       setSolicitacaoId(null);
-      setSuccessMessage(null);
     } finally {
       setIsLoading(false);
     }
@@ -195,38 +103,16 @@ const CustomerQrCode: React.FC = () => {
     processarSolicitacao(mesa.num_cnpj, mesa.numMesa);
   };
 
-  const handleCancel = () => {
-    if (solicitacaoId) {
-      // TODO: Implementar cancelamento da solicitação no backend
-      setShowScanner(true);
-      setSolicitacaoId(null);
-      setSuccessMessage(null);
-      setTimeoutSeconds(300);
-    }
-    router.push('/home');
-  };
-
   return (
     <>
       <SeoHead title='QR Code - DeuQuantas' />
       <Layout>
         <div className='flex flex-col items-center mt-[10vh] min-h-screen p-4'>
-          {successMessage && (
-            <div className='mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded'>
-              {successMessage}
-              <p className='mt-2'>
-                Tempo restante: {Math.floor(timeoutSeconds / 60)}:
-                {(timeoutSeconds % 60).toString().padStart(2, '0')}
-              </p>
-            </div>
-          )}
-
           {isLoading ? (
             <div className='flex flex-col items-center'>
-              {/* <ConfirmLottie /> */}
               <p className='mt-4'>Processando QR Code...</p>
             </div>
-          ) : showScanner ? (
+          ) : (
             <div className='w-full max-w-md'>
               {error ? (
                 <div>
@@ -237,7 +123,7 @@ const CustomerQrCode: React.FC = () => {
                   <Button
                     text='Voltar para a home'
                     variant='primary'
-                    onClick={handleCancel}
+                    onClick={() => void router.push('/home')}
                   />
                 </div>
               ) : (
@@ -245,17 +131,6 @@ const CustomerQrCode: React.FC = () => {
               )}
               <div className='mt-4'>
                 <InputCodigoMesa onCodigoCompleto={processarCodigoMesa} />
-              </div>
-            </div>
-          ) : (
-            <div className='flex flex-col items-center'>
-              <p className='mt-4'>Aguardando resposta do estabelecimento...</p>
-              <div className='mt-4'>
-                <Button
-                  text='Cancelar'
-                  onClick={handleCancel}
-                  variant='primary'
-                />
               </div>
             </div>
           )}

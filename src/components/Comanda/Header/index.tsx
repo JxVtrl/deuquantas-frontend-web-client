@@ -42,6 +42,8 @@ export const ComandaHeader: React.FC = () => {
       0,
     ) || 0;
 
+  const valorTotal = comanda?.conta?.valTotal || 0;
+
   return (
     <MaxWidthWrapper
       style={{
@@ -127,7 +129,7 @@ export const ComandaHeader: React.FC = () => {
             TOTAL R$
           </span>
           <span className='text-[28px] leading-[28px] font-[700] text-[#27272799]'>
-            {currencyFormatter(comanda?.conta?.valTotal || 0, {
+            {currencyFormatter(valorTotal, {
               noPrefix: true,
             })}
           </span>
