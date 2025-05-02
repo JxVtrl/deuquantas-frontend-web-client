@@ -44,28 +44,20 @@ const CheckoutTransparente = () => {
     const form = formRef.current;
     if (!form) return;
 
-    // Coleta os dados do cartão
-    const cardData = {
-      cardNumber: (form['cardNumber'] as HTMLInputElement).value,
-      cardholderName: (form['cardholderName'] as HTMLInputElement).value,
-      cardExpirationMonth: (form['cardExpirationMonth'] as HTMLInputElement)
-        .value,
-      cardExpirationYear: (form['cardExpirationYear'] as HTMLInputElement)
-        .value,
-      securityCode: (form['securityCode'] as HTMLInputElement).value,
-      identificationType: 'CPF',
-      identificationNumber: (form['identificationNumber'] as HTMLInputElement)
-        .value,
-    };
-
     try {
-      // Gera o token do cartão
-      const { id: token } = await mpRef.current.createCardToken(cardData);
+      // Gera o token do cartão usando o form
+      const result = await mpRef.current.card.createToken(form);
+      if (result.error) {
+        setError(result.error.message || 'Erro ao gerar token do cartão');
+        setLoading(false);
+        return;
+      }
+      const token = result.id;
       setCardToken(token);
-      // Envia para o backend (ajuste endpoint e payload conforme sua API)
+      // Envia para o backend
       const response = await api.post('/pagamentos/checkout-transparente', {
         token,
-        valor: Number(valor), // valor vindo do query param
+        valor: Number(valor),
         descricao: 'Pagamento checkout transparente',
         id_comanda,
       });
