@@ -2,6 +2,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import Script from 'next/script';
 import { api } from '@/lib/axios';
 import { useRouter } from 'next/router';
+import Layout from '@/layout';
+import { withAuthCustomer } from '@/hoc/withAuth';
 
 declare global {
   interface Window {
@@ -70,7 +72,7 @@ const CheckoutTransparente = () => {
   };
 
   return (
-    <div className='max-w-md mx-auto mt-10 p-6 bg-white rounded shadow'>
+    <Layout>
       <Script
         src='https://sdk.mercadopago.com/js/v2'
         strategy='beforeInteractive'
@@ -162,8 +164,8 @@ const CheckoutTransparente = () => {
           Token gerado: {cardToken}
         </div>
       )}
-    </div>
+    </Layout>
   );
 };
 
-export default CheckoutTransparente;
+export default withAuthCustomer(CheckoutTransparente);
