@@ -197,7 +197,7 @@ const CheckoutTransparente = () => {
         <Button
           disabled={loading}
           text={loading ? 'Processando...' : 'Pagar'}
-          onClick={() => void handleSubmit}
+          onClick={() => void handleSubmit()}
           variant='primary'
         />
         {error && <div className='text-red-600 mt-2'>{error}</div>}
