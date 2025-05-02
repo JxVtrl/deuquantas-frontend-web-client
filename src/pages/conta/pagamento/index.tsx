@@ -49,7 +49,6 @@ const CheckoutTransparente = () => {
       return;
     }
 
-
     try {
       // Coleta os dados do cartão manualmente
       const cardData = {
