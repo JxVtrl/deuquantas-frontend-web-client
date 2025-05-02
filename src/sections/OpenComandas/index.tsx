@@ -217,49 +217,58 @@ export const OpenComandas: React.FC = () => {
               </span>
             </div>
             <div className='flex flex-col gap-2'>
-              {comandasAtivas.map((comanda) => (
-                <Card
-                  key={comanda.id}
-                  className='p-4 cursor-pointer transition-all duration-200 hover:shadow-lg active:scale-[0.98] bg-white'
-                  onClick={() => handleComandaClick(comanda)}
-                >
-                  <div className='flex items-start justify-between'>
-                    <div className='flex items-center gap-2'>
-                      <div className='p-2 bg-[#F5F5F5] rounded-full'>
-                        <ReceiptIcon />
-                      </div>
-                      <div>
-                        <h2 className='text-[14px] font-[600] text-[#272727] leading-[24px]'>
-                          {comanda.estabelecimento?.nome ||
-                            'Estabelecimento não encontrado'}
-                        </h2>
-                        <div className='flex items-center gap-2'>
-                          <p className='text-[12px] font-[400] text-[#666666] leading-[20px]'>
-                            Mesa {comanda.numMesa}
-                          </p>
-                          <span className='w-1 h-1 bg-gray-300 rounded-full'></span>
-                          <p className='text-[12px] font-[400] text-[#666666] leading-[20px]'>
-                            {comanda.clientes?.length || 0}{' '}
-                            {comanda.clientes?.length === 1
-                              ? 'pessoa'
-                              : 'pessoas'}
-                          </p>
-                          <span className='w-1 h-1 bg-gray-300 rounded-full'></span>
-                          <p className='text-[12px] font-[400] text-[#666666] leading-[20px]'>
-                            {comanda.itens.length}{' '}
-                            {comanda.itens.length === 1 ? 'item' : 'itens'}
-                          </p>
+              {comandasAtivas.map((comanda) => {
+                console.log(comanda);
+                // Soma do valor já pago por todos
+                const valorPago = comanda.clientes?.reduce((acc, cliente) => acc + (Number(cliente.valor_pago) || 0), 0) || 0;
+
+                const valorTotal =
+                  (comanda?.conta?.valTotal || 0) - valorPago;
+
+                return (
+                  <Card
+                    key={comanda.id}
+                    className='p-4 cursor-pointer transition-all duration-200 hover:shadow-lg active:scale-[0.98] bg-white'
+                    onClick={() => handleComandaClick(comanda)}
+                  >
+                    <div className='flex items-start justify-between'>
+                      <div className='flex items-center gap-2'>
+                        <div className='p-2 bg-[#F5F5F5] rounded-full'>
+                          <ReceiptIcon />
+                        </div>
+                        <div>
+                          <h2 className='text-[14px] font-[600] text-[#272727] leading-[24px]'>
+                            {comanda.estabelecimento?.nome ||
+                              'Estabelecimento não encontrado'}
+                          </h2>
+                          <div className='flex items-center gap-2'>
+                            <p className='text-[12px] font-[400] text-[#666666] leading-[20px]'>
+                              Mesa {comanda.numMesa}
+                            </p>
+                            <span className='w-1 h-1 bg-gray-300 rounded-full'></span>
+                            <p className='text-[12px] font-[400] text-[#666666] leading-[20px]'>
+                              {comanda.clientes?.length || 0}{' '}
+                              {comanda.clientes?.length === 1
+                                ? 'pessoa'
+                                : 'pessoas'}
+                            </p>
+                            <span className='w-1 h-1 bg-gray-300 rounded-full'></span>
+                            <p className='text-[12px] font-[400] text-[#666666] leading-[20px]'>
+                              {comanda.itens.length}{' '}
+                              {comanda.itens.length === 1 ? 'item' : 'itens'}
+                            </p>
+                          </div>
                         </div>
                       </div>
+                      <div className='text-right'>
+                        <p className='text-[14px] font-[600] text-[#272727] leading-[20px]'>
+                          {currencyFormatter(valorTotal)}
+                        </p>
+                      </div>
                     </div>
-                    <div className='text-right'>
-                      <p className='text-[14px] font-[600] text-[#272727] leading-[20px]'>
-                        {currencyFormatter(comanda.conta?.valTotal || 0)}
-                      </p>
-                    </div>
-                  </div>
-                </Card>
-              ))}
+                  </Card>
+                )
+              })}
             </div>
           </div>
         ) : (

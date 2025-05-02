@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useComanda } from '@/contexts/ComandaContext';
 import { api } from '@/lib/axios';
@@ -34,8 +34,19 @@ export const ComandaPayOptions = () => {
     message: '',
   });
   const router = useRouter();
-  const { comanda } = useComanda();
+  const { comanda, fetchComanda } = useComanda();
   const { user } = useAuth();
+  const [isSplitting, setIsSplitting] = useState(false);
+
+  useEffect(() => {
+    if (
+      comanda?.clientes?.some(
+        (cliente) => cliente.status === 'aguardando_split',
+      )
+    ) {
+      setIsSplitting(true);
+    }
+  }, [comanda]);
 
   const getConfirmationDetails = (option: PaymentOption) => {
     if (!comanda?.conta)
@@ -86,47 +97,51 @@ export const ComandaPayOptions = () => {
     });
   };
 
+  const handleStartSplit = async () => {
+    if (!comanda) return;
+    setLoading(true);
+    setError(null);
+
+    try {
+      await api.post(`/comandas/${comanda.id}/iniciar-split`);
+      if (fetchComanda) {
+        await fetchComanda(comanda.id);
+      }
+      setConfirmation((prev) => ({ ...prev, show: false }));
+      setIsOpen(false);
+    } catch (error: any) {
+      setError(
+        error.response?.data?.message ||
+        'Ocorreu um erro ao iniciar a divisão. Tente novamente.',
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleConfirmPayment = async () => {
     if (!comanda || !confirmation.option) return;
 
     setLoading(true);
     setError(null);
 
-    console.log('[Frontend] Enviando requisição de pagamento:', {
-      id_comanda: comanda.id,
-      tipo: confirmation.option,
-    });
-
     try {
-      // Para split: se todos estão ativos, é o split inicial (não envia idClientePagante)
-      // Se já está aguardando_split, envia idClientePagante (pagamento individual)
-      let payload: any = {
+      const payload = {
         id_comanda: comanda.id,
         tipo: confirmation.option,
       };
-      if (
-        confirmation.option === 'split' &&
-        comanda.clientes?.some(
-          (cliente) => cliente.status === 'aguardando_split',
-        )
-      ) {
-        payload.idClientePagante = user?.usuario.id;
-      }
       const response = await api.post<PaymentResponse>(
         `/comandas/${comanda.id}/pagamento`,
         payload,
       );
 
-      console.log('[Frontend] Resposta do backend:', response.data);
-
       if (response.data.success) {
         router.push('/pedidos');
       }
     } catch (error: any) {
-      console.error('[Frontend] Erro ao processar pagamento:', error);
       setError(
         error.response?.data?.message ||
-          'Ocorreu um erro ao processar o pagamento. Tente novamente.',
+        'Ocorreu um erro ao processar o pagamento. Tente novamente.',
       );
     } finally {
       setLoading(false);
@@ -145,8 +160,7 @@ export const ComandaPayOptions = () => {
     (cliente) => cliente.status === 'ativo',
   );
   const todosAguardandoSplit = comanda.clientes?.every(
-    (cliente) =>
-      cliente.status === 'aguardando_split' || cliente.status === 'pago',
+    (cliente) => cliente.status === 'aguardando_split',
   );
 
   // Lógica de exibição dos botões
@@ -173,7 +187,7 @@ export const ComandaPayOptions = () => {
     }
   }
 
-  if (opcoes.length === 0) return null;
+  const isAlone = comanda.clientes.length === 1;
 
   return (
     <MaxWidthWrapper
@@ -183,11 +197,25 @@ export const ComandaPayOptions = () => {
       }}
     >
       <button
-        onClick={() => setIsOpen(true)}
+        onClick={() => {
+          if (isAlone) {
+            handlePaymentOptionClick('individual');
+          } else if (isSplitting) {
+            handlePaymentOptionClick('split');
+          } else {
+            setIsOpen(true);
+          }
+        }}
         className='w-full py-3 bg-[#FFCC00] text-black font-semibold rounded-lg hover:bg-[#E6B800] transition-colors'
         disabled={loading}
       >
-        {loading ? 'Processando...' : 'Opções de Pagamento'}
+        {loading
+          ? 'Processando...'
+          : isAlone
+            ? 'Pagar meu consumo'
+            : isSplitting
+              ? 'Pagar minha parte'
+              : 'Opções de Pagamento'}
       </button>
 
       {/* Modal de Opções de Pagamento */}
@@ -267,7 +295,19 @@ export const ComandaPayOptions = () => {
 
               <div className='space-y-3'>
                 <button
-                  onClick={handleConfirmPayment}
+                  onClick={() => {
+                    if (
+                      confirmation.option === 'split' &&
+                      user?.usuario.id === criadorId &&
+                      comanda.clientes?.some((c) => c.status === 'ativo')
+                    ) {
+                      // Criador inicia o split
+                      handleStartSplit();
+                    } else {
+                      // Participante paga, ou criador paga após todos pagarem
+                      handleConfirmPayment();
+                    }
+                  }}
                   className='w-full py-3 bg-[#FFCC00] text-black font-semibold rounded-lg hover:bg-[#E6B800] transition-colors disabled:opacity-50'
                   disabled={loading}
                 >
