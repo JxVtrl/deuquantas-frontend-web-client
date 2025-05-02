@@ -86,7 +86,7 @@ const CheckoutTransparente = () => {
 
       if (response.data.success) {
         setSuccess('Pagamento realizado com sucesso!');
-        router.push('/pedidos')
+        router.push('/pedidos');
       } else {
         setError(response.data.message || 'Erro ao processar pagamento');
       }
