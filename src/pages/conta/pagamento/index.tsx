@@ -4,6 +4,8 @@ import { api } from '@/lib/axios';
 import { useRouter } from 'next/router';
 import Layout from '@/layout';
 import { withAuthCustomer } from '@/hoc/withAuth';
+import { currencyFormatter } from '@/utils/formatters';
+import { MaxWidthWrapper } from '@deuquantas/components';
 
 declare global {
   interface Window {
@@ -63,7 +65,12 @@ const CheckoutTransparente = () => {
         descricao: 'Pagamento checkout transparente',
         id_comanda,
       });
-      setSuccess('Pagamento realizado com sucesso!');
+
+      if (response.data.success) {
+        setSuccess('Pagamento realizado com sucesso!');
+      } else {
+        setError(response.data.message || 'Erro ao processar pagamento');
+      }
     } catch (err: any) {
       setError(err.message || 'Erro ao processar pagamento');
     } finally {
@@ -73,97 +80,103 @@ const CheckoutTransparente = () => {
 
   return (
     <Layout>
-      <Script
-        src='https://sdk.mercadopago.com/js/v2'
-        strategy='beforeInteractive'
-        onLoad={() => {
-          if (window.MercadoPago) {
-            mpRef.current = new window.MercadoPago(PUBLIC_KEY, {
-              locale: 'pt-BR',
-            });
-          }
+      <MaxWidthWrapper
+        styleContent={{
+          paddingTop: '20px',
+          paddingBottom: '81px',
         }}
-      />
-      <h2 className='text-2xl font-bold mb-4'>
-        Checkout Transparente Mercado Pago
-      </h2>
-      {valor && (
-        <div className='mb-4 text-lg font-semibold'>
-          Valor a pagar: R${' '}
-          {Number(valor).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-        </div>
-      )}
-      <form ref={formRef} onSubmit={handleSubmit} className='space-y-4'>
-        <div>
-          <label className='block mb-1'>Número do cartão</label>
-          <input
-            name='cardNumber'
-            className='w-full border rounded px-3 py-2'
-            required
-            maxLength={16}
-          />
-        </div>
-        <div>
-          <label className='block mb-1'>Nome impresso no cartão</label>
-          <input
-            name='cardholderName'
-            className='w-full border rounded px-3 py-2'
-            required
-          />
-        </div>
-        <div className='flex gap-2'>
-          <div className='flex-1'>
-            <label className='block mb-1'>Mês expiração</label>
+      >
+        <Script
+          src='https://sdk.mercadopago.com/js/v2'
+          strategy='beforeInteractive'
+          onLoad={() => {
+            if (window.MercadoPago) {
+              mpRef.current = new window.MercadoPago(PUBLIC_KEY, {
+                locale: 'pt-BR',
+              });
+            }
+          }}
+        />
+        <h2 className='text-2xl font-bold mb-4'>
+          Checkout Transparente Mercado Pago
+        </h2>
+        {valor && (
+          <div className='mb-4 text-lg font-semibold'>
+            Valor a pagar: {currencyFormatter(Number(valor))}
+          </div>
+        )}
+        <form ref={formRef} onSubmit={handleSubmit} className='space-y-4'>
+          <div>
+            <label className='block mb-1'>Número do cartão</label>
             <input
-              name='cardExpirationMonth'
+              name='cardNumber'
               className='w-full border rounded px-3 py-2'
               required
-              maxLength={2}
+              maxLength={16}
             />
           </div>
-          <div className='flex-1'>
-            <label className='block mb-1'>Ano expiração</label>
+          <div>
+            <label className='block mb-1'>Nome impresso no cartão</label>
             <input
-              name='cardExpirationYear'
+              name='cardholderName'
+              className='w-full border rounded px-3 py-2'
+              required
+            />
+          </div>
+          <div className='flex gap-2'>
+            <div className='flex-1'>
+              <label className='block mb-1'>Mês expiração</label>
+              <input
+                name='cardExpirationMonth'
+                className='w-full border rounded px-3 py-2'
+                required
+                maxLength={2}
+              />
+            </div>
+            <div className='flex-1'>
+              <label className='block mb-1'>Ano expiração</label>
+              <input
+                name='cardExpirationYear'
+                className='w-full border rounded px-3 py-2'
+                required
+                maxLength={4}
+              />
+            </div>
+          </div>
+          <div>
+            <label className='block mb-1'>CVV</label>
+            <input
+              name='securityCode'
               className='w-full border rounded px-3 py-2'
               required
               maxLength={4}
             />
           </div>
-        </div>
-        <div>
-          <label className='block mb-1'>CVV</label>
-          <input
-            name='securityCode'
-            className='w-full border rounded px-3 py-2'
-            required
-            maxLength={4}
-          />
-        </div>
-        <div>
-          <label className='block mb-1'>CPF do titular</label>
-          <input
-            name='identificationNumber'
-            className='w-full border rounded px-3 py-2'
-            required
-            maxLength={11}
-          />
-        </div>
-        <button
-          type='submit'
-          className='w-full py-3 bg-[#FFCC00] text-black font-semibold rounded-lg hover:bg-[#E6B800] transition-colors'
-          disabled={loading}
-        >
-          {loading ? 'Processando...' : 'Pagar'}
-        </button>
-        {error && <div className='text-red-600 mt-2'>{error}</div>}
-        {success && <div className='text-green-600 mt-2'>{success}</div>}
-      </form>
-      {cardToken && (
-        <div className='mt-4 text-xs text-gray-500'>
-          Token gerado: {cardToken}
-        </div>
-      )}
+          <div>
+            <label className='block mb-1'>CPF do titular</label>
+            <input
+              name='identificationNumber'
+              className='w-full border rounded px-3 py-2'
+              required
+              maxLength={11}
+            />
+          </div>
+          <button
+            type='submit'
+            className='w-full py-3 bg-[#FFCC00] text-black font-semibold rounded-lg hover:bg-[#E6B800] transition-colors'
+            disabled={loading}
+          >
+            {loading ? 'Processando...' : 'Pagar'}
+          </button>
+          {error && <div className='text-red-600 mt-2'>{error}</div>}
+          {success && <div className='text-green-600 mt-2'>{success}</div>}
+        </form>
+        {cardToken && (
+          <div className='mt-4 text-xs text-gray-500'>
+            Token gerado: {cardToken}
+          </div>
+        )}
+      </MaxWidthWrapper>
     </Layout>
   );
 };
