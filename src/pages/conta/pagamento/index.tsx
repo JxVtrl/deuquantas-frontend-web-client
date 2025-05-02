@@ -50,18 +50,14 @@ const CheckoutTransparente = () => {
     }
 
     try {
-      // Coleta os dados do cartão manualmente
-      const cardData = {
-        cardNumber: cardNumber,
-        cardholderName: cardholderName,
-        cardExpirationMonth: cardExpirationMonth,
-        cardExpirationYear: cardExpirationYear,
-        securityCode: securityCode,
-        identificationType: 'CPF',
-        identificationNumber: identificationNumber,
-      };
-      // Gera o token do cartão usando os dados coletados
-      const result = await mpRef.current.card.createToken(cardData);
+      const result = await mpRef.current.card.createToken({
+        cardNumber,
+        cardholderName,
+        cardExpirationMonth,
+        cardExpirationYear,
+        securityCode,
+        identificationNumber,
+      });
       console.log('result', result);
       if (result.error) {
         setError(result.error.message || 'Erro ao gerar token do cartão');
@@ -90,6 +86,7 @@ const CheckoutTransparente = () => {
 
       if (response.data.success) {
         setSuccess('Pagamento realizado com sucesso!');
+        router.push('/pedidos')
       } else {
         setError(response.data.message || 'Erro ao processar pagamento');
       }
@@ -195,10 +192,9 @@ const CheckoutTransparente = () => {
           />
         </div>
         <Button
-          disabled={loading}
-          text={loading ? 'Processando...' : 'Pagar'}
           onClick={() => void handleSubmit()}
           variant='primary'
+          text='Pagar'
         />
         {error && <div className='text-red-600 mt-2'>{error}</div>}
         {success && <div className='text-green-600 mt-2'>{success}</div>}
