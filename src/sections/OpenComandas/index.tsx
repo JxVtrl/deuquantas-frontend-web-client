@@ -55,7 +55,8 @@ export const OpenComandas: React.FC = () => {
       return;
     }
     try {
-      const response = await MesaService.verificarStatusSolicitacao(solicitacaoId);
+      const response =
+        await MesaService.verificarStatusSolicitacao(solicitacaoId);
       setSolicitacaoAguardando(response);
     } catch (error) {
       setSolicitacaoAguardando(null);
@@ -112,7 +113,12 @@ export const OpenComandas: React.FC = () => {
 
     // Limpa o intervalo quando o componente for desmontado
     return () => clearInterval(intervalId);
-  }, [user?.usuario?.id, fetchSolicitacoes, fetchComandasAtivas, fetchSolicitacaoAguardando]);
+  }, [
+    user?.usuario?.id,
+    fetchSolicitacoes,
+    fetchComandasAtivas,
+    fetchSolicitacaoAguardando,
+  ]);
 
   if (loading) {
     return <div>Carregando...</div>;
@@ -126,19 +132,21 @@ export const OpenComandas: React.FC = () => {
     >
       <div className='flex flex-col gap-4'>
         {/* Card de Aguardando Aprovação */}
-        {solicitacaoAguardando && solicitacaoAguardando.status === 'pendente' && (
-          <Card className='p-4 bg-yellow-50 border border-yellow-300 mb-4'>
-            <div className='flex flex-col items-center'>
-              <h2 className='text-lg font-semibold text-yellow-800 mb-2'>
-                Aguardando aprovação do estabelecimento
-              </h2>
-              <p className='text-yellow-700'>
-                Sua solicitação para a mesa #{solicitacaoAguardando.numMesa} está aguardando aprovação.
-              </p>
-              {/* Botão de cancelar pode ser implementado aqui se desejar */}
-            </div>
-          </Card>
-        )}
+        {solicitacaoAguardando &&
+          solicitacaoAguardando.status === 'pendente' && (
+            <Card className='p-4 bg-yellow-50 border border-yellow-300 mb-4'>
+              <div className='flex flex-col items-center'>
+                <h2 className='text-lg font-semibold text-yellow-800 mb-2'>
+                  Aguardando aprovação do estabelecimento
+                </h2>
+                <p className='text-yellow-700'>
+                  Sua solicitação para a mesa #{solicitacaoAguardando.numMesa}{' '}
+                  está aguardando aprovação.
+                </p>
+                {/* Botão de cancelar pode ser implementado aqui se desejar */}
+              </div>
+            </Card>
+          )}
         {/* Seção de Solicitações Pendentes */}
         {solicitacoes?.length > 0 && (
           <div>

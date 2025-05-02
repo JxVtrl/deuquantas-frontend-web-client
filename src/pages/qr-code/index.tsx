@@ -22,7 +22,6 @@ const QrCodeScanner = dynamic(() => import('@/components/QRCodeScanner'), {
   ),
 });
 
-
 const CustomerQrCode: React.FC = () => {
   const router = useRouter();
   const { user } = useAuth();
