@@ -46,7 +46,6 @@ export const ComandaPessoas = () => {
             >
               <div className='flex items-center gap-[12px]'>
                 <div style={{ opacity: pessoa.status === 'pago' ? 0.5 : 1 }}>
-
                   <Avatar
                     name={pessoa.nome}
                     src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${pessoa.avatar}`}
@@ -55,15 +54,23 @@ export const ComandaPessoas = () => {
                     }
                   />
                 </div>
-                <span className='text-[16px] font-[500] text-[#000000] leading-[16px]' style={{
-                  color: pessoa.status === 'pago' ? 'rgb(21, 128, 61)' : '#000000'
-                }}>
+                <span
+                  className='text-[16px] font-[500] text-[#000000] leading-[16px]'
+                  style={{
+                    color:
+                      pessoa.status === 'pago' ? 'rgb(21, 128, 61)' : '#000000',
+                  }}
+                >
                   {pessoa.nome}
                 </span>
               </div>
-              <span className='text-[16px] font-[500] leading-[16px]' style={{
-                color: pessoa.status === 'pago' ? 'rgb(21, 128, 61)' : '#737373'
-              }}>
+              <span
+                className='text-[16px] font-[500] leading-[16px]'
+                style={{
+                  color:
+                    pessoa.status === 'pago' ? 'rgb(21, 128, 61)' : '#737373',
+                }}
+              >
                 {currencyFormatter(pessoa.valor_total)}
               </span>
             </div>

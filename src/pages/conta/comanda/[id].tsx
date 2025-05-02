@@ -12,7 +12,8 @@ import SeoHead from '@/components/SeoHead';
 const ComandaPage = () => {
   const router = useRouter();
   const { id } = router.query;
-  const { comanda, loading, error, fetchComandasAtivas, fetchComanda } = useComanda();
+  const { comanda, loading, error, fetchComandasAtivas, fetchComanda } =
+    useComanda();
 
   useEffect(() => {
     fetchComandasAtivas();

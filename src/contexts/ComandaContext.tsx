@@ -7,7 +7,11 @@ import React, {
 } from 'react';
 import { toast } from 'react-hot-toast';
 import { RegisterFormData } from '@/interfaces/register';
-import { ComandaResponse, ComandaService, ComandaPessoa } from '@/services/comanda.service';
+import {
+  ComandaResponse,
+  ComandaService,
+  ComandaPessoa,
+} from '@/services/comanda.service';
 import { useAuth } from './AuthContext';
 import { Item, MenuService } from '@/services/menu.service';
 import { useRouter } from 'next/router';

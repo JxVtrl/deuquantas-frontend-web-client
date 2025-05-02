@@ -32,7 +32,7 @@ export default function App({ Component, pageProps }: AppProps) {
               <Component {...pageProps} />
             </main>
             <ToastContainer
-              position="top-right"
+              position='top-right'
               autoClose={5000}
               hideProgressBar={false}
               newestOnTop
@@ -41,7 +41,7 @@ export default function App({ Component, pageProps }: AppProps) {
               pauseOnFocusLoss
               draggable
               pauseOnHover
-              theme="light"
+              theme='light'
             />
           </ComandaProvider>
         </UserPreferencesProvider>

@@ -226,40 +226,39 @@ const CustomerQrCode: React.FC = () => {
               {/* <ConfirmLottie /> */}
               <p className='mt-4'>Processando QR Code...</p>
             </div>
-          ) :
-            showScanner ? (
-              <div className='w-full max-w-md'>
-                {error ? (
-                  <div>
-                    <div className='mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded'>
-                      {error}
-                    </div>
-
-                    <Button
-                      text='Voltar para a home'
-                      variant='primary'
-                      onClick={handleCancel}
-                    />
+          ) : showScanner ? (
+            <div className='w-full max-w-md'>
+              {error ? (
+                <div>
+                  <div className='mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded'>
+                    {error}
                   </div>
-                ) :
-                  <QrCodeScanner onResult={processarQrCode} onError={setError} />
-                }
-                <div className='mt-4'>
-                  <InputCodigoMesa onCodigoCompleto={processarCodigoMesa} />
-                </div>
-              </div>
-            ) : (
-              <div className='flex flex-col items-center'>
-                <p className='mt-4'>Aguardando resposta do estabelecimento...</p>
-                <div className='mt-4'>
+
                   <Button
-                    text='Cancelar'
-                    onClick={handleCancel}
+                    text='Voltar para a home'
                     variant='primary'
+                    onClick={handleCancel}
                   />
                 </div>
+              ) : (
+                <QrCodeScanner onResult={processarQrCode} onError={setError} />
+              )}
+              <div className='mt-4'>
+                <InputCodigoMesa onCodigoCompleto={processarCodigoMesa} />
               </div>
-            )}
+            </div>
+          ) : (
+            <div className='flex flex-col items-center'>
+              <p className='mt-4'>Aguardando resposta do estabelecimento...</p>
+              <div className='mt-4'>
+                <Button
+                  text='Cancelar'
+                  onClick={handleCancel}
+                  variant='primary'
+                />
+              </div>
+            </div>
+          )}
         </div>
       </Layout>
     </>

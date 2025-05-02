@@ -36,7 +36,11 @@ export const ComandaHeader: React.FC = () => {
     })?.valor_total_consumido || 0;
 
   // Soma do valor já pago por todos
-  const valorPagoTotal = comanda?.pessoas?.reduce((acc, pessoa) => acc + (pessoa.valor_pago || 0), 0) || 0;
+  const valorPagoTotal =
+    comanda?.pessoas?.reduce(
+      (acc, pessoa) => acc + (pessoa.valor_pago || 0),
+      0,
+    ) || 0;
 
   return (
     <MaxWidthWrapper

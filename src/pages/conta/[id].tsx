@@ -15,7 +15,8 @@ import SeoHead from '@/components/SeoHead';
 const ContaPage = () => {
   const router = useRouter();
   const { id } = router.query;
-  const { comanda, loading, error, fetchComandasAtivas, fetchComanda } = useComanda();
+  const { comanda, loading, error, fetchComandasAtivas, fetchComanda } =
+    useComanda();
 
   useEffect(() => {
     fetchComandasAtivas();
@@ -26,7 +27,6 @@ const ContaPage = () => {
       fetchComanda(id as string);
     }
   }, [id, fetchComanda]);
-
 
   if (loading) {
     return (

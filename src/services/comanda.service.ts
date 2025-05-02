@@ -37,69 +37,71 @@ export interface ComandaResponse {
     data_criacao: string;
     data_fechamento?: string;
   };
-  itens: {
-    id: string;
-    nome: string;
-    descricao: string;
-    preco: number;
-    quantidade: number;
-    tipo: string;
-    img: string;
-    observacao: string;
-    data_criacao: string;
-    cliente: {
-      id: string;
-      nome: string;
-      avatar: string;
-    };
-  }[] | {
-    data_criacao: Date;
-    id: string;
-    id_cliente: string;
-    id_comanda: string;
-    id_item: string;
-    observacao: string;
-    valor_total: number;
-    valor_unitario: number;
-    item: {
-      data_atualizacao: Date;
-      data_criacao: Date;
-      descricao: string;
-      disponivel: boolean;
-      estabelecimento_id: string;
-      id: string;
-      img: string;
-      nome: string;
-      preco: number;
-      tipo: string;
-    };
-    cliente: {
-      avatar: string;
-      bairro: string;
-      cep: string;
-      cidade: string;
-      complement: string;
-      createdAt: Date;
-      data_nascimento: Date;
-      endereco: string;
-      estado: string;
-      id: string;
-      is_ativo: boolean;
-      num_celular: string;
-      num_cpf: string;
-      numero: string;
-      updatedAt: Date;
-      usuario: {
-        data_atualizacao: Date;
-        data_criacao: Date;
-        email: string;
+  itens:
+    | {
         id: string;
-        is_admin: boolean;
-        is_ativo: boolean;
-        name: string;
-      }
-    }
-  }[];
+        nome: string;
+        descricao: string;
+        preco: number;
+        quantidade: number;
+        tipo: string;
+        img: string;
+        observacao: string;
+        data_criacao: string;
+        cliente: {
+          id: string;
+          nome: string;
+          avatar: string;
+        };
+      }[]
+    | {
+        data_criacao: Date;
+        id: string;
+        id_cliente: string;
+        id_comanda: string;
+        id_item: string;
+        observacao: string;
+        valor_total: number;
+        valor_unitario: number;
+        item: {
+          data_atualizacao: Date;
+          data_criacao: Date;
+          descricao: string;
+          disponivel: boolean;
+          estabelecimento_id: string;
+          id: string;
+          img: string;
+          nome: string;
+          preco: number;
+          tipo: string;
+        };
+        cliente: {
+          avatar: string;
+          bairro: string;
+          cep: string;
+          cidade: string;
+          complement: string;
+          createdAt: Date;
+          data_nascimento: Date;
+          endereco: string;
+          estado: string;
+          id: string;
+          is_ativo: boolean;
+          num_celular: string;
+          num_cpf: string;
+          numero: string;
+          updatedAt: Date;
+          usuario: {
+            data_atualizacao: Date;
+            data_criacao: Date;
+            email: string;
+            id: string;
+            is_admin: boolean;
+            is_ativo: boolean;
+            name: string;
+          };
+        };
+      }[];
   pessoas: ComandaPessoa[];
   estabelecimento: {
     nome: string;
@@ -263,7 +265,9 @@ export const ComandaService = {
 
   async getComandasFinalizadas(id_usuario: string): Promise<ComandaResponse[]> {
     try {
-      const response = await api.get(`/comandas/finalizadas/usuario/${id_usuario}`);
+      const response = await api.get(
+        `/comandas/finalizadas/usuario/${id_usuario}`,
+      );
       return response.data;
     } catch (error) {
       console.error('Erro ao buscar comandas finalizadas:', error);

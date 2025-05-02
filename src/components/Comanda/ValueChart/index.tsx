@@ -22,8 +22,7 @@ export const ComandaValueChart: React.FC = () => {
         return pessoa.id === user?.usuario.id;
       })?.valor_total || 0;
     const limite = 250; // TODO: Verificar limite do usuario nas preferências
-    const per =
-      consumo_t > 0 ? (consumo / consumo_t) * 100 : 0;
+    const per = consumo_t > 0 ? (consumo / consumo_t) * 100 : 0;
 
     setConsumoUser(consumo);
     setConsumoTotal(consumo_t);

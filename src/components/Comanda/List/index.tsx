@@ -35,9 +35,16 @@ export const ComandaList: React.FC = () => {
             className='flex justify-between items-center border-t border-[#E0E0E0] py-[16px]'
           >
             <div className='flex items-center gap-[8px]'>
-              <span className='text-[14px] font-[500] text-[#272727] leading-[14px] capitalize' style={{
-                textDecoration: pessoas?.find((pessoa) => pessoa.id === item.cliente.id)?.status === 'pago' ? 'line-through' : 'none',
-              }}>
+              <span
+                className='text-[14px] font-[500] text-[#272727] leading-[14px] capitalize'
+                style={{
+                  textDecoration:
+                    pessoas?.find((pessoa) => pessoa.id === item.cliente.id)
+                      ?.status === 'pago'
+                      ? 'line-through'
+                      : 'none',
+                }}
+              >
                 {item.nome}
               </span>
             </div>
@@ -49,9 +56,16 @@ export const ComandaList: React.FC = () => {
                   item.cliente.id === user?.cliente.id ? '#FFCC00' : 'muted'
                 }
               />
-              <span className='text-[14px] font-[500] text-[#272727] leading-[14px]' style={{
-                textDecoration: pessoas?.find((pessoa) => pessoa.id === item.cliente.id)?.status === 'pago' ? 'line-through' : 'none'
-              }}>
+              <span
+                className='text-[14px] font-[500] text-[#272727] leading-[14px]'
+                style={{
+                  textDecoration:
+                    pessoas?.find((pessoa) => pessoa.id === item.cliente.id)
+                      ?.status === 'pago'
+                      ? 'line-through'
+                      : 'none',
+                }}
+              >
                 {currencyFormatter(item.preco)}
               </span>
               <button className='cursor-pointer w-[16px] h-[16px] p-0 bg-[#F0F0F0] flex items-center justify-center rounded-[2px]'>
