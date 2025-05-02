@@ -51,6 +51,7 @@ const CheckoutTransparente = () => {
     try {
       // Gera o token do cartão usando o form
       const result = await mpRef.current.card.createToken(form);
+      console.log('result', result);
       if (result.error) {
         setError(result.error.message || 'Erro ao gerar token do cartão');
         setLoading(false);
@@ -58,13 +59,20 @@ const CheckoutTransparente = () => {
       }
       const token = result.id;
       setCardToken(token);
-      // Envia para o backend
-      const response = await api.post('/pagamentos/checkout-transparente', {
+
+      const payload = {
         token,
         valor: Number(valor),
         descricao: 'Pagamento checkout transparente',
         id_comanda,
-      });
+      };
+
+      console.log('payload', payload);
+
+      // Envia para o backend
+      const response = await api.post('/pagamentos/checkout-transparente', payload);
+
+      console.log('response', response);
 
       if (response.data.success) {
         setSuccess('Pagamento realizado com sucesso!');
