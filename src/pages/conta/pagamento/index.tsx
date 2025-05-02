@@ -70,7 +70,10 @@ const CheckoutTransparente = () => {
       console.log('payload', payload);
 
       // Envia para o backend
-      const response = await api.post('/pagamentos/checkout-transparente', payload);
+      const response = await api.post(
+        '/pagamentos/checkout-transparente',
+        payload,
+      );
 
       console.log('response', response);
 
