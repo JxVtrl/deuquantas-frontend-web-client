@@ -95,7 +95,8 @@ const CheckoutTransparente = () => {
       </h2>
       {valor && (
         <div className='mb-4 text-lg font-semibold'>
-          Valor a pagar: R$ {Number(valor).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+          Valor a pagar: R${' '}
+          {Number(valor).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
         </div>
       )}
       <form ref={formRef} onSubmit={handleSubmit} className='space-y-4'>
