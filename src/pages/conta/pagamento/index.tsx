@@ -5,7 +5,7 @@ import { useRouter } from 'next/router';
 import Layout from '@/layout';
 import { withAuthCustomer } from '@/hoc/withAuth';
 import { currencyFormatter } from '@/utils/formatters';
-import { MaxWidthWrapper } from '@deuquantas/components';
+import { Button, MaxWidthWrapper } from '@deuquantas/components';
 
 declare global {
   interface Window {
@@ -17,13 +17,18 @@ const PUBLIC_KEY = process.env.NEXT_PUBLIC_MP_PUBLIC_KEY || '';
 
 const CheckoutTransparente = () => {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
-  const [cardToken, setCardToken] = useState<string | null>(null);
-  const formRef = useRef<HTMLFormElement>(null);
+  const [error, setError] = useState<string>('');
+  const [success, setSuccess] = useState<string>('');
+  const [cardToken, setCardToken] = useState<string>('');
   const mpRef = useRef<any>(null);
   const router = useRouter();
   const { id_comanda, valor } = router.query;
+  const [cardNumber, setCardNumber] = useState<string>('');
+  const [cardholderName, setCardholderName] = useState<string>('');
+  const [cardExpirationMonth, setCardExpirationMonth] = useState<string>('');
+  const [cardExpirationYear, setCardExpirationYear] = useState<string>('');
+  const [securityCode, setSecurityCode] = useState<string>('');
+  const [identificationNumber, setIdentificationNumber] = useState<string>('');
 
   useEffect(() => {
     if (window.MercadoPago) {
@@ -33,10 +38,9 @@ const CheckoutTransparente = () => {
     }
   }, []);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    setSuccess(null);
+  const handleSubmit = async () => {
+    setError('');
+    setSuccess('');
     setLoading(true);
 
     if (!mpRef.current) {
@@ -45,12 +49,20 @@ const CheckoutTransparente = () => {
       return;
     }
 
-    const form = formRef.current;
-    if (!form) return;
 
     try {
-      // Gera o token do cartão usando o form
-      const result = await mpRef.current.card.createToken(form);
+      // Coleta os dados do cartão manualmente
+      const cardData = {
+        cardNumber: cardNumber,
+        cardholderName: cardholderName,
+        cardExpirationMonth: cardExpirationMonth,
+        cardExpirationYear: cardExpirationYear,
+        securityCode: securityCode,
+        identificationType: 'CPF',
+        identificationNumber: identificationNumber,
+      };
+      // Gera o token do cartão usando os dados coletados
+      const result = await mpRef.current.card.createToken(cardData);
       console.log('result', result);
       if (result.error) {
         setError(result.error.message || 'Erro ao gerar token do cartão');
@@ -116,72 +128,81 @@ const CheckoutTransparente = () => {
             Valor a pagar: {currencyFormatter(Number(valor))}
           </div>
         )}
-        <form ref={formRef} onSubmit={handleSubmit} className='space-y-4'>
-          <div>
-            <label className='block mb-1'>Número do cartão</label>
+        <div>
+          <label className='block mb-1'>Número do cartão</label>
+          <input
+            name='cardNumber'
+            className='w-full border rounded px-3 py-2'
+            required
+            maxLength={19}
+            onChange={(e) => setCardNumber(e.target.value)}
+            value={cardNumber}
+          />
+        </div>
+        <div>
+          <label className='block mb-1'>Nome impresso no cartão</label>
+          <input
+            name='cardholderName'
+            className='w-full border rounded px-3 py-2'
+            required
+            onChange={(e) => setCardholderName(e.target.value)}
+            value={cardholderName}
+          />
+        </div>
+        <div className='flex gap-2'>
+          <div className='flex-1'>
+            <label className='block mb-1'>Mês expiração</label>
             <input
-              name='cardNumber'
+              name='cardExpirationMonth'
               className='w-full border rounded px-3 py-2'
               required
-              maxLength={16}
+              maxLength={2}
+              onChange={(e) => setCardExpirationMonth(e.target.value)}
+              value={cardExpirationMonth}
             />
           </div>
-          <div>
-            <label className='block mb-1'>Nome impresso no cartão</label>
+          <div className='flex-1'>
+            <label className='block mb-1'>Ano expiração</label>
             <input
-              name='cardholderName'
-              className='w-full border rounded px-3 py-2'
-              required
-            />
-          </div>
-          <div className='flex gap-2'>
-            <div className='flex-1'>
-              <label className='block mb-1'>Mês expiração</label>
-              <input
-                name='cardExpirationMonth'
-                className='w-full border rounded px-3 py-2'
-                required
-                maxLength={2}
-              />
-            </div>
-            <div className='flex-1'>
-              <label className='block mb-1'>Ano expiração</label>
-              <input
-                name='cardExpirationYear'
-                className='w-full border rounded px-3 py-2'
-                required
-                maxLength={4}
-              />
-            </div>
-          </div>
-          <div>
-            <label className='block mb-1'>CVV</label>
-            <input
-              name='securityCode'
+              name='cardExpirationYear'
               className='w-full border rounded px-3 py-2'
               required
               maxLength={4}
+              onChange={(e) => setCardExpirationYear(e.target.value)}
+              value={cardExpirationYear}
             />
           </div>
-          <div>
-            <label className='block mb-1'>CPF do titular</label>
-            <input
-              name='identificationNumber'
-              className='w-full border rounded px-3 py-2'
-              required
-              maxLength={11}
-            />
-          </div>
-          <button
-            type='submit'
-            className='w-full py-3 bg-[#FFCC00] text-black font-semibold rounded-lg hover:bg-[#E6B800] transition-colors'
-            disabled={loading}
-          >
-            {loading ? 'Processando...' : 'Pagar'}
-          </button>
-          {error && <div className='text-red-600 mt-2'>{error}</div>}
-          {success && <div className='text-green-600 mt-2'>{success}</div>}
-        </form>
+        </div>
+        <div>
+          <label className='block mb-1'>CVV</label>
+          <input
+            name='securityCode'
+            className='w-full border rounded px-3 py-2'
+            required
+            maxLength={4}
+            onChange={(e) => setSecurityCode(e.target.value)}
+            value={securityCode}
+          />
+        </div>
+        <div>
+          <label className='block mb-1'>CPF do titular</label>
+          <input
+            name='identificationNumber'
+            className='w-full border rounded px-3 py-2'
+            required
+            maxLength={11}
+            onChange={(e) => setIdentificationNumber(e.target.value)}
+            value={identificationNumber}
+          />
+        </div>
+        <Button
+          disabled={loading}
+          text={loading ? 'Processando...' : 'Pagar'}
+          onClick={() => void handleSubmit}
+          variant='primary'
+        />
+        {error && <div className='text-red-600 mt-2'>{error}</div>}
+        {success && <div className='text-green-600 mt-2'>{success}</div>}
         {cardToken && (
           <div className='mt-4 text-xs text-gray-500'>
             Token gerado: {cardToken}
