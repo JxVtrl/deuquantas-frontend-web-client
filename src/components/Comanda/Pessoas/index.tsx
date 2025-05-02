@@ -58,7 +58,9 @@ export const ComandaPessoas = () => {
                   className='text-[16px] font-[500] text-[#000000] leading-[16px]'
                   style={{
                     color:
-                      cliente.status === 'pago' ? 'rgb(21, 128, 61)' : '#000000',
+                      cliente.status === 'pago'
+                        ? 'rgb(21, 128, 61)'
+                        : '#000000',
                   }}
                 >
                   {cliente.nome}

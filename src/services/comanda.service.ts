@@ -68,7 +68,6 @@ export interface ItensFull {
 }
 
 export interface Itens {
-
   id: string;
   nome: string;
   descricao: string;
@@ -104,9 +103,7 @@ export interface ComandaResponse {
     data_criacao: string;
     data_fechamento?: string;
   };
-  itens:
-  | Itens[]
-  | ItensFull[];
+  itens: Itens[] | ItensFull[];
   clientes: ComandaPessoa[];
   estabelecimento: {
     nome: string;

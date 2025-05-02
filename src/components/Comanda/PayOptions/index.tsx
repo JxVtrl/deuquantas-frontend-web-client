@@ -106,13 +106,15 @@ export const ComandaPayOptions = () => {
       };
       if (
         confirmation.option === 'split' &&
-        comanda.clientes?.some((cliente) => cliente.status === 'aguardando_split')
+        comanda.clientes?.some(
+          (cliente) => cliente.status === 'aguardando_split',
+        )
       ) {
         payload.idClientePagante = user?.usuario.id;
       }
       const response = await api.post<PaymentResponse>(
         `/comandas/${comanda.id}/pagamento`,
-        payload
+        payload,
       );
 
       console.log('[Frontend] Resposta do backend:', response.data);
@@ -124,7 +126,7 @@ export const ComandaPayOptions = () => {
       console.error('[Frontend] Erro ao processar pagamento:', error);
       setError(
         error.response?.data?.message ||
-        'Ocorreu um erro ao processar o pagamento. Tente novamente.'
+          'Ocorreu um erro ao processar o pagamento. Tente novamente.',
       );
     } finally {
       setLoading(false);
@@ -136,11 +138,15 @@ export const ComandaPayOptions = () => {
 
   // Identifica o criador da comanda (primeira pessoa da lista)
   const criadorId = comanda.clientes?.[0]?.id;
-  const meuStatus = comanda.clientes?.find((cliente) => cliente.id === user?.usuario.id)
-    ?.status as ComandaPessoa['status'];
-  const todosAtivos = comanda.clientes?.every((cliente) => cliente.status === 'ativo');
+  const meuStatus = comanda.clientes?.find(
+    (cliente) => cliente.id === user?.usuario.id,
+  )?.status as ComandaPessoa['status'];
+  const todosAtivos = comanda.clientes?.every(
+    (cliente) => cliente.status === 'ativo',
+  );
   const todosAguardandoSplit = comanda.clientes?.every(
-    (cliente) => cliente.status === 'aguardando_split' || cliente.status === 'pago',
+    (cliente) =>
+      cliente.status === 'aguardando_split' || cliente.status === 'pago',
   );
 
   // Lógica de exibição dos botões
