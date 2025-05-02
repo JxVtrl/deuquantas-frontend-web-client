@@ -14,31 +14,31 @@ export const ComandaHeader: React.FC = () => {
     return null;
   }
 
-  const myself = comanda?.pessoas?.find((pessoa) => {
-    return pessoa.id === user.usuario.id;
+  const myself = comanda?.clientes?.find((cliente) => {
+    return cliente.id === user.usuario.id;
   });
 
   if (!myself) {
     return null;
   }
 
-  const pessoas = comanda?.pessoas?.filter((pessoa) => {
-    return pessoa.id !== user.usuario.id;
+  const clientes = comanda?.clientes?.filter((cliente) => {
+    return cliente.id !== user.usuario.id;
   });
 
-  if (pessoas) {
-    pessoas.unshift(myself);
+  if (clientes) {
+    clientes.unshift(myself);
   }
 
   const consumo_user =
-    pessoas?.find((pessoa) => {
-      return pessoa.id === user?.usuario.id;
+    clientes?.find((cliente) => {
+      return cliente.id === user?.usuario.id;
     })?.valor_total_consumido || 0;
 
   // Soma do valor já pago por todos
   const valorPagoTotal =
-    comanda?.pessoas?.reduce(
-      (acc, pessoa) => acc + (pessoa.valor_pago || 0),
+    comanda?.clientes?.reduce(
+      (acc, cliente) => acc + (cliente.valor_pago || 0),
       0,
     ) || 0;
 
@@ -58,60 +58,60 @@ export const ComandaHeader: React.FC = () => {
           Mesa {comanda?.numMesa}
         </h2>
         <p className='text-[14px] font-[300]'>
-          <span className='font-[500]'>Grupo</span> - {pessoas?.length || 1}{' '}
-          {pessoas?.length === 1 ? 'pessoa' : 'pessoas'}
+          <span className='font-[500]'>Grupo</span> - {clientes?.length || 1}{' '}
+          {clientes?.length === 1 ? 'pessoa' : 'pessoas'}
         </p>
-        {pessoas?.length && (
+        {clientes?.length && (
           <div className='flex items-center gap-[8px] mt-[12px]'>
-            {pessoas.length <= 4 ? (
+            {clientes.length <= 4 ? (
               <>
-                {pessoas.map((pessoa, index) => (
+                {clientes.map((cliente, index) => (
                   <div
                     key={index}
-                    className={`rounded-full outline outline-[#FFCC00] ${pessoa.status === 'pago' ? 'opacity-40' : ''}`}
+                    className={`rounded-full outline outline-[#FFCC00] ${cliente.status === 'pago' ? 'opacity-40' : ''}`}
                   >
                     <Avatar
-                      name={pessoa.nome}
+                      name={cliente.nome}
                       bgColor={
-                        pessoa.id === user.usuario.id ? '#FFCC00' : 'muted'
+                        cliente.id === user.usuario.id ? '#FFCC00' : 'muted'
                       }
-                      src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${pessoa.avatar}`}
+                      src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${cliente.avatar}`}
                     />
                   </div>
                 ))}
               </>
             ) : (
               <>
-                {pessoas.slice(0, 4).map((pessoa, index) => (
+                {clientes.slice(0, 4).map((cliente, index) => (
                   <div
                     key={index}
-                    className={`rounded-full outline outline-[#FFCC00] ${pessoa.status === 'pago' ? 'opacity-40' : ''}`}
+                    className={`rounded-full outline outline-[#FFCC00] ${cliente.status === 'pago' ? 'opacity-40' : ''}`}
                   >
                     <Avatar
-                      name={pessoa.nome}
+                      name={cliente.nome}
                       bgColor={
-                        pessoa.id === user.usuario.id ? '#FFCC00' : 'muted'
+                        cliente.id === user.usuario.id ? '#FFCC00' : 'muted'
                       }
-                      src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${pessoa.avatar}`}
+                      src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${cliente.avatar}`}
                     />
                   </div>
                 ))}
                 <div className='relative w-[20px] h-[24px]'>
-                  {pessoas.slice(4, 8).map((pessoa, index) => (
+                  {clientes.slice(4, 8).map((cliente, index) => (
                     <div
                       key={index}
-                      className={`absolute inset-0 rounded-full outline outline-[#FFCC00] w-[24px] h-[24px] ${pessoa.status === 'pago' ? 'opacity-40' : ''}`}
+                      className={`absolute inset-0 rounded-full outline outline-[#FFCC00] w-[24px] h-[24px] ${cliente.status === 'pago' ? 'opacity-40' : ''}`}
                       style={{
                         left: index * 10,
                         zIndex: 1 - index,
                       }}
                     >
                       <Avatar
-                        name={pessoa.nome}
+                        name={cliente.nome}
                         bgColor={
-                          pessoa.id === user.usuario.id ? '#FFCC00' : 'muted'
+                          cliente.id === user.usuario.id ? '#FFCC00' : 'muted'
                         }
-                        src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${pessoa.avatar}`}
+                        src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${cliente.avatar}`}
                       />
                     </div>
                   ))}

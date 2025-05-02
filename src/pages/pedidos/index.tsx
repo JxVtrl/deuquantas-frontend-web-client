@@ -117,23 +117,23 @@ const OrdersPage = () => {
                   Pessoas na comanda:
                 </div>
                 <ul className='flex flex-wrap gap-3'>
-                  {comanda.pessoas.map((pessoa) => (
+                  {comanda.clientes.map((cliente) => (
                     <li
-                      key={pessoa.id}
+                      key={cliente.id}
                       className='flex items-center gap-2 bg-gray-50 rounded-lg px-2 py-1'
                     >
-                      {pessoa.avatar && (
+                      {cliente.avatar && (
                         <img
-                          src={pessoa.avatar}
-                          alt={pessoa.nome}
+                          src={cliente.avatar}
+                          alt={cliente.nome}
                           className='w-7 h-7 rounded-full object-cover border'
                         />
                       )}
                       <span className='text-gray-700 font-medium'>
-                        {pessoa.nome}
+                        {cliente.nome}
                       </span>
                       <span className='text-gray-500 text-xs ml-1'>
-                        {currencyFormatter(pessoa.valor_total_consumido)}
+                        {currencyFormatter(cliente.valor_total_consumido)}
                       </span>
                     </li>
                   ))}

@@ -3,13 +3,14 @@ import { Avatar, Button, MaxWidthWrapper } from '@deuquantas/components';
 import { currencyFormatter } from '@/utils/formatters';
 import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { Itens, ItensFull } from '@/services/comanda.service';
 
 export const ComandaList: React.FC = () => {
   const { comanda } = useComanda();
   const { user } = useAuth();
 
-  const pessoas = comanda?.pessoas?.filter((pessoa) => {
-    return pessoa.id !== user?.usuario.id;
+  const clientes = comanda?.clientes?.filter((cliente) => {
+    return cliente.id !== user?.usuario.id;
   });
 
   return (
@@ -28,7 +29,7 @@ export const ComandaList: React.FC = () => {
         />
       </div>
 
-      {comanda?.itens?.map((item) => {
+      {(comanda?.itens as Itens[]).map((item) => {
         return (
           <div
             key={item.id}
@@ -39,7 +40,7 @@ export const ComandaList: React.FC = () => {
                 className='text-[14px] font-[500] text-[#272727] leading-[14px] capitalize'
                 style={{
                   textDecoration:
-                    pessoas?.find((pessoa) => pessoa.id === item.cliente.id)
+                    clientes?.find((cliente) => cliente.id === item.cliente.id)
                       ?.status === 'pago'
                       ? 'line-through'
                       : 'none',
@@ -60,7 +61,7 @@ export const ComandaList: React.FC = () => {
                 className='text-[14px] font-[500] text-[#272727] leading-[14px]'
                 style={{
                   textDecoration:
-                    pessoas?.find((pessoa) => pessoa.id === item.cliente.id)
+                    clientes?.find((cliente) => cliente.id === item.cliente.id)
                       ?.status === 'pago'
                       ? 'line-through'
                       : 'none',

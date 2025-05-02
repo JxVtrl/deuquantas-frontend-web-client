@@ -31,14 +31,14 @@ export const ExcluirPessoaModal: React.FC<ExcluirPessoaModalProps> = ({
     }
   };
 
-  const pessoas = comanda?.pessoas || [];
-  const criadorId = pessoas[0]?.id;
+  const clientes = comanda?.clientes || [];
+  const criadorId = clientes[0]?.id;
 
-  const options = pessoas
-    .filter((pessoa) => pessoa.id !== criadorId)
-    .map((pessoa) => ({
-      value: pessoa.id,
-      label: pessoa.nome,
+  const options = clientes
+    .filter((cliente) => cliente.id !== criadorId)
+    .map((cliente) => ({
+      value: cliente.id,
+      label: cliente.nome,
     }));
 
   return (

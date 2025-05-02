@@ -41,7 +41,7 @@ interface ComandaContextData {
   handleAddClick: () => void;
   adicionarUsuario: (id_usuario: string) => Promise<void>;
   removerUsuario: (id_usuario: string) => Promise<void>;
-  pessoas: ComandaPessoa[];
+  clientes: ComandaPessoa[];
   fetchComandasAtivas: () => Promise<void>;
   fetchComanda: (id: string) => Promise<void>;
   setComandaAtiva: (comanda: ComandaResponse) => void;
@@ -66,7 +66,7 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
   const [tipo, setTipo] = useState<string | null>(null);
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
   const [menu, setMenu] = useState<Item[]>([]);
-  const [pessoas, setPessoas] = useState<ComandaPessoa[]>([]);
+  const [clientes, setClientes] = useState<ComandaPessoa[]>([]);
 
   const getMenu = async (cnpj: string) => {
     try {
@@ -205,7 +205,7 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
       });
 
       setComanda(response);
-      setPessoas(response.pessoas || []);
+      setClientes(response.clientes || []);
     } catch (error) {
       console.error('Erro ao adicionar cliente:', error);
       toast.error('Erro ao adicionar cliente à comanda');
@@ -221,7 +221,7 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
         id_usuario,
       );
       setComanda(response);
-      setPessoas(response.pessoas || []);
+      setClientes(response.clientes || []);
     } catch (error) {
       console.error('Erro ao remover cliente:', error);
       toast.error('Erro ao remover cliente da comanda');
@@ -230,7 +230,7 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
 
   useEffect(() => {
     if (comanda) {
-      setPessoas(comanda.pessoas || []);
+      setClientes(comanda.clientes || []);
     }
   }, [comanda]);
 
@@ -261,7 +261,7 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
         handleAddClick,
         adicionarUsuario,
         removerUsuario,
-        pessoas,
+        clientes,
         fetchComandasAtivas,
         fetchComanda,
         setComandaAtiva,

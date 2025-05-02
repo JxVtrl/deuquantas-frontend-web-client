@@ -46,7 +46,7 @@ export const ComandaPayOptions = () => {
       };
 
     const valorTotal = comanda.conta.valTotal;
-    const totalClientes = comanda.pessoas.length;
+    const totalClientes = comanda.clientes.length;
 
     switch (option) {
       case 'individual':
@@ -98,12 +98,21 @@ export const ComandaPayOptions = () => {
     });
 
     try {
+      // Para split: se todos estão ativos, é o split inicial (não envia idClientePagante)
+      // Se já está aguardando_split, envia idClientePagante (pagamento individual)
+      let payload: any = {
+        id_comanda: comanda.id,
+        tipo: confirmation.option,
+      };
+      if (
+        confirmation.option === 'split' &&
+        comanda.clientes?.some((cliente) => cliente.status === 'aguardando_split')
+      ) {
+        payload.idClientePagante = user?.usuario.id;
+      }
       const response = await api.post<PaymentResponse>(
         `/comandas/${comanda.id}/pagamento`,
-        {
-          id_comanda: comanda.id,
-          tipo: confirmation.option,
-        },
+        payload
       );
 
       console.log('[Frontend] Resposta do backend:', response.data);
@@ -115,7 +124,7 @@ export const ComandaPayOptions = () => {
       console.error('[Frontend] Erro ao processar pagamento:', error);
       setError(
         error.response?.data?.message ||
-          'Ocorreu um erro ao processar o pagamento. Tente novamente.',
+        'Ocorreu um erro ao processar o pagamento. Tente novamente.'
       );
     } finally {
       setLoading(false);
@@ -126,12 +135,12 @@ export const ComandaPayOptions = () => {
   if (!comanda) return null;
 
   // Identifica o criador da comanda (primeira pessoa da lista)
-  const criadorId = comanda.pessoas?.[0]?.id;
-  const meuStatus = comanda.pessoas?.find((p) => p.id === user?.usuario.id)
+  const criadorId = comanda.clientes?.[0]?.id;
+  const meuStatus = comanda.clientes?.find((cliente) => cliente.id === user?.usuario.id)
     ?.status as ComandaPessoa['status'];
-  const todosAtivos = comanda.pessoas?.every((p) => p.status === 'ativo');
-  const todosAguardandoSplit = comanda.pessoas?.every(
-    (p) => p.status === 'aguardando_split' || p.status === 'pago',
+  const todosAtivos = comanda.clientes?.every((cliente) => cliente.status === 'ativo');
+  const todosAguardandoSplit = comanda.clientes?.every(
+    (cliente) => cliente.status === 'aguardando_split' || cliente.status === 'pago',
   );
 
   // Lógica de exibição dos botões

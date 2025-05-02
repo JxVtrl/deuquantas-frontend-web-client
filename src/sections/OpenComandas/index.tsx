@@ -195,8 +195,8 @@ export const OpenComandas: React.FC = () => {
                           </p>
                           <span className='w-1 h-1 bg-gray-300 rounded-full'></span>
                           <p className='text-[12px] font-[400] text-[#666666] leading-[20px]'>
-                            {comanda.pessoas?.length || 0}{' '}
-                            {comanda.pessoas?.length === 1
+                            {comanda.clientes?.length || 0}{' '}
+                            {comanda.clientes?.length === 1
                               ? 'pessoa'
                               : 'pessoas'}
                           </p>

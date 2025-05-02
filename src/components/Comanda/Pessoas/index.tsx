@@ -9,13 +9,13 @@ import { ExcluirPessoaModal } from './ExcluirPessoaModal';
 export const ComandaPessoas = () => {
   const { comanda, fetchComandasAtivas } = useComanda();
   const { user } = useAuth();
-  const pessoas = comanda?.pessoas;
+  const clientes = comanda?.clientes;
 
   const [isAdicionarModalOpen, setIsAdicionarModalOpen] = useState(false);
   const [isExcluirModalOpen, setIsExcluirModalOpen] = useState(false);
 
   const isCriador =
-    pessoas && pessoas.length > 0 && pessoas[0].id === user?.usuario?.id;
+    clientes && clientes.length > 0 && clientes[0].id === user?.usuario?.id;
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -39,18 +39,18 @@ export const ComandaPessoas = () => {
           Integrantes
         </span>
         <div className='flex flex-col h-full overflow-y-auto'>
-          {pessoas?.map((pessoa) => (
+          {clientes?.map((cliente) => (
             <div
-              key={pessoa.id}
+              key={cliente.id}
               className='flex items-center justify-between gap-[8px] border-t border-[#E0E0E0] py-[10px]'
             >
               <div className='flex items-center gap-[12px]'>
-                <div style={{ opacity: pessoa.status === 'pago' ? 0.5 : 1 }}>
+                <div style={{ opacity: cliente.status === 'pago' ? 0.5 : 1 }}>
                   <Avatar
-                    name={pessoa.nome}
-                    src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${pessoa.avatar}`}
+                    name={cliente.nome}
+                    src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${cliente.avatar}`}
                     bgColor={
-                      pessoa.id === user?.usuario?.id ? '#FFCC00' : 'muted'
+                      cliente.id === user?.usuario?.id ? '#FFCC00' : 'muted'
                     }
                   />
                 </div>
@@ -58,20 +58,20 @@ export const ComandaPessoas = () => {
                   className='text-[16px] font-[500] text-[#000000] leading-[16px]'
                   style={{
                     color:
-                      pessoa.status === 'pago' ? 'rgb(21, 128, 61)' : '#000000',
+                      cliente.status === 'pago' ? 'rgb(21, 128, 61)' : '#000000',
                   }}
                 >
-                  {pessoa.nome}
+                  {cliente.nome}
                 </span>
               </div>
               <span
                 className='text-[16px] font-[500] leading-[16px]'
                 style={{
                   color:
-                    pessoa.status === 'pago' ? 'rgb(21, 128, 61)' : '#737373',
+                    cliente.status === 'pago' ? 'rgb(21, 128, 61)' : '#737373',
                 }}
               >
-                {currencyFormatter(pessoa.valor_total)}
+                {currencyFormatter(cliente.valor_total)}
               </span>
             </div>
           ))}

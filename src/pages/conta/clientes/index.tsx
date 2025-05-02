@@ -11,7 +11,7 @@ const Comanda: React.FC = () => {
     const checkComandaAtiva = async () => {
       await fetchComandasAtivas();
       if (comandasAtivas.length > 0) {
-        router.push(`/conta/pessoas/${comandasAtivas[0].id}`);
+        router.push(`/conta/clientes/${comandasAtivas[0].id}`);
       } else {
         router.push('/qr-code');
       }

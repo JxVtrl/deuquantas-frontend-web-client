@@ -18,6 +18,73 @@ export interface ComandaPessoa {
   valor_total: number;
 }
 
+export interface ItensFull {
+  data_criacao: Date;
+  id: string;
+  id_cliente: string;
+  id_comanda: string;
+  id_item: string;
+  observacao: string;
+  valor_total: number;
+  valor_unitario: number;
+  item: {
+    data_atualizacao: Date;
+    data_criacao: Date;
+    descricao: string;
+    disponivel: boolean;
+    estabelecimento_id: string;
+    id: string;
+    img: string;
+    nome: string;
+    preco: number;
+    tipo: string;
+  };
+  cliente: {
+    avatar: string;
+    bairro: string;
+    cep: string;
+    cidade: string;
+    complement: string;
+    createdAt: Date;
+    data_nascimento: Date;
+    endereco: string;
+    estado: string;
+    id: string;
+    is_ativo: boolean;
+    num_celular: string;
+    num_cpf: string;
+    numero: string;
+    updatedAt: Date;
+    usuario: {
+      data_atualizacao: Date;
+      data_criacao: Date;
+      email: string;
+      id: string;
+      is_admin: boolean;
+      is_ativo: boolean;
+      name: string;
+    };
+  };
+}
+
+export interface Itens {
+
+  id: string;
+  nome: string;
+  descricao: string;
+  preco: number;
+  quantidade: number;
+  tipo: string;
+  img: string;
+  observacao: string;
+  data_criacao: string;
+  cliente: {
+    id: string;
+    nome: string;
+    avatar: string;
+  };
+}
+
 export interface ComandaResponse {
   id: string;
   num_cpf: string;
@@ -38,71 +105,9 @@ export interface ComandaResponse {
     data_fechamento?: string;
   };
   itens:
-    | {
-        id: string;
-        nome: string;
-        descricao: string;
-        preco: number;
-        quantidade: number;
-        tipo: string;
-        img: string;
-        observacao: string;
-        data_criacao: string;
-        cliente: {
-          id: string;
-          nome: string;
-          avatar: string;
-        };
-      }[]
-    | {
-        data_criacao: Date;
-        id: string;
-        id_cliente: string;
-        id_comanda: string;
-        id_item: string;
-        observacao: string;
-        valor_total: number;
-        valor_unitario: number;
-        item: {
-          data_atualizacao: Date;
-          data_criacao: Date;
-          descricao: string;
-          disponivel: boolean;
-          estabelecimento_id: string;
-          id: string;
-          img: string;
-          nome: string;
-          preco: number;
-          tipo: string;
-        };
-        cliente: {
-          avatar: string;
-          bairro: string;
-          cep: string;
-          cidade: string;
-          complement: string;
-          createdAt: Date;
-          data_nascimento: Date;
-          endereco: string;
-          estado: string;
-          id: string;
-          is_ativo: boolean;
-          num_celular: string;
-          num_cpf: string;
-          numero: string;
-          updatedAt: Date;
-          usuario: {
-            data_atualizacao: Date;
-            data_criacao: Date;
-            email: string;
-            id: string;
-            is_admin: boolean;
-            is_ativo: boolean;
-            name: string;
-          };
-        };
-      }[];
-  pessoas: ComandaPessoa[];
+  | Itens[]
+  | ItensFull[];
+  clientes: ComandaPessoa[];
   estabelecimento: {
     nome: string;
   };
@@ -204,7 +209,7 @@ export const ComandaService = {
     dto: AdicionarClienteComandaDto,
   ): Promise<ComandaResponse> {
     try {
-      const response = await api.post('/comandas/pessoas', dto);
+      const response = await api.post('/comandas/clientes', dto);
       return response.data;
     } catch (error) {
       console.error('Erro ao adicionar cliente à comanda:', error);
