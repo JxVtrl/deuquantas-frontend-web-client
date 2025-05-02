@@ -112,7 +112,7 @@ export const ComandaPayOptions = () => {
     } catch (error: any) {
       setError(
         error.response?.data?.message ||
-          'Ocorreu um erro ao iniciar a divisão. Tente novamente.',
+        'Ocorreu um erro ao iniciar a divisão. Tente novamente.',
       );
     } finally {
       setLoading(false);
@@ -126,22 +126,18 @@ export const ComandaPayOptions = () => {
     setError(null);
 
     try {
-      const payload = {
-        id_comanda: comanda.id,
-        tipo: confirmation.option,
-      };
-      const response = await api.post<PaymentResponse>(
-        `/comandas/${comanda.id}/pagamento`,
-        payload,
-      );
-
-      if (response.data.success) {
-        router.push('/pedidos');
-      }
+      // Redireciona para a página de pagamento, passando id_comanda e valor
+      router.push({
+        pathname: '/conta/pagamento',
+        query: {
+          id_comanda: comanda.id,
+          valor: confirmation.value,
+        },
+      });
     } catch (error: any) {
       setError(
         error.response?.data?.message ||
-          'Ocorreu um erro ao processar o pagamento. Tente novamente.',
+        'Ocorreu um erro ao processar o pagamento. Tente novamente.',
       );
     } finally {
       setLoading(false);

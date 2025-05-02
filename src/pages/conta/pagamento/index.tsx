@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Script from 'next/script';
 import { api } from '@/lib/axios';
+import { useRouter } from 'next/router';
 
 declare global {
   interface Window {
@@ -17,6 +18,8 @@ const CheckoutTransparente = () => {
   const [cardToken, setCardToken] = useState<string | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
   const mpRef = useRef<any>(null);
+  const router = useRouter();
+  const { id_comanda, valor } = router.query;
 
   useEffect(() => {
     if (window.MercadoPago) {
@@ -62,8 +65,9 @@ const CheckoutTransparente = () => {
       // Envia para o backend (ajuste endpoint e payload conforme sua API)
       const response = await api.post('/pagamentos/checkout-transparente', {
         token,
-        valor: 100, // valor de teste, ajuste conforme necessário
-        descricao: 'Pagamento teste checkout transparente',
+        valor: Number(valor), // valor vindo do query param
+        descricao: 'Pagamento checkout transparente',
+        id_comanda,
       });
       setSuccess('Pagamento realizado com sucesso!');
     } catch (err: any) {
@@ -89,6 +93,11 @@ const CheckoutTransparente = () => {
       <h2 className='text-2xl font-bold mb-4'>
         Checkout Transparente Mercado Pago
       </h2>
+      {valor && (
+        <div className='mb-4 text-lg font-semibold'>
+          Valor a pagar: R$ {Number(valor).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+        </div>
+      )}
       <form ref={formRef} onSubmit={handleSubmit} className='space-y-4'>
         <div>
           <label className='block mb-1'>Número do cartão</label>
