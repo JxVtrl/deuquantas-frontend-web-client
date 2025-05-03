@@ -27,7 +27,16 @@ const CheckoutTransparente = () => {
   const { estabelecimento } = useComanda();
 
   useEffect(() => {
-    console.log('[Checkout] useEffect - PUBLIC_KEY:', PUBLIC_KEY, 'valor:', valor, 'id_comanda:', id_comanda, 'tipoPagamento:', tipoPagamento);
+    console.log(
+      '[Checkout] useEffect - PUBLIC_KEY:',
+      PUBLIC_KEY,
+      'valor:',
+      valor,
+      'id_comanda:',
+      id_comanda,
+      'tipoPagamento:',
+      tipoPagamento,
+    );
     if (!PUBLIC_KEY) {
       setError('Chave pública do Mercado Pago não definida!');
       return;
@@ -90,7 +99,9 @@ const CheckoutTransparente = () => {
         },
       });
     } else {
-      console.log('[Checkout] Aguardando SDK Mercado Pago ou elemento form-checkout...');
+      console.log(
+        '[Checkout] Aguardando SDK Mercado Pago ou elemento form-checkout...',
+      );
     }
   }, [valor, id_comanda, tipoPagamento, router, estabelecimento]);
 
