@@ -147,24 +147,28 @@ const CheckoutTransparente = () => {
           </div>
         )}
         <div className='grid grid-cols-1 gap-4'>
-          {input_list.map((input) => (
-            <div key={input.name} className='flex flex-col gap-2'>
-              <Label>{input.label}</Label>
-              <Input
-                value={input.value}
-                onChange={(e) => input.onChange(e.target.value)}
-                placeholder={input.placeholder}
-              />
-            </div>
-          ))}
+          {input_list.map((input) => {
+            return (
+              <div key={input.name} className='flex flex-col gap-2'>
+                <Label>{input.label}</Label>
+                <Input
+                  value={input.value}
+                  onChange={(e) => input.onChange(e.target.value)}
+                  placeholder={input.placeholder}
+                />
+              </div>
+            )
+          })}
         </div>
-        <Button
+        <button
           onClick={() => {
+            console.log('handlePayment');
             handlePayment();
           }}
-          variant='primary'
-          text='Pagar'
-        />
+          className='bg-primary text-white px-4 py-2 rounded-md'
+        >
+          Pagar
+        </button>
         {error && <div className='text-red-600 mt-2'>{error}</div>}
         {success && <div className='text-green-600 mt-2'>{success}</div>}
         {cardToken && (
