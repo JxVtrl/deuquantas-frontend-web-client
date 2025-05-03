@@ -54,7 +54,10 @@ const CheckoutTransparente = () => {
             },
             onSubmit: async (cardFormData: any) => {
               try {
-                console.log('[Checkout] onSubmit - cardFormData:', cardFormData);
+                console.log(
+                  '[Checkout] onSubmit - cardFormData:',
+                  cardFormData,
+                );
                 const payload = {
                   token: cardFormData.token,
                   payment_method_id: cardFormData.payment_method_id,
@@ -64,7 +67,10 @@ const CheckoutTransparente = () => {
                   tipoPagamento: tipoPagamento || 'individual',
                   num_cnpj: estabelecimento?.num_cnpj,
                 };
-                console.log('[Checkout] Payload enviado para backend:', payload);
+                console.log(
+                  '[Checkout] Payload enviado para backend:',
+                  payload,
+                );
                 const response = await api.post(
                   '/pagamentos/checkout-transparente',
                   payload,
@@ -93,7 +99,9 @@ const CheckoutTransparente = () => {
           brickRef.current = brick;
         });
     } else {
-      console.log('[Checkout] SDK Mercado Pago ou elemento form-checkout não disponível ainda.');
+      console.log(
+        '[Checkout] SDK Mercado Pago ou elemento form-checkout não disponível ainda.',
+      );
     }
   }, [valor, id_comanda, tipoPagamento, router, estabelecimento]);
 
