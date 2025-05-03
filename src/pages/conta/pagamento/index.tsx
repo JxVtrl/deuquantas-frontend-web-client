@@ -24,7 +24,6 @@ const CheckoutTransparente = () => {
   const [success, setSuccess] = useState<string>('');
   const router = useRouter();
   const { id_comanda, valor, tipoPagamento } = router.query;
-  const { user } = useAuth();
   const { estabelecimento } = useComanda();
 
   useEffect(() => {
@@ -47,7 +46,7 @@ const CheckoutTransparente = () => {
               const payload = {
                 token: cardFormData.token,
                 valor: Number(valor),
-                descricao: 'Pagamento checkout transparente',
+                descricao: `Pagamento ${estabelecimento?.nome_estab} - ${id_comanda}`,
                 id_comanda,
                 tipoPagamento: tipoPagamento || 'individual',
                 num_cnpj: estabelecimento?.num_cnpj,
