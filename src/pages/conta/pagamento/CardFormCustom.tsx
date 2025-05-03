@@ -86,16 +86,16 @@ const CardFormCustom: React.FC<CardFormCustomProps> = ({
   // Função para tratar colagem nos inputs mascarados
   const handlePaste =
     (field: keyof typeof form, maskType: string) =>
-    (e: React.ClipboardEvent<HTMLInputElement>) => {
-      e.preventDefault();
-      const pastedData = e.clipboardData.getData('text');
-      // Aplica a máscara manualmente
-      // Importa as máscaras dinamicamente para evitar import circular
-      // (ou mova as máscaras para um utilitário comum se necessário)
-      // Aqui, para simplificar, vamos só remover caracteres não numéricos
-      const numbers = pastedData.replace(/\D/g, '');
-      setForm((prev) => ({ ...prev, [field]: numbers }));
-    };
+      (e: React.ClipboardEvent<HTMLInputElement>) => {
+        e.preventDefault();
+        const pastedData = e.clipboardData.getData('text');
+        // Aplica a máscara manualmente
+        // Importa as máscaras dinamicamente para evitar import circular
+        // (ou mova as máscaras para um utilitário comum se necessário)
+        // Aqui, para simplificar, vamos só remover caracteres não numéricos
+        const numbers = pastedData.replace(/\D/g, '');
+        setForm((prev) => ({ ...prev, [field]: numbers }));
+      };
 
   // Carrega o SDK Mercado Pago
   useEffect(() => {
@@ -174,6 +174,8 @@ const CardFormCustom: React.FC<CardFormCustomProps> = ({
         tipoPagamento,
         num_cnpj,
         installments: Number(form.installments),
+        identificationType: 'CPF',
+        identificationNumber: form.docNumber.replace(/\D/g, ''),
       };
       const response = await api.post(
         '/pagamentos/checkout-transparente',
@@ -266,6 +268,9 @@ const CardFormCustom: React.FC<CardFormCustomProps> = ({
               onChange={handleChange}
               required
             />
+            <div className='text-xs text-gray-500 mt-1'>
+              Informe o CPF do titular do cartão, que pode ser diferente do seu.
+            </div>
           </div>
           {installmentsOptions.length > 0 && (
             <div>
