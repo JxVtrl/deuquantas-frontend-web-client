@@ -14,6 +14,8 @@ declare global {
   }
 }
 
+const PUBLIC_KEY = process.env.NEXT_PUBLIC_MP_PUBLIC_KEY || '';
+
 const CheckoutTransparente = () => {
   const [error, setError] = useState<string>('');
   const [success, setSuccess] = useState<string>('');
@@ -30,14 +32,18 @@ const CheckoutTransparente = () => {
     setError('');
     setSuccess('');
 
+    const mp = new window.MercadoPago(PUBLIC_KEY, { locale: 'pt-BR' });
+    console.log('mp', mp);
+
     try {
-      const result = await window.MercadoPago.card.createToken({
+      const result = await mp.card.createToken({
         cardNumber,
         cardholderName,
         cardExpirationDate,
         securityCode,
         identificationNumber,
       });
+
       console.log('result', result);
       if (result.error) {
         setError(result.error.message || 'Erro ao gerar token do cartão');
@@ -53,8 +59,6 @@ const CheckoutTransparente = () => {
         id_comanda,
         tipoPagamento: tipoPagamento || 'individual',
       };
-
-      console.log('payload', payload);
 
       // Envia para o backend
       const response = await api.post(
