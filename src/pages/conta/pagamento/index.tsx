@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { api } from '@/lib/axios';
 import { useRouter } from 'next/router';
 import Layout from '@/layout';
@@ -22,18 +22,26 @@ const CheckoutTransparente = () => {
   const [success, setSuccess] = useState<string>('');
   const router = useRouter();
   const { id_comanda, valor, tipoPagamento } = router.query;
+  const formRef = useRef<HTMLDivElement>(null);
 
-  // Monta o CardForm do Mercado Pago ao carregar o componente
-  React.useEffect(() => {
-    if (typeof window !== 'undefined' && window.MercadoPago) {
+  useEffect(() => {
+    if (!PUBLIC_KEY) {
+      setError('Chave pública do Mercado Pago não definida!');
+      return;
+    }
+    if (
+      typeof window !== 'undefined' &&
+      window.MercadoPago &&
+      formRef.current
+    ) {
       const mp = new window.MercadoPago(PUBLIC_KEY, { locale: 'pt-BR' });
-      mp.bricks().create('cardPayment', 'form-checkout', {
+      mp.bricks().create('cardPayment', formRef.current, {
         initialization: {
           amount: Number(valor) || 1,
         },
         callbacks: {
           onReady: () => {
-            // CardForm pronto
+            console.log('CardForm pronto');
           },
           onSubmit: async (cardFormData: any) => {
             try {
@@ -65,6 +73,8 @@ const CheckoutTransparente = () => {
           },
         },
       });
+    } else {
+      console.log('Aguardando SDK Mercado Pago ou elemento form-checkout...');
     }
   }, [valor, id_comanda, tipoPagamento, router]);
 
@@ -92,7 +102,7 @@ const CheckoutTransparente = () => {
               Valor a pagar: {currencyFormatter(Number(valor))}
             </div>
           )}
-          <div id='form-checkout' className='my-6'></div>
+          <div ref={formRef} id='form-checkout' className='my-6'></div>
           {error && <div className='text-red-600 mt-2'>{error}</div>}
           {success && <div className='text-green-600 mt-2'>{success}</div>}
         </MaxWidthWrapper>
