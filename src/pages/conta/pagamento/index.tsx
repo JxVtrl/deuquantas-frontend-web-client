@@ -120,8 +120,8 @@ const CheckoutTransparente = () => {
       label: 'CPF do titular',
       value: identificationNumber,
       onChange: setIdentificationNumber,
-    }
-  ]
+    },
+  ];
 
   return (
     <Layout>
@@ -149,7 +149,9 @@ const CheckoutTransparente = () => {
           ))}
         </div>
         <Button
-          onClick={() => { handlePayment(); }}
+          onClick={() => {
+            handlePayment();
+          }}
           variant='primary'
           text='Pagar'
         />
