@@ -37,6 +37,15 @@ const CheckoutTransparente = () => {
         initialization: {
           amount: Number(valor) || 1,
         },
+        customization: {
+          fields: {
+            payer: {
+              email: {
+                visible: false,
+              },
+            },
+          },
+        },
         callbacks: {
           onReady: () => {
             console.log('CardForm pronto');
