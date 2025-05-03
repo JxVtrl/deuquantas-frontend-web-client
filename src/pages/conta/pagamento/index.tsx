@@ -6,6 +6,7 @@ import Layout from '@/layout';
 import { withAuthCustomer } from '@/hoc/withAuth';
 import { currencyFormatter } from '@/utils/formatters';
 import { Button, MaxWidthWrapper } from '@deuquantas/components';
+import { Input } from '@/components/ui/input';
 
 declare global {
   interface Window {
@@ -16,7 +17,6 @@ declare global {
 const PUBLIC_KEY = process.env.NEXT_PUBLIC_MP_PUBLIC_KEY || '';
 
 const CheckoutTransparente = () => {
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>('');
   const [success, setSuccess] = useState<string>('');
   const [cardToken, setCardToken] = useState<string>('');
@@ -25,8 +25,7 @@ const CheckoutTransparente = () => {
   const { id_comanda, valor } = router.query;
   const [cardNumber, setCardNumber] = useState<string>('');
   const [cardholderName, setCardholderName] = useState<string>('');
-  const [cardExpirationMonth, setCardExpirationMonth] = useState<string>('');
-  const [cardExpirationYear, setCardExpirationYear] = useState<string>('');
+  const [cardExpirationDate, setCardExpirationDate] = useState<string>('');
   const [securityCode, setSecurityCode] = useState<string>('');
   const [identificationNumber, setIdentificationNumber] = useState<string>('');
 
@@ -38,14 +37,12 @@ const CheckoutTransparente = () => {
     }
   }, []);
 
-  const handleSubmit = async () => {
+  const handlePayment = async () => {
     setError('');
     setSuccess('');
-    setLoading(true);
 
     if (!mpRef.current) {
       setError('SDK Mercado Pago não carregado');
-      setLoading(false);
       return;
     }
 
@@ -53,15 +50,13 @@ const CheckoutTransparente = () => {
       const result = await mpRef.current.card.createToken({
         cardNumber,
         cardholderName,
-        cardExpirationMonth,
-        cardExpirationYear,
+        cardExpirationDate,
         securityCode,
         identificationNumber,
       });
       console.log('result', result);
       if (result.error) {
         setError(result.error.message || 'Erro ao gerar token do cartão');
-        setLoading(false);
         return;
       }
       const token = result.id;
@@ -92,10 +87,41 @@ const CheckoutTransparente = () => {
       }
     } catch (err: any) {
       setError(err.message || 'Erro ao processar pagamento');
-    } finally {
-      setLoading(false);
     }
   };
+
+  const input_list = [
+    {
+      name: 'cardNumber',
+      label: 'Número do cartão',
+      value: cardNumber,
+      onChange: setCardNumber,
+    },
+    {
+      name: 'cardholderName',
+      label: 'Nome impresso no cartão',
+      value: cardholderName,
+      onChange: setCardholderName,
+    },
+    {
+      name: 'cardExpirationDate',
+      label: 'Data de expiração',
+      value: cardExpirationDate,
+      onChange: setCardExpirationDate,
+    },
+    {
+      name: 'securityCode',
+      label: 'CVV',
+      value: securityCode,
+      onChange: setSecurityCode,
+    },
+    {
+      name: 'identificationNumber',
+      label: 'CPF do titular',
+      value: identificationNumber,
+      onChange: setIdentificationNumber,
+    }
+  ]
 
   return (
     <Layout>
@@ -105,17 +131,6 @@ const CheckoutTransparente = () => {
           paddingBottom: '81px',
         }}
       >
-        <Script
-          src='https://sdk.mercadopago.com/js/v2'
-          strategy='beforeInteractive'
-          onLoad={() => {
-            if (window.MercadoPago) {
-              mpRef.current = new window.MercadoPago(PUBLIC_KEY, {
-                locale: 'pt-BR',
-              });
-            }
-          }}
-        />
         <h2 className='text-2xl font-bold mb-4'>
           Checkout Transparente Mercado Pago
         </h2>
@@ -125,74 +140,16 @@ const CheckoutTransparente = () => {
           </div>
         )}
         <div>
-          <label className='block mb-1'>Número do cartão</label>
-          <input
-            name='cardNumber'
-            className='w-full border rounded px-3 py-2'
-            required
-            maxLength={19}
-            onChange={(e) => setCardNumber(e.target.value)}
-            value={cardNumber}
-          />
-        </div>
-        <div>
-          <label className='block mb-1'>Nome impresso no cartão</label>
-          <input
-            name='cardholderName'
-            className='w-full border rounded px-3 py-2'
-            required
-            onChange={(e) => setCardholderName(e.target.value)}
-            value={cardholderName}
-          />
-        </div>
-        <div className='flex gap-2'>
-          <div className='flex-1'>
-            <label className='block mb-1'>Mês expiração</label>
-            <input
-              name='cardExpirationMonth'
-              className='w-full border rounded px-3 py-2'
-              required
-              maxLength={2}
-              onChange={(e) => setCardExpirationMonth(e.target.value)}
-              value={cardExpirationMonth}
+          {input_list.map((input) => (
+            <Input
+              key={input.name}
+              value={input.value}
+              onChange={(e) => input.onChange(e.target.value)}
             />
-          </div>
-          <div className='flex-1'>
-            <label className='block mb-1'>Ano expiração</label>
-            <input
-              name='cardExpirationYear'
-              className='w-full border rounded px-3 py-2'
-              required
-              maxLength={4}
-              onChange={(e) => setCardExpirationYear(e.target.value)}
-              value={cardExpirationYear}
-            />
-          </div>
-        </div>
-        <div>
-          <label className='block mb-1'>CVV</label>
-          <input
-            name='securityCode'
-            className='w-full border rounded px-3 py-2'
-            required
-            maxLength={4}
-            onChange={(e) => setSecurityCode(e.target.value)}
-            value={securityCode}
-          />
-        </div>
-        <div>
-          <label className='block mb-1'>CPF do titular</label>
-          <input
-            name='identificationNumber'
-            className='w-full border rounded px-3 py-2'
-            required
-            maxLength={11}
-            onChange={(e) => setIdentificationNumber(e.target.value)}
-            value={identificationNumber}
-          />
+          ))}
         </div>
         <Button
-          onClick={() => void handleSubmit()}
+          onClick={() => { handlePayment(); }}
           variant='primary'
           text='Pagar'
         />

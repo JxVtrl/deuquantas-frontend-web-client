@@ -8,8 +8,6 @@ export const ComandaHeader: React.FC = () => {
   const { user } = useAuth();
   const { comanda } = useComanda();
 
-  console.log('comanda', JSON.stringify(comanda, null, 2));
-
   if (!user) {
     return null;
   }
