@@ -60,20 +60,35 @@ const CardFormCustom: React.FC<CardFormCustomProps> = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [sdkLoaded, setSdkLoaded] = useState(false);
+
+  // Função para tratar colagem nos inputs mascarados
+  const handlePaste = (field: keyof typeof form, maskType: string) => (e: React.ClipboardEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    const pastedData = e.clipboardData.getData('text');
+    // Aplica a máscara manualmente
+    // Importa as máscaras dinamicamente para evitar import circular
+    // (ou mova as máscaras para um utilitário comum se necessário)
+    // Aqui, para simplificar, vamos só remover caracteres não numéricos
+    const numbers = pastedData.replace(/\D/g, '');
+    setForm((prev) => ({ ...prev, [field]: numbers }));
+  };
 
   // Carrega o SDK Mercado Pago
   useEffect(() => {
     if (
+      sdkLoaded &&
       typeof window !== 'undefined' &&
       window.MercadoPago &&
       !window.mpCustom
     ) {
       window.mpCustom = new window.MercadoPago(PUBLIC_KEY, { locale: 'pt-BR' });
     }
-  }, []);
+  }, [sdkLoaded]);
 
   // Detecta a bandeira e parcelas ao digitar o cartão
   useEffect(() => {
+    if (!sdkLoaded) return;
     const bin = form.cardNumber.replace(/\D/g, '').slice(0, 6);
     if (bin.length === 6 && window.mpCustom) {
       window.mpCustom.getPaymentMethods({ bin }).then((res: any) => {
@@ -93,7 +108,7 @@ const CardFormCustom: React.FC<CardFormCustomProps> = ({
           }
         });
     }
-  }, [form.cardNumber, valor]);
+  }, [form.cardNumber, valor, sdkLoaded]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
@@ -146,7 +161,7 @@ const CardFormCustom: React.FC<CardFormCustomProps> = ({
   };
 
   return (
-    <Card className='max-w-md mx-auto mt-8'>
+    <Card className='mt-8'>
       <CardHeader>
         <CardTitle>Pagamento com Cartão</CardTitle>
       </CardHeader>
@@ -163,6 +178,7 @@ const CardFormCustom: React.FC<CardFormCustomProps> = ({
               onChange={handleChange}
               autoComplete='cc-number'
               required
+              onPaste={handlePaste('cardNumber', 'cartao')}
             />
           </div>
           <div>
@@ -189,6 +205,7 @@ const CardFormCustom: React.FC<CardFormCustomProps> = ({
                 onChange={handleChange}
                 autoComplete='cc-exp'
                 required
+                onPaste={handlePaste('cardExpiration', 'validade')}
               />
             </div>
             <div className='w-1/2'>
@@ -202,6 +219,7 @@ const CardFormCustom: React.FC<CardFormCustomProps> = ({
                 onChange={handleChange}
                 autoComplete='cc-csc'
                 required
+                onPaste={handlePaste('securityCode', 'cvv')}
               />
             </div>
           </div>
@@ -215,6 +233,7 @@ const CardFormCustom: React.FC<CardFormCustomProps> = ({
               value={form.docNumber}
               onChange={handleChange}
               required
+              onPaste={handlePaste('docNumber', 'num_cpf')}
             />
           </div>
           <div>
@@ -262,7 +281,8 @@ const CardFormCustom: React.FC<CardFormCustomProps> = ({
       </CardFooter>
       <Script
         src='https://sdk.mercadopago.com/js/v2'
-        strategy='beforeInteractive'
+        strategy='afterInteractive'
+        onLoad={() => setSdkLoaded(true)}
       />
     </Card>
   );
