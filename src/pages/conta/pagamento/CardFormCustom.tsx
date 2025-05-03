@@ -65,16 +65,16 @@ const CardFormCustom: React.FC<CardFormCustomProps> = ({
   // Função para tratar colagem nos inputs mascarados
   const handlePaste =
     (field: keyof typeof form, maskType: string) =>
-    (e: React.ClipboardEvent<HTMLInputElement>) => {
-      e.preventDefault();
-      const pastedData = e.clipboardData.getData('text');
-      // Aplica a máscara manualmente
-      // Importa as máscaras dinamicamente para evitar import circular
-      // (ou mova as máscaras para um utilitário comum se necessário)
-      // Aqui, para simplificar, vamos só remover caracteres não numéricos
-      const numbers = pastedData.replace(/\D/g, '');
-      setForm((prev) => ({ ...prev, [field]: numbers }));
-    };
+      (e: React.ClipboardEvent<HTMLInputElement>) => {
+        e.preventDefault();
+        const pastedData = e.clipboardData.getData('text');
+        // Aplica a máscara manualmente
+        // Importa as máscaras dinamicamente para evitar import circular
+        // (ou mova as máscaras para um utilitário comum se necessário)
+        // Aqui, para simplificar, vamos só remover caracteres não numéricos
+        const numbers = pastedData.replace(/\D/g, '');
+        setForm((prev) => ({ ...prev, [field]: numbers }));
+      };
 
   // Carrega o SDK Mercado Pago
   useEffect(() => {
@@ -180,7 +180,6 @@ const CardFormCustom: React.FC<CardFormCustomProps> = ({
               onChange={handleChange}
               autoComplete='cc-number'
               required
-              onPaste={handlePaste('cardNumber', 'cartao')}
             />
           </div>
           <div>
@@ -207,7 +206,6 @@ const CardFormCustom: React.FC<CardFormCustomProps> = ({
                 onChange={handleChange}
                 autoComplete='cc-exp'
                 required
-                onPaste={handlePaste('cardExpiration', 'validade')}
               />
             </div>
             <div className='w-1/2'>
@@ -221,7 +219,6 @@ const CardFormCustom: React.FC<CardFormCustomProps> = ({
                 onChange={handleChange}
                 autoComplete='cc-csc'
                 required
-                onPaste={handlePaste('securityCode', 'cvv')}
               />
             </div>
           </div>
@@ -235,33 +232,34 @@ const CardFormCustom: React.FC<CardFormCustomProps> = ({
               value={form.docNumber}
               onChange={handleChange}
               required
-              onPaste={handlePaste('docNumber', 'num_cpf')}
             />
           </div>
-          <div>
-            <Label htmlFor='installments'>Parcelas</Label>
-            <Select
-              name='installments'
-              value={form.installments}
-              onValueChange={(value) =>
-                setForm((f) => ({ ...f, installments: value }))
-              }
-            >
-              <SelectTrigger id='installments'>
-                <SelectValue placeholder='Selecione' />
-              </SelectTrigger>
-              <SelectContent>
-                {installmentsOptions.map((opt) => (
-                  <SelectItem
-                    key={opt.installments}
-                    value={String(opt.installments)}
-                  >
-                    {opt.recommended_message}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          {installmentsOptions.length > 0 && (
+            <div>
+              <Label htmlFor='installments'>Parcelas</Label>
+              <Select
+                name='installments'
+                value={form.installments}
+                onValueChange={(value) =>
+                  setForm((f) => ({ ...f, installments: value }))
+                }
+              >
+                <SelectTrigger id='installments'>
+                  <SelectValue placeholder='Selecione' />
+                </SelectTrigger>
+                <SelectContent>
+                  {installmentsOptions.map((opt) => (
+                    <SelectItem
+                      key={opt.installments}
+                      value={String(opt.installments)}
+                    >
+                      {opt.recommended_message}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
           {paymentMethodName && (
             <div className='text-sm text-gray-500'>
               Bandeira: {paymentMethodName}
