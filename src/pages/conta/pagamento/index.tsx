@@ -125,10 +125,9 @@ const CheckoutTransparente = () => {
 
   return (
     <>
-
       <Script
         src='https://sdk.mercadopago.com/js/v2'
-        strategy="beforeInteractive"
+        strategy='beforeInteractive'
         onLoad={() => {
           console.log('Mercado Pago SDK carregado');
         }}
@@ -182,7 +181,6 @@ const CheckoutTransparente = () => {
         </MaxWidthWrapper>
       </Layout>
     </>
-
   );
 };
 
