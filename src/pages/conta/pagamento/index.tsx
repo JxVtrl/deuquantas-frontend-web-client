@@ -1,11 +1,10 @@
-import React, { useEffect, useRef, useState } from 'react';
-import Script from 'next/script';
+import React, { useState } from 'react';
 import { api } from '@/lib/axios';
 import { useRouter } from 'next/router';
 import Layout from '@/layout';
 import { withAuthCustomer } from '@/hoc/withAuth';
 import { currencyFormatter } from '@/utils/formatters';
-import { Button, MaxWidthWrapper } from '@deuquantas/components';
+import { MaxWidthWrapper } from '@deuquantas/components';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
@@ -15,13 +14,10 @@ declare global {
   }
 }
 
-const PUBLIC_KEY = process.env.NEXT_PUBLIC_MP_PUBLIC_KEY || '';
-
 const CheckoutTransparente = () => {
   const [error, setError] = useState<string>('');
   const [success, setSuccess] = useState<string>('');
   const [cardToken, setCardToken] = useState<string>('');
-  const mpRef = useRef<any>(null);
   const router = useRouter();
   const { id_comanda, valor, tipoPagamento } = router.query;
   const [cardNumber, setCardNumber] = useState<string>('');
@@ -30,25 +26,12 @@ const CheckoutTransparente = () => {
   const [securityCode, setSecurityCode] = useState<string>('');
   const [identificationNumber, setIdentificationNumber] = useState<string>('');
 
-  useEffect(() => {
-    if (window.MercadoPago) {
-      mpRef.current = new window.MercadoPago(PUBLIC_KEY, {
-        locale: 'pt-BR',
-      });
-    }
-  }, []);
-
   const handlePayment = async () => {
     setError('');
     setSuccess('');
 
-    if (!mpRef.current) {
-      setError('SDK Mercado Pago não carregado');
-      return;
-    }
-
     try {
-      const result = await mpRef.current.card.createToken({
+      const result = await window.MercadoPago.card.createToken({
         cardNumber,
         cardholderName,
         cardExpirationDate,
