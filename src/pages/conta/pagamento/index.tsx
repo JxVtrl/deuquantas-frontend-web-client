@@ -27,11 +27,13 @@ const CheckoutTransparente = () => {
   const { estabelecimento } = useComanda();
 
   useEffect(() => {
+    console.log('[Checkout] useEffect - PUBLIC_KEY:', PUBLIC_KEY, 'valor:', valor, 'id_comanda:', id_comanda, 'tipoPagamento:', tipoPagamento);
     if (!PUBLIC_KEY) {
       setError('Chave pública do Mercado Pago não definida!');
       return;
     }
     if (typeof window !== 'undefined' && window.MercadoPago) {
+      console.log('[Checkout] MercadoPago SDK detectado, montando CardForm...');
       const mp = new window.MercadoPago(PUBLIC_KEY, { locale: 'pt-BR' });
       mp.bricks().create('cardPayment', 'form-checkout', {
         initialization: {
@@ -48,13 +50,11 @@ const CheckoutTransparente = () => {
         },
         callbacks: {
           onReady: () => {
-            console.log('CardForm pronto');
+            console.log('[Checkout] CardForm pronto');
           },
-          onSubmit: async (cardFormData: {
-            token: string;
-            payment_method_id: string;
-          }) => {
+          onSubmit: async (cardFormData: any) => {
             try {
+              console.log('[Checkout] onSubmit - cardFormData:', cardFormData);
               const payload = {
                 token: cardFormData.token,
                 payment_method_id: cardFormData.payment_method_id,
@@ -64,10 +64,12 @@ const CheckoutTransparente = () => {
                 tipoPagamento: tipoPagamento || 'individual',
                 num_cnpj: estabelecimento?.num_cnpj,
               };
+              console.log('[Checkout] Payload enviado para backend:', payload);
               const response = await api.post(
                 '/pagamentos/checkout-transparente',
                 payload,
               );
+              console.log('[Checkout] Resposta do backend:', response.data);
               if (response.data.success) {
                 setSuccess('Pagamento realizado com sucesso!');
                 router.push('/pedidos');
@@ -77,16 +79,18 @@ const CheckoutTransparente = () => {
                 );
               }
             } catch (err: any) {
+              console.error('[Checkout] Erro ao processar pagamento:', err);
               setError(err.message || 'Erro ao processar pagamento');
             }
           },
           onError: (error: any) => {
+            console.error('[Checkout] Erro no CardForm:', error);
             setError(error.message || 'Erro ao processar pagamento');
           },
         },
       });
     } else {
-      console.log('Aguardando SDK Mercado Pago ou elemento form-checkout...');
+      console.log('[Checkout] Aguardando SDK Mercado Pago ou elemento form-checkout...');
     }
   }, [valor, id_comanda, tipoPagamento, router, estabelecimento]);
 
