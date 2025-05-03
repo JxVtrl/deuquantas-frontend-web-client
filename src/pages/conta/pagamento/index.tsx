@@ -31,7 +31,7 @@ const CheckoutTransparente = () => {
           <CardFormCustom
             valor={Number(valor)}
             id_comanda={id_comanda as string}
-            tipoPagamento={tipoPagamento as string || 'individual'}
+            tipoPagamento={(tipoPagamento as string) || 'individual'}
             num_cnpj={estabelecimento.num_cnpj}
             onSuccess={() => router.push('/pedidos')}
           />
