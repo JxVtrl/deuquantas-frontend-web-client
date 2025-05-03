@@ -17,6 +17,8 @@ interface CustomerContextData {
   isSafari: boolean;
   solicitacaoId: string | null;
   setSolicitacaoId: (id: string | null) => void;
+  menuOpen: boolean;
+  setMenuOpen: (open: boolean) => void;
 }
 
 export const CustomerContext = createContext<CustomerContextData>(
@@ -31,6 +33,7 @@ export const CustomerProvider = ({ children }: { children: ReactNode }) => {
   );
   const [isSafari, setIsSafari] = useState(false);
   const [solicitacaoId, setSolicitacaoId] = useState<string | null>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     const browser = Bowser.getParser(window.navigator.userAgent);
@@ -48,6 +51,8 @@ export const CustomerProvider = ({ children }: { children: ReactNode }) => {
         isSafari,
         solicitacaoId,
         setSolicitacaoId,
+        menuOpen,
+        setMenuOpen,
       }}
     >
       {children}

@@ -14,15 +14,13 @@ import { CartEmptyError } from '@/components/CartEmptyError';
 import { useCustomerContext } from '@/contexts/CustomerContext';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-  const { isSafari } = useCustomerContext();
+  const { isSafari, menuOpen, setMenuOpen } = useCustomerContext();
 
   const { bottomNavItems } = useNavigation();
   const { estabelecimento, handleAddClick, isNavigationButtonDisabled } =
     useComanda();
   const { user, logout } = useAuth();
-  const [menuOpen, setMenuOpen] = useState(false);
   const router = useRouter();
-
   const [establishmentName, setEstablishmentName] = useState<
     string | undefined
   >(undefined);
@@ -53,7 +51,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             text_variant={!establishmentName ? 'welcome' : 'on-establishment'}
             menuOpen={menuOpen}
             setMenuOpen={setMenuOpen}
-            onLogoClick={() => router.push('/home')}
+            onLogoClick={() => {
+              router.push('/home');
+              setMenuOpen(false);
+            }}
           />
           {children}
           <CartEmptyError />
@@ -64,6 +65,15 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             setMenuOpen={setMenuOpen}
             variant='client'
             menuItems={menu_items.map((item) => {
+              if (item.href === '/home') {
+                return {
+                  label: item.label,
+                  onClick: () => {
+                    router.push('/home');
+                    setMenuOpen(false);
+                  },
+                };
+              }
               if (item.href === '/sair') {
                 return {
                   label: item.label,
