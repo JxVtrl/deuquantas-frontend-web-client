@@ -10,6 +10,7 @@ import SeoHead from '@/components/SeoHead';
 import { useToast } from '@/components/ui/use-toast';
 import Image from 'next/image';
 import { api } from '@/lib/axios';
+import { MaxWidthWrapper } from '@deuquantas/components';
 
 const ProfilePage: React.FC = () => {
   const { user, setUser } = useAuth();
@@ -80,7 +81,12 @@ const ProfilePage: React.FC = () => {
     <>
       <SeoHead title='Perfil - DeuQuantas' />
       <Layout>
-        <div className='max-w-4xl mx-auto p-6 overflow-y-scroll h-[calc(100vh-120px)]'>
+        <MaxWidthWrapper
+          styleContent={{
+            paddingTop: '20px',
+            paddingBottom: '81px',
+          }}
+        >
           <h1 className='text-2xl font-bold mb-6'>Meu Perfil</h1>
 
           <Card className='mb-6'>
@@ -164,9 +170,9 @@ const ProfilePage: React.FC = () => {
                 <h3 className='font-medium'>Data de Nascimento</h3>
                 <p className='text-sm text-gray-500'>
                   {user?.cliente?.data_nascimento
-                    ? new Date(user?.cliente?.data_nascimento).toLocaleDateString(
-                      'pt-BR',
-                    )
+                    ? new Date(
+                      user?.cliente?.data_nascimento,
+                    ).toLocaleDateString('pt-BR')
                     : 'Não informado'}
                 </p>
               </div>
@@ -222,7 +228,7 @@ const ProfilePage: React.FC = () => {
               </div>
             </CardContent>
           </Card>
-        </div>
+        </MaxWidthWrapper>
       </Layout>
     </>
   );
