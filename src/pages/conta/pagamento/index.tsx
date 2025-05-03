@@ -22,7 +22,7 @@ const CheckoutTransparente = () => {
   const [cardToken, setCardToken] = useState<string>('');
   const mpRef = useRef<any>(null);
   const router = useRouter();
-  const { id_comanda, valor } = router.query;
+  const { id_comanda, valor, tipoPagamento } = router.query;
   const [cardNumber, setCardNumber] = useState<string>('');
   const [cardholderName, setCardholderName] = useState<string>('');
   const [cardExpirationDate, setCardExpirationDate] = useState<string>('');
@@ -67,6 +67,7 @@ const CheckoutTransparente = () => {
         valor: Number(valor),
         descricao: 'Pagamento checkout transparente',
         id_comanda,
+        tipoPagamento: tipoPagamento || 'individual',
       };
 
       console.log('payload', payload);
