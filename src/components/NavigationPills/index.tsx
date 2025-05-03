@@ -3,7 +3,7 @@ import React from 'react';
 import { SwiperSlide } from 'swiper/react';
 import { Carousel } from '../Carousel';
 import { MaxWidthWrapper } from '@deuquantas/components';
-
+import { useComanda } from '@/contexts/ComandaContext';
 interface NavigationPill {
   label: string;
   isActive?: boolean;
@@ -46,6 +46,7 @@ export const NavigationPills: React.FC<{
   hasArrowBack?: boolean;
 }> = ({ navigationPills, hasArrowBack = false }) => {
   const router = useRouter();
+  const { comanda } = useComanda();
   return (
     <div
       style={{
@@ -57,7 +58,7 @@ export const NavigationPills: React.FC<{
         <MaxWidthWrapper>
           <div
             onClick={() => {
-              router.push('/conta');
+              router.push(`/conta/${comanda?.id}`);
             }}
             style={{
               cursor: 'pointer',
