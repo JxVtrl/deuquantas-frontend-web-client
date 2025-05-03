@@ -52,11 +52,20 @@ export const MaskedInput = React.forwardRef<HTMLInputElement, MaskedInputProps>(
     };
 
     const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+      e.preventDefault();
       const pastedData = e.clipboardData.getData('text');
       const maskedValue = applyMask(pastedData);
       if (onChange) {
-        e.currentTarget.value = maskedValue;
-        onChange(e as unknown as React.ChangeEvent<HTMLInputElement>);
+        // Cria um evento sintético para atualizar o estado do pai corretamente
+        const syntheticEvent = {
+          ...e,
+          target: {
+            ...e.target,
+            value: maskedValue,
+            name: props.name,
+          },
+        };
+        onChange(syntheticEvent as any);
       }
     };
 

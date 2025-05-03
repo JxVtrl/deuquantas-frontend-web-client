@@ -157,6 +157,28 @@ const ProfilePage: React.FC = () => {
                   {user?.cliente?.num_celular}
                 </p>
               </div>
+
+              <Separator />
+
+              <div>
+                <h3 className='font-medium'>Data de Nascimento</h3>
+                <p className='text-sm text-gray-500'>
+                  {user?.cliente?.data_nascimento
+                    ? new Date(user?.cliente?.data_nascimento).toLocaleDateString(
+                      'pt-BR',
+                    )
+                    : 'Não informado'}
+                </p>
+              </div>
+
+              <Separator />
+
+              <div>
+                <h3 className='font-medium'>CPF</h3>
+                <p className='text-sm text-gray-500'>
+                  {user?.cliente?.num_cpf}
+                </p>
+              </div>
             </CardContent>
           </Card>
 
