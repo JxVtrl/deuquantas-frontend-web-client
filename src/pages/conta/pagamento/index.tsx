@@ -41,10 +41,14 @@ const CheckoutTransparente = () => {
           onReady: () => {
             console.log('CardForm pronto');
           },
-          onSubmit: async (cardFormData: any) => {
+          onSubmit: async (cardFormData: {
+            token: string;
+            payment_method_id: string;
+          }) => {
             try {
               const payload = {
                 token: cardFormData.token,
+                payment_method_id: cardFormData.payment_method_id,
                 valor: Number(valor),
                 descricao: `Pagamento ${estabelecimento?.nome_estab} - ${id_comanda}`,
                 id_comanda,
