@@ -36,6 +36,6 @@ export const actions: ActionItem[] = [
   {
     icon: LocationIcon,
     label: 'Locais',
-    href: '/home/locations',
+    href: '/locais',
   },
 ];

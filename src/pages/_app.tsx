@@ -11,6 +11,7 @@ import 'modern-normalize/modern-normalize.css';
 import { ToastContainer } from 'react-toastify';
 import { initializeMercadoPago } from '@/config/mercadopago';
 import 'react-toastify/dist/ReactToastify.css';
+import 'leaflet/dist/leaflet.css';
 
 const inter = Inter({ subsets: ['latin'] });
 
