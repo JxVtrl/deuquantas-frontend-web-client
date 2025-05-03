@@ -38,6 +38,26 @@ declare global {
   }
 }
 
+// Função utilitária para mensagens de status do pagamento
+function getPaymentStatusMessage(status: string): string {
+  switch (status) {
+    case 'approved':
+      return 'Pagamento aprovado! 🎉 Seu pagamento foi aprovado com sucesso. Agora é só aguardar a confirmação do estabelecimento.';
+    case 'in_process':
+      return 'Seu pagamento está em análise pelo Mercado Pago. Assim que for aprovado, você receberá uma notificação.';
+    case 'pending_review_manual':
+      return 'Seu pagamento está passando por uma análise manual do Mercado Pago. Assim que houver uma resposta, você será avisado.';
+    case 'rejected':
+      return 'Não foi possível aprovar seu pagamento. Por favor, verifique os dados do cartão ou tente outro método de pagamento.';
+    case 'cancelled':
+      return 'O pagamento foi cancelado. Se não foi você, entre em contato com o suporte.';
+    case 'refunded':
+      return 'O valor foi devolvido para o seu cartão ou conta. Se tiver dúvidas, entre em contato com o suporte.';
+    default:
+      return 'Status do pagamento desconhecido. Por favor, entre em contato com o suporte.';
+  }
+}
+
 const CardFormCustom: React.FC<CardFormCustomProps> = ({
   valor,
   id_comanda,
@@ -61,20 +81,21 @@ const CardFormCustom: React.FC<CardFormCustomProps> = ({
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [sdkLoaded, setSdkLoaded] = useState(false);
+  const [paymentStatus, setPaymentStatus] = useState<string | null>(null);
 
   // Função para tratar colagem nos inputs mascarados
   const handlePaste =
     (field: keyof typeof form, maskType: string) =>
-    (e: React.ClipboardEvent<HTMLInputElement>) => {
-      e.preventDefault();
-      const pastedData = e.clipboardData.getData('text');
-      // Aplica a máscara manualmente
-      // Importa as máscaras dinamicamente para evitar import circular
-      // (ou mova as máscaras para um utilitário comum se necessário)
-      // Aqui, para simplificar, vamos só remover caracteres não numéricos
-      const numbers = pastedData.replace(/\D/g, '');
-      setForm((prev) => ({ ...prev, [field]: numbers }));
-    };
+      (e: React.ClipboardEvent<HTMLInputElement>) => {
+        e.preventDefault();
+        const pastedData = e.clipboardData.getData('text');
+        // Aplica a máscara manualmente
+        // Importa as máscaras dinamicamente para evitar import circular
+        // (ou mova as máscaras para um utilitário comum se necessário)
+        // Aqui, para simplificar, vamos só remover caracteres não numéricos
+        const numbers = pastedData.replace(/\D/g, '');
+        setForm((prev) => ({ ...prev, [field]: numbers }));
+      };
 
   // Carrega o SDK Mercado Pago
   useEffect(() => {
@@ -123,6 +144,7 @@ const CardFormCustom: React.FC<CardFormCustomProps> = ({
     setLoading(true);
     setError('');
     setSuccess('');
+    setPaymentStatus(null);
     try {
       if (!window.mpCustom) throw new Error('Mercado Pago SDK não carregado');
       if (!form.paymentMethodId) {
@@ -159,7 +181,11 @@ const CardFormCustom: React.FC<CardFormCustomProps> = ({
       );
       if (response.data.success || response.data.status === 'approved') {
         setSuccess('Pagamento realizado com sucesso!');
+        setPaymentStatus(response.data.status || 'approved');
         if (onSuccess) onSuccess();
+      } else if (response.data.status) {
+        setPaymentStatus(response.data.status);
+        setError(getPaymentStatusMessage(response.data.status));
       } else {
         setError(response.data.message || 'Erro ao processar pagamento');
       }
@@ -275,6 +301,11 @@ const CardFormCustom: React.FC<CardFormCustomProps> = ({
           {error && <div className='text-red-600 text-sm mt-2'>{error}</div>}
           {success && (
             <div className='text-green-600 text-sm mt-2'>{success}</div>
+          )}
+          {paymentStatus && (
+            <div className='text-sm mt-2'>
+              {getPaymentStatusMessage(paymentStatus)}
+            </div>
           )}
           <Button
             type='submit'
