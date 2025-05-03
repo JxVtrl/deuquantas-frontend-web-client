@@ -7,23 +7,25 @@ import {
   DrinksIcon,
 } from '@deuquantas/components';
 import { useRouter } from 'next/router';
+import { useComanda } from '@/contexts/ComandaContext';
 
 export const ComandaButtons: React.FC = () => {
   const router = useRouter();
+  const { comanda } = useComanda();
 
   const conta_buttons_navigation = [
     {
-      href: '/conta/menu',
+      href: `/conta/menu/${comanda?.id}`,
       icon: <DrinksIcon />,
       title: 'Menu',
     },
     {
-      href: '/conta/comanda',
+      href: `/conta/comanda/${comanda?.id}`,
       icon: <ReceiptIcon />,
       title: 'Comanda',
     },
     {
-      href: '/conta/clientes',
+      href: `/conta/clientes/${comanda?.id}`,
       icon: <PeopleIcon />,
       title: 'Pessoas',
     },
@@ -55,24 +57,24 @@ export const ComandaButtons: React.FC = () => {
                 },
                 ...(isFirst
                   ? {
-                      borderTopLeftRadius: '12px',
-                      borderBottomLeftRadius: '12px',
-                      borderTopRightRadius: '0px',
-                      borderBottomRightRadius: '0px',
-                    }
+                    borderTopLeftRadius: '12px',
+                    borderBottomLeftRadius: '12px',
+                    borderTopRightRadius: '0px',
+                    borderBottomRightRadius: '0px',
+                  }
                   : isLast
                     ? {
-                        borderTopRightRadius: '12px',
-                        borderBottomRightRadius: '12px',
-                        borderTopLeftRadius: '0px',
-                        borderBottomLeftRadius: '0px',
-                      }
+                      borderTopRightRadius: '12px',
+                      borderBottomRightRadius: '12px',
+                      borderTopLeftRadius: '0px',
+                      borderBottomLeftRadius: '0px',
+                    }
                     : {
-                        borderTopLeftRadius: '0px',
-                        borderBottomLeftRadius: '0px',
-                        borderTopRightRadius: '0px',
-                        borderBottomRightRadius: '0px',
-                      }),
+                      borderTopLeftRadius: '0px',
+                      borderBottomLeftRadius: '0px',
+                      borderTopRightRadius: '0px',
+                      borderBottomRightRadius: '0px',
+                    }),
               }}
               icon={{
                 src: button.icon,
