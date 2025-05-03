@@ -86,16 +86,16 @@ const CardFormCustom: React.FC<CardFormCustomProps> = ({
   // Função para tratar colagem nos inputs mascarados
   const handlePaste =
     (field: keyof typeof form, maskType: string) =>
-    (e: React.ClipboardEvent<HTMLInputElement>) => {
-      e.preventDefault();
-      const pastedData = e.clipboardData.getData('text');
-      // Aplica a máscara manualmente
-      // Importa as máscaras dinamicamente para evitar import circular
-      // (ou mova as máscaras para um utilitário comum se necessário)
-      // Aqui, para simplificar, vamos só remover caracteres não numéricos
-      const numbers = pastedData.replace(/\D/g, '');
-      setForm((prev) => ({ ...prev, [field]: numbers }));
-    };
+      (e: React.ClipboardEvent<HTMLInputElement>) => {
+        e.preventDefault();
+        const pastedData = e.clipboardData.getData('text');
+        // Aplica a máscara manualmente
+        // Importa as máscaras dinamicamente para evitar import circular
+        // (ou mova as máscaras para um utilitário comum se necessário)
+        // Aqui, para simplificar, vamos só remover caracteres não numéricos
+        const numbers = pastedData.replace(/\D/g, '');
+        setForm((prev) => ({ ...prev, [field]: numbers }));
+      };
 
   // Carrega o SDK Mercado Pago
   useEffect(() => {
@@ -291,11 +291,6 @@ const CardFormCustom: React.FC<CardFormCustomProps> = ({
                   ))}
                 </SelectContent>
               </Select>
-            </div>
-          )}
-          {paymentMethodName && (
-            <div className='text-sm text-gray-500'>
-              Bandeira: {paymentMethodName}
             </div>
           )}
           {error && <div className='text-red-600 text-sm mt-2'>{error}</div>}
