@@ -9,8 +9,7 @@ import { ComandaPayOptions } from '@/components/Comanda/PayOptions';
 import SeoHead from '@/components/SeoHead';
 
 const ComandaPage = () => {
-  const { comanda, loading, error } =
-    useComanda();
+  const { comanda, loading, error } = useComanda();
 
   if (loading) {
     return (

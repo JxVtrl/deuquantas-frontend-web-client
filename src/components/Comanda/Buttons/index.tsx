@@ -7,7 +7,6 @@ import {
   DrinksIcon,
 } from '@deuquantas/components';
 import { useRouter } from 'next/router';
-import { useComanda } from '@/contexts/ComandaContext';
 
 export const ComandaButtons: React.FC = () => {
   const router = useRouter();
