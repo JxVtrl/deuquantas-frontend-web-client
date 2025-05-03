@@ -31,6 +31,13 @@ interface CardFormCustomProps {
   onSuccess?: () => void;
 }
 
+declare global {
+  interface Window {
+    MercadoPago: any;
+    mpCustom?: any;
+  }
+}
+
 export const CardFormCustom: React.FC<CardFormCustomProps> = ({
   valor,
   id_comanda,
