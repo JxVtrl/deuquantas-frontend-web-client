@@ -1,5 +1,4 @@
-import React, { useEffect } from 'react';
-import { useRouter } from 'next/router';
+import React from 'react';
 import Layout from '@/layout';
 import { withAuthCustomer } from '@/hoc/withAuth';
 import { useComanda } from '@/contexts/ComandaContext';
@@ -10,12 +9,8 @@ import { ComandaPayOptions } from '@/components/Comanda/PayOptions';
 import SeoHead from '@/components/SeoHead';
 
 const ComandaPage = () => {
-  const { comanda, loading, error, fetchComandasAtivas, fetchComanda } =
+  const { comanda, loading, error } =
     useComanda();
-
-  useEffect(() => {
-    fetchComandasAtivas();
-  }, []);
 
   if (loading) {
     return (
