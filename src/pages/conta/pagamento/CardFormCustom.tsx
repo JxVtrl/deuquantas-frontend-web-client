@@ -38,7 +38,7 @@ declare global {
   }
 }
 
-export const CardFormCustom: React.FC<CardFormCustomProps> = ({
+const CardFormCustom: React.FC<CardFormCustomProps> = ({
   valor,
   id_comanda,
   tipoPagamento,
@@ -267,3 +267,5 @@ export const CardFormCustom: React.FC<CardFormCustomProps> = ({
     </Card>
   );
 };
+
+export default CardFormCustom;

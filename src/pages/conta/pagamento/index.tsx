@@ -4,7 +4,7 @@ import { withAuthCustomer } from '@/hoc/withAuth';
 import { MaxWidthWrapper } from '@deuquantas/components';
 import { useRouter } from 'next/router';
 import { useComanda } from '@/contexts/ComandaContext';
-import { CardFormCustom } from './CardFormCustom';
+import CardFormCustom from './CardFormCustom';
 
 const CheckoutTransparente = () => {
   const router = useRouter();
