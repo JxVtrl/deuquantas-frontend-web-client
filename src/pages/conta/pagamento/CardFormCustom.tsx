@@ -65,16 +65,16 @@ const CardFormCustom: React.FC<CardFormCustomProps> = ({
   // Função para tratar colagem nos inputs mascarados
   const handlePaste =
     (field: keyof typeof form, maskType: string) =>
-    (e: React.ClipboardEvent<HTMLInputElement>) => {
-      e.preventDefault();
-      const pastedData = e.clipboardData.getData('text');
-      // Aplica a máscara manualmente
-      // Importa as máscaras dinamicamente para evitar import circular
-      // (ou mova as máscaras para um utilitário comum se necessário)
-      // Aqui, para simplificar, vamos só remover caracteres não numéricos
-      const numbers = pastedData.replace(/\D/g, '');
-      setForm((prev) => ({ ...prev, [field]: numbers }));
-    };
+      (e: React.ClipboardEvent<HTMLInputElement>) => {
+        e.preventDefault();
+        const pastedData = e.clipboardData.getData('text');
+        // Aplica a máscara manualmente
+        // Importa as máscaras dinamicamente para evitar import circular
+        // (ou mova as máscaras para um utilitário comum se necessário)
+        // Aqui, para simplificar, vamos só remover caracteres não numéricos
+        const numbers = pastedData.replace(/\D/g, '');
+        setForm((prev) => ({ ...prev, [field]: numbers }));
+      };
 
   // Carrega o SDK Mercado Pago
   useEffect(() => {
@@ -125,6 +125,11 @@ const CardFormCustom: React.FC<CardFormCustomProps> = ({
     setSuccess('');
     try {
       if (!window.mpCustom) throw new Error('Mercado Pago SDK não carregado');
+      if (!form.paymentMethodId) {
+        setError('Não foi possível identificar a bandeira do cartão. Verifique o número digitado.');
+        setLoading(false);
+        return;
+      }
       const [expMonth, expYear] = form.cardExpiration.split('/');
       const cardData = {
         cardNumber: form.cardNumber.replace(/\D/g, ''),
@@ -269,7 +274,7 @@ const CardFormCustom: React.FC<CardFormCustomProps> = ({
           {success && (
             <div className='text-green-600 text-sm mt-2'>{success}</div>
           )}
-          <Button type='submit' className='w-full mt-2' disabled={loading}>
+          <Button type='submit' className='w-full mt-2' disabled={loading || !form.paymentMethodId}>
             {loading ? 'Processando...' : 'Pagar'}
           </Button>
         </form>
