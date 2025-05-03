@@ -28,10 +28,7 @@ const CheckoutTransparente = () => {
       setError('Chave pública do Mercado Pago não definida!');
       return;
     }
-    if (
-      typeof window !== 'undefined' &&
-      window.MercadoPago
-    ) {
+    if (typeof window !== 'undefined' && window.MercadoPago) {
       const mp = new window.MercadoPago(PUBLIC_KEY, { locale: 'pt-BR' });
       mp.bricks().create('cardPayment', 'form-checkout', {
         initialization: {
