@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { api } from '@/lib/axios';
 import { useRouter } from 'next/router';
 import Layout from '@/layout';
@@ -22,7 +22,6 @@ const CheckoutTransparente = () => {
   const [success, setSuccess] = useState<string>('');
   const router = useRouter();
   const { id_comanda, valor, tipoPagamento } = router.query;
-  const formRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!PUBLIC_KEY) {
@@ -31,11 +30,10 @@ const CheckoutTransparente = () => {
     }
     if (
       typeof window !== 'undefined' &&
-      window.MercadoPago &&
-      formRef.current
+      window.MercadoPago
     ) {
       const mp = new window.MercadoPago(PUBLIC_KEY, { locale: 'pt-BR' });
-      mp.bricks().create('cardPayment', formRef.current, {
+      mp.bricks().create('cardPayment', 'form-checkout', {
         initialization: {
           amount: Number(valor) || 1,
         },
@@ -102,7 +100,7 @@ const CheckoutTransparente = () => {
               Valor a pagar: {currencyFormatter(Number(valor))}
             </div>
           )}
-          <div ref={formRef} id='form-checkout' className='my-6'></div>
+          <div id='form-checkout' className='my-6'></div>
           {error && <div className='text-red-600 mt-2'>{error}</div>}
           {success && <div className='text-green-600 mt-2'>{success}</div>}
         </MaxWidthWrapper>
