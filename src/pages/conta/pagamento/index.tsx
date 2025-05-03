@@ -8,6 +8,8 @@ import { MaxWidthWrapper } from '@deuquantas/components';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import Script from 'next/script';
+import { useAuth } from '@/contexts/AuthContext';
+import { useComanda } from '@/contexts/ComandaContext';
 
 declare global {
   interface Window {
@@ -22,6 +24,8 @@ const CheckoutTransparente = () => {
   const [success, setSuccess] = useState<string>('');
   const router = useRouter();
   const { id_comanda, valor, tipoPagamento } = router.query;
+  const { user } = useAuth();
+  const { estabelecimento } = useComanda();
 
   useEffect(() => {
     if (!PUBLIC_KEY) {
@@ -46,6 +50,7 @@ const CheckoutTransparente = () => {
                 descricao: 'Pagamento checkout transparente',
                 id_comanda,
                 tipoPagamento: tipoPagamento || 'individual',
+                num_cnpj: estabelecimento?.num_cnpj,
               };
               const response = await api.post(
                 '/pagamentos/checkout-transparente',
@@ -71,7 +76,7 @@ const CheckoutTransparente = () => {
     } else {
       console.log('Aguardando SDK Mercado Pago ou elemento form-checkout...');
     }
-  }, [valor, id_comanda, tipoPagamento, router]);
+  }, [valor, id_comanda, tipoPagamento, router, estabelecimento]);
 
   return (
     <>
