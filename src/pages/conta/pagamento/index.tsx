@@ -157,7 +157,7 @@ const CheckoutTransparente = () => {
                   placeholder={input.placeholder}
                 />
               </div>
-            )
+            );
           })}
         </div>
         <button
