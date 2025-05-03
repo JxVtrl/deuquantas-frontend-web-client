@@ -42,13 +42,27 @@ const CheckoutTransparente = () => {
     console.log('mp', mp);
 
     try {
-      const result = await mp.card.createToken({
-        cardNumber,
-        cardholderName,
-        cardExpirationDate,
-        securityCode,
-        identificationNumber,
-      });
+      let result;
+      if (mp.card && mp.card.createToken) {
+        result = await mp.card.createToken({
+          cardNumber,
+          cardholderName,
+          cardExpirationDate,
+          securityCode,
+          identificationNumber,
+        });
+      } else if (mp.fields && mp.fields.createCardToken) {
+        result = await mp.fields.createCardToken({
+          cardNumber,
+          cardholderName,
+          cardExpirationDate,
+          securityCode,
+          identificationNumber,
+        });
+      } else {
+        setError('Método de tokenização do cartão não encontrado na SDK do Mercado Pago');
+        return;
+      }
 
       console.log('result', result);
       if (result.error) {
