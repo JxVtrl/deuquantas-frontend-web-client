@@ -61,8 +61,11 @@ export const ComandaPayOptions = () => {
 
     switch (option) {
       case 'individual':
-        // TODO: Implementar cálculo real do valor individual
-        const valorIndividual = 0; // Será calculado pelo backend
+        // Busca o valor individual do usuário logado
+        const clienteAtual = comanda.clientes.find(
+          (cliente) => cliente.id === user?.cliente.id
+        );
+        const valorIndividual = clienteAtual?.valor_total || 0;
         return {
           title: 'Confirmar Pagamento Individual',
           message:
@@ -111,7 +114,7 @@ export const ComandaPayOptions = () => {
     } catch (error: any) {
       setError(
         error.response?.data?.message ||
-          'Ocorreu um erro ao iniciar a divisão. Tente novamente.',
+        'Ocorreu um erro ao iniciar a divisão. Tente novamente.',
       );
     } finally {
       setLoading(false);
@@ -136,7 +139,7 @@ export const ComandaPayOptions = () => {
     } catch (error: any) {
       setError(
         error.response?.data?.message ||
-          'Ocorreu um erro ao processar o pagamento. Tente novamente.',
+        'Ocorreu um erro ao processar o pagamento. Tente novamente.',
       );
     } finally {
       setLoading(false);

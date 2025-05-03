@@ -31,7 +31,7 @@ export const ComandaHeader: React.FC = () => {
   const consumo_user =
     clientes?.find((cliente) => {
       return cliente.id === user?.usuario.id;
-    })?.valor_total_consumido || 0;
+    })?.valor_total || 0;
 
   // Soma do valor já pago por todos
   const valorPagoTotal =

@@ -139,7 +139,7 @@ const OrdersPage = () => {
                           {cliente.nome}
                         </span>
                         <span className='text-gray-500 text-xs ml-1'>
-                          {currencyFormatter(cliente.valor_total_consumido)}
+                          {currencyFormatter(cliente.valor_total)}
                         </span>
                       </li>
                     ))}

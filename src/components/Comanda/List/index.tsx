@@ -30,6 +30,8 @@ export const ComandaList: React.FC = () => {
       </div>
 
       {(comanda?.itens as Itens[]).map((item) => {
+        const isFromClientLogged = item.cliente.id === user?.usuario.id;
+        const isFromClientPaid = clientes?.find((cliente) => cliente.id === item.cliente.id)?.status === 'pago';
         return (
           <div
             key={item.id}
@@ -39,11 +41,7 @@ export const ComandaList: React.FC = () => {
               <span
                 className='text-[14px] font-[500] text-[#272727] leading-[14px] capitalize'
                 style={{
-                  textDecoration:
-                    clientes?.find((cliente) => cliente.id === item.cliente.id)
-                      ?.status === 'pago'
-                      ? 'line-through'
-                      : 'none',
+                  textDecoration: isFromClientPaid ? 'line-through' : 'none',
                 }}
               >
                 {item.nome}
@@ -54,17 +52,13 @@ export const ComandaList: React.FC = () => {
                 name={item.cliente.nome}
                 src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${item.cliente.avatar}`}
                 bgColor={
-                  item.cliente.id === user?.cliente.id ? '#FFCC00' : 'muted'
+                  isFromClientLogged ? '#FFCC00' : 'muted'
                 }
               />
               <span
                 className='text-[14px] font-[500] text-[#272727] leading-[14px]'
                 style={{
-                  textDecoration:
-                    clientes?.find((cliente) => cliente.id === item.cliente.id)
-                      ?.status === 'pago'
-                      ? 'line-through'
-                      : 'none',
+                  textDecoration: isFromClientPaid ? 'line-through' : 'none',
                 }}
               >
                 {currencyFormatter(item.preco)}

@@ -12,7 +12,6 @@ export interface ComandaPessoa {
   data_criacao: string;
   avatar: string;
   status: 'ativo' | 'pago' | 'aguardando_split';
-  valor_total_consumido: number;
   valor_pago: number;
   itens_consumidos: { nome: string; quantidade: number; valor_total: number }[];
   valor_total: number;

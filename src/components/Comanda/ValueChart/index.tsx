@@ -16,21 +16,28 @@ export const ComandaValueChart: React.FC = () => {
     if (!comanda || !comanda.conta) {
       return;
     }
-    const consumo_t = comanda.conta.valTotal;
-    const consumo =
-      comanda.clientes?.find((cliente) => {
-        return cliente.id === user?.usuario.id;
-      })?.valor_total || 0;
+    console.log('comanda', comanda);
+    let consumo_proprio = 0;
+    let valor_pago = 0
     const limite = 250; // TODO: Verificar limite do usuario nas preferências
-    const valorPago =
-      comanda.clientes?.reduce(
-        (acc, cliente) => acc + (cliente.valor_pago || 0),
-        0,
-      ) || 0;
-    let per_total = consumo_t > 0 ? (valorPago / consumo_t) * 100 : 0;
+    if (comanda.clientes.length === 1) {
+      consumo_proprio = comanda.conta.valTotal;
+    } else {
+      consumo_proprio =
+        comanda.clientes.find((cliente) => {
+          const isFromClientLogged = cliente.id === user?.usuario.id;
+          return isFromClientLogged;
+        })?.valor_total || 0;
 
-    setConsumoUser(consumo);
-    setConsumoTotal(consumo_t - valorPago);
+      valor_pago = comanda.clientes.reduce((acc, cliente) => {
+        const isFromClientPaid = cliente.status === 'pago';
+        return isFromClientPaid ? acc + cliente.valor_pago : acc;
+      }, 0);
+    }
+    let per_total = (consumo_proprio / comanda.conta.valTotal) * 100;
+
+    setConsumoUser(consumo_proprio);
+    setConsumoTotal(comanda.conta.valTotal - valor_pago);
     setPercentage(per_total);
     setLimiteUser(limite);
   }, [comanda]);
