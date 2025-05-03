@@ -7,6 +7,7 @@ import { withAuthCustomer } from '@/hoc/withAuth';
 import { currencyFormatter } from '@/utils/formatters';
 import { Button, MaxWidthWrapper } from '@deuquantas/components';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 declare global {
   interface Window {
@@ -95,30 +96,35 @@ const CheckoutTransparente = () => {
     {
       name: 'cardNumber',
       label: 'Número do cartão',
+      placeholder: '1234 1234 1234 1234',
       value: cardNumber,
       onChange: setCardNumber,
     },
     {
       name: 'cardholderName',
       label: 'Nome impresso no cartão',
+      placeholder: 'Nome impresso no cartão',
       value: cardholderName,
       onChange: setCardholderName,
     },
     {
       name: 'cardExpirationDate',
       label: 'Data de expiração',
+      placeholder: 'MM/AA',
       value: cardExpirationDate,
       onChange: setCardExpirationDate,
     },
     {
       name: 'securityCode',
       label: 'CVV',
+      placeholder: 'CVV',
       value: securityCode,
       onChange: setSecurityCode,
     },
     {
       name: 'identificationNumber',
       label: 'CPF do titular',
+      placeholder: 'CPF do titular',
       value: identificationNumber,
       onChange: setIdentificationNumber,
     },
@@ -140,13 +146,16 @@ const CheckoutTransparente = () => {
             Valor a pagar: {currencyFormatter(Number(valor))}
           </div>
         )}
-        <div>
+        <div className='grid grid-cols-1 gap-4'>
           {input_list.map((input) => (
-            <Input
-              key={input.name}
-              value={input.value}
-              onChange={(e) => input.onChange(e.target.value)}
-            />
+            <div key={input.name} className='flex flex-col gap-2'>
+              <Label>{input.label}</Label>
+              <Input
+                value={input.value}
+                onChange={(e) => input.onChange(e.target.value)}
+                placeholder={input.placeholder}
+              />
+            </div>
           ))}
         </div>
         <Button
