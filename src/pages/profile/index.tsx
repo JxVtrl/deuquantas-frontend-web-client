@@ -171,8 +171,8 @@ const ProfilePage: React.FC = () => {
                 <p className='text-sm text-gray-500'>
                   {user?.cliente?.data_nascimento
                     ? new Date(
-                      user?.cliente?.data_nascimento,
-                    ).toLocaleDateString('pt-BR')
+                        user?.cliente?.data_nascimento,
+                      ).toLocaleDateString('pt-BR')
                     : 'Não informado'}
                 </p>
               </div>
