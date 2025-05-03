@@ -61,18 +61,7 @@ export default function Document() {
         <Main />
         <NextScript />
 
-        <Script
-          src='https://sdk.mercadopago.com/js/v2'
-          strategy='beforeInteractive'
-          onLoad={() => {
-            if (window.MercadoPago) {
-              window.MercadoPago.init({
-                publicKey: process.env.NEXT_PUBLIC_MP_PUBLIC_KEY,
-                locale: 'pt-BR',
-              });
-            }
-          }}
-        />
+
       </body>
     </Html>
   );

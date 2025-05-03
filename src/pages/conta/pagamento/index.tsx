@@ -7,6 +7,7 @@ import { currencyFormatter } from '@/utils/formatters';
 import { MaxWidthWrapper } from '@deuquantas/components';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import Script from 'next/script';
 
 declare global {
   interface Window {
@@ -31,6 +32,11 @@ const CheckoutTransparente = () => {
   const handlePayment = async () => {
     setError('');
     setSuccess('');
+
+    if (typeof window === 'undefined' || !window.MercadoPago) {
+      setError('SDK Mercado Pago não carregado');
+      return;
+    }
 
     const mp = new window.MercadoPago(PUBLIC_KEY, { locale: 'pt-BR' });
     console.log('mp', mp);
@@ -118,53 +124,65 @@ const CheckoutTransparente = () => {
   ];
 
   return (
-    <Layout>
-      <MaxWidthWrapper
-        styleContent={{
-          paddingTop: '20px',
-          paddingBottom: '81px',
+    <>
+
+      <Script
+        src='https://sdk.mercadopago.com/js/v2'
+        strategy="beforeInteractive"
+        onLoad={() => {
+          console.log('Mercado Pago SDK carregado');
         }}
-      >
-        <h2 className='text-2xl font-bold mb-4'>
-          Checkout Transparente Mercado Pago
-        </h2>
-        {valor && (
-          <div className='mb-4 text-lg font-semibold'>
-            Valor a pagar: {currencyFormatter(Number(valor))}
-          </div>
-        )}
-        <div className='grid grid-cols-1 gap-4'>
-          {input_list.map((input) => {
-            return (
-              <div key={input.name} className='flex flex-col gap-2'>
-                <Label>{input.label}</Label>
-                <Input
-                  value={input.value}
-                  onChange={(e) => input.onChange(e.target.value)}
-                  placeholder={input.placeholder}
-                />
-              </div>
-            );
-          })}
-        </div>
-        <button
-          onClick={() => {
-            console.log('handlePayment');
-            handlePayment();
+      />
+
+      <Layout>
+        <MaxWidthWrapper
+          styleContent={{
+            paddingTop: '20px',
+            paddingBottom: '81px',
           }}
-          className='bg-primary text-white px-4 py-2 rounded-md'
         >
-          Pagar
-        </button>
-        {error && <div className='text-red-600 mt-2'>{error}</div>}
-        {success && <div className='text-green-600 mt-2'>{success}</div>}
-        {cardToken && (
-          <div className='mt-4 text-xs text-gray-500'>
-            Token gerado: {cardToken}
+          <h2 className='text-2xl font-bold mb-4'>
+            Checkout Transparente Mercado Pago
+          </h2>
+          {valor && (
+            <div className='mb-4 text-lg font-semibold'>
+              Valor a pagar: {currencyFormatter(Number(valor))}
+            </div>
+          )}
+          <div className='grid grid-cols-1 gap-4'>
+            {input_list.map((input) => {
+              return (
+                <div key={input.name} className='flex flex-col gap-2'>
+                  <Label>{input.label}</Label>
+                  <Input
+                    value={input.value}
+                    onChange={(e) => input.onChange(e.target.value)}
+                    placeholder={input.placeholder}
+                  />
+                </div>
+              );
+            })}
           </div>
-        )}
-      </MaxWidthWrapper>
-    </Layout>
+          <button
+            onClick={() => {
+              console.log('handlePayment');
+              handlePayment();
+            }}
+            className='bg-primary text-white px-4 py-2 rounded-md'
+          >
+            Pagar
+          </button>
+          {error && <div className='text-red-600 mt-2'>{error}</div>}
+          {success && <div className='text-green-600 mt-2'>{success}</div>}
+          {cardToken && (
+            <div className='mt-4 text-xs text-gray-500'>
+              Token gerado: {cardToken}
+            </div>
+          )}
+        </MaxWidthWrapper>
+      </Layout>
+    </>
+
   );
 };
 
