@@ -31,7 +31,9 @@ export const ComandaList: React.FC = () => {
 
       {(comanda?.itens as Itens[]).map((item) => {
         const isFromClientLogged = item.cliente.id === user?.usuario.id;
-        const isFromClientPaid = clientes?.find((cliente) => cliente.id === item.cliente.id)?.status === 'pago';
+        const isFromClientPaid =
+          clientes?.find((cliente) => cliente.id === item.cliente.id)
+            ?.status === 'pago';
         return (
           <div
             key={item.id}
@@ -51,9 +53,7 @@ export const ComandaList: React.FC = () => {
               <Avatar
                 name={item.cliente.nome}
                 src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${item.cliente.avatar}`}
-                bgColor={
-                  isFromClientLogged ? '#FFCC00' : 'muted'
-                }
+                bgColor={isFromClientLogged ? '#FFCC00' : 'muted'}
               />
               <span
                 className='text-[14px] font-[500] text-[#272727] leading-[14px]'
