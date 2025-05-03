@@ -60,7 +60,9 @@ const CheckoutTransparente = () => {
           identificationNumber,
         });
       } else {
-        setError('Método de tokenização do cartão não encontrado na SDK do Mercado Pago');
+        setError(
+          'Método de tokenização do cartão não encontrado na SDK do Mercado Pago',
+        );
         return;
       }
 
