@@ -20,124 +20,51 @@ const PUBLIC_KEY = process.env.NEXT_PUBLIC_MP_PUBLIC_KEY || '';
 const CheckoutTransparente = () => {
   const [error, setError] = useState<string>('');
   const [success, setSuccess] = useState<string>('');
-  const [cardToken, setCardToken] = useState<string>('');
   const router = useRouter();
   const { id_comanda, valor, tipoPagamento } = router.query;
-  const [cardNumber, setCardNumber] = useState<string>('');
-  const [cardholderName, setCardholderName] = useState<string>('');
-  const [cardExpirationDate, setCardExpirationDate] = useState<string>('');
-  const [securityCode, setSecurityCode] = useState<string>('');
-  const [identificationNumber, setIdentificationNumber] = useState<string>('');
 
-  const handlePayment = async () => {
-    setError('');
-    setSuccess('');
-
-    if (typeof window === 'undefined' || !window.MercadoPago) {
-      setError('SDK Mercado Pago não carregado');
-      return;
+  // Monta o CardForm do Mercado Pago ao carregar o componente
+  React.useEffect(() => {
+    if (typeof window !== 'undefined' && window.MercadoPago) {
+      const mp = new window.MercadoPago(PUBLIC_KEY, { locale: 'pt-BR' });
+      mp.bricks().create('cardPayment', 'form-checkout', {
+        initialization: {
+          amount: Number(valor) || 1,
+        },
+        callbacks: {
+          onReady: () => {
+            // CardForm pronto
+          },
+          onSubmit: async (cardFormData: any) => {
+            try {
+              const payload = {
+                token: cardFormData.token,
+                valor: Number(valor),
+                descricao: 'Pagamento checkout transparente',
+                id_comanda,
+                tipoPagamento: tipoPagamento || 'individual',
+              };
+              const response = await api.post(
+                '/pagamentos/checkout-transparente',
+                payload,
+              );
+              if (response.data.success) {
+                setSuccess('Pagamento realizado com sucesso!');
+                router.push('/pedidos');
+              } else {
+                setError(response.data.message || 'Erro ao processar pagamento');
+              }
+            } catch (err: any) {
+              setError(err.message || 'Erro ao processar pagamento');
+            }
+          },
+          onError: (error: any) => {
+            setError(error.message || 'Erro ao processar pagamento');
+          },
+        },
+      });
     }
-
-    const mp = new window.MercadoPago(PUBLIC_KEY, { locale: 'pt-BR' });
-    console.log('mp', mp);
-
-    try {
-      let result;
-      if (mp.card && mp.card.createToken) {
-        result = await mp.card.createToken({
-          cardNumber,
-          cardholderName,
-          cardExpirationDate,
-          securityCode,
-          identificationNumber,
-        });
-      } else if (mp.fields && mp.fields.createCardToken) {
-        result = await mp.fields.createCardToken({
-          cardNumber,
-          cardholderName,
-          cardExpirationDate,
-          securityCode,
-          identificationNumber,
-        });
-      } else {
-        setError(
-          'Método de tokenização do cartão não encontrado na SDK do Mercado Pago',
-        );
-        return;
-      }
-
-      console.log('result', result);
-      if (result.error) {
-        setError(result.error.message || 'Erro ao gerar token do cartão');
-        return;
-      }
-      const token = result.id;
-      setCardToken(token);
-
-      const payload = {
-        token,
-        valor: Number(valor),
-        descricao: 'Pagamento checkout transparente',
-        id_comanda,
-        tipoPagamento: tipoPagamento || 'individual',
-      };
-
-      // Envia para o backend
-      const response = await api.post(
-        '/pagamentos/checkout-transparente',
-        payload,
-      );
-
-      console.log('response', response);
-
-      if (response.data.success) {
-        setSuccess('Pagamento realizado com sucesso!');
-        router.push('/pedidos');
-      } else {
-        setError(response.data.message || 'Erro ao processar pagamento');
-      }
-    } catch (err: any) {
-      setError(err.message || 'Erro ao processar pagamento');
-    }
-  };
-
-  const input_list = [
-    {
-      name: 'cardNumber',
-      label: 'Número do cartão',
-      placeholder: '1234 1234 1234 1234',
-      value: cardNumber,
-      onChange: setCardNumber,
-    },
-    {
-      name: 'cardholderName',
-      label: 'Nome impresso no cartão',
-      placeholder: 'Nome impresso no cartão',
-      value: cardholderName,
-      onChange: setCardholderName,
-    },
-    {
-      name: 'cardExpirationDate',
-      label: 'Data de expiração',
-      placeholder: 'MM/AA',
-      value: cardExpirationDate,
-      onChange: setCardExpirationDate,
-    },
-    {
-      name: 'securityCode',
-      label: 'CVV',
-      placeholder: 'CVV',
-      value: securityCode,
-      onChange: setSecurityCode,
-    },
-    {
-      name: 'identificationNumber',
-      label: 'CPF do titular',
-      placeholder: 'CPF do titular',
-      value: identificationNumber,
-      onChange: setIdentificationNumber,
-    },
-  ];
+  }, [valor, id_comanda, tipoPagamento, router]);
 
   return (
     <>
@@ -148,7 +75,6 @@ const CheckoutTransparente = () => {
           console.log('Mercado Pago SDK carregado');
         }}
       />
-
       <Layout>
         <MaxWidthWrapper
           styleContent={{
@@ -164,36 +90,9 @@ const CheckoutTransparente = () => {
               Valor a pagar: {currencyFormatter(Number(valor))}
             </div>
           )}
-          <div className='grid grid-cols-1 gap-4'>
-            {input_list.map((input) => {
-              return (
-                <div key={input.name} className='flex flex-col gap-2'>
-                  <Label>{input.label}</Label>
-                  <Input
-                    value={input.value}
-                    onChange={(e) => input.onChange(e.target.value)}
-                    placeholder={input.placeholder}
-                  />
-                </div>
-              );
-            })}
-          </div>
-          <button
-            onClick={() => {
-              console.log('handlePayment');
-              handlePayment();
-            }}
-            className='bg-primary text-white px-4 py-2 rounded-md'
-          >
-            Pagar
-          </button>
+          <div id='form-checkout' className='my-6'></div>
           {error && <div className='text-red-600 mt-2'>{error}</div>}
           {success && <div className='text-green-600 mt-2'>{success}</div>}
-          {cardToken && (
-            <div className='mt-4 text-xs text-gray-500'>
-              Token gerado: {cardToken}
-            </div>
-          )}
         </MaxWidthWrapper>
       </Layout>
     </>
