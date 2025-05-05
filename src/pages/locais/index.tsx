@@ -16,8 +16,8 @@ type Estabelecimento = {
   numero: string;
   complemento?: string;
   cep: string;
-  latitude?: number;
-  longitude?: number;
+  lat?: number;
+  lng?: number;
 };
 
 type EstabelecimentoComCoord = Estabelecimento & {
@@ -40,11 +40,11 @@ export default function Locais() {
       const estabelecimentosComCoord: EstabelecimentoComCoord[] = [];
       for (const est of lista) {
         // Se já tiver lat/lng, usa, senão busca
-        if (est.latitude && est.longitude) {
+        if (est.lat && est.lng) {
           estabelecimentosComCoord.push({
             ...est,
-            lat: est.latitude,
-            lng: est.longitude,
+            lat: est.lat,
+            lng: est.lng,
           });
         } else {
           const enderecoCompleto = `${est.endereco}, ${est.numero}, ${est.cep}`;
