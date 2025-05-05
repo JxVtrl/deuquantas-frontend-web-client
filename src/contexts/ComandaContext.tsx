@@ -42,7 +42,7 @@ interface ComandaContextData {
   adicionarUsuario: (id_usuario: string) => Promise<void>;
   removerUsuario: (id_usuario: string) => Promise<void>;
   clientes: ComandaPessoa[];
-  fetchComandasAtivas: () => Promise<void>;
+  fetchComandasAtivas: () => Promise<ComandaResponse[] | undefined>;
   fetchComanda: (id: string) => Promise<void>;
   setComandaAtiva: (comanda: ComandaResponse) => void;
 }
@@ -101,6 +101,7 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
         user?.usuario.id || '',
       );
       setComandasAtivas(comandas);
+      return comandas
     } catch (error) {
       console.error('Erro ao buscar comandas ativas:', error);
       setError('Erro ao buscar comandas ativas');
@@ -147,19 +148,22 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
       return;
     }
 
-    if (!router.pathname.includes('/conta/menu') && !!comanda) {
-      router.push('/conta/menu');
-      return;
-    } else if (!comanda) {
-      router.push('/qr-code');
-      return;
+    // Se ele não está na página de menu e não tem comanda, pega a ultima comanda ativa
+    if (!router.pathname.includes('/conta/menu')) {
+      const comandas = await fetchComandasAtivas();
+      if (comandas && comandas.length > 0) {
+        const ultimaComanda = comandas.sort((a, b) => new Date(b.data_criacao).getTime() - new Date(a.data_criacao).getTime())[0];
+        setComanda(ultimaComanda);
+        router.push('/conta/menu');
+        return;
+      } else {
+        toast.error('Nenhuma comanda ativa encontrada');
+        router.push('/qr-code');
+        return;
+      }
     }
 
-    if (!user?.cliente?.id) {
-      toast.error('Cliente não encontrado');
-      return;
-    }
-
+    // Se ele está na página de menu clicou no botão de adicionar, adiciona os itens à comanda
     try {
       const itensFormatados = itensInCart.map((item) => ({
         id_item: item.id,
@@ -167,9 +171,11 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
         observacao: item.observacao,
       }));
 
+      console.log('itensFormatados', itensFormatados);
+
       await ComandaService.adicionarItens({
-        id_comanda: comanda.id,
-        id_cliente: user.cliente.id,
+        id_comanda: comanda?.id || '',
+        id_cliente: user?.cliente.id || '',
         itens: itensFormatados,
       });
 
@@ -180,7 +186,7 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
       await fetchComandasAtivas();
 
       // Redireciona para a página da comanda
-      router.push(`/conta/${comanda.id}`);
+      router.push(`/conta/${comanda?.id}`);
     } catch (error) {
       console.error('Erro ao adicionar itens à comanda:', error);
       toast.error('Erro ao adicionar itens à comanda');
