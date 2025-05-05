@@ -101,7 +101,7 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
         user?.usuario.id || '',
       );
       setComandasAtivas(comandas);
-      return comandas
+      return comandas;
     } catch (error) {
       console.error('Erro ao buscar comandas ativas:', error);
       setError('Erro ao buscar comandas ativas');
@@ -152,7 +152,11 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
     if (!router.pathname.includes('/conta/menu')) {
       const comandas = await fetchComandasAtivas();
       if (comandas && comandas.length > 0) {
-        const ultimaComanda = comandas.sort((a, b) => new Date(b.data_criacao).getTime() - new Date(a.data_criacao).getTime())[0];
+        const ultimaComanda = comandas.sort(
+          (a, b) =>
+            new Date(b.data_criacao).getTime() -
+            new Date(a.data_criacao).getTime(),
+        )[0];
         setComanda(ultimaComanda);
         router.push('/conta/menu');
         return;
