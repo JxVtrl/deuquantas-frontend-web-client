@@ -73,7 +73,12 @@ export const AdicionarPessoaModal: React.FC<AdicionarPessoaModalProps> = ({
         >
           <div className='relative'>
             <div className='flex flex-col gap-[8px]'>
-              <label htmlFor="cpf" className='text-[12px] font-[500] text-[#272727] leading-[12px]'>Adicionar:</label>
+              <label
+                htmlFor='cpf'
+                className='text-[12px] font-[500] text-[#272727] leading-[12px]'
+              >
+                Adicionar:
+              </label>
               <input
                 placeholder='Digite o nome ou CPF da pessoa'
                 value={busca}

@@ -13,7 +13,9 @@ const statusColors: Record<string, string> = {
 
 const OrdersPage = () => {
   const { user } = useAuth();
-  const [comandasFinalizadas, setComandasFinalizadas] = useState<ComandaResponse[]>([]);
+  const [comandasFinalizadas, setComandasFinalizadas] = useState<
+    ComandaResponse[]
+  >([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -68,7 +70,8 @@ const OrdersPage = () => {
               >
                 <div className='flex items-center justify-between'>
                   <div className='text-lg font-bold text-gray-700'>
-                    {comandaFinalizada.estabelecimento?.nome || 'Estabelecimento'}
+                    {comandaFinalizada.estabelecimento?.nome ||
+                      'Estabelecimento'}
                   </div>
                   <span
                     className={`px-3 py-1 rounded-full text-xs font-semibold ${statusColors[comandaFinalizada.status] || 'bg-gray-100 text-gray-700'}`}
@@ -79,7 +82,9 @@ const OrdersPage = () => {
                 <div className='text-sm text-gray-500 mb-1'>
                   Data:{' '}
                   {comandaFinalizada.conta?.data_fechamento
-                    ? new Date(comandaFinalizada.conta.data_fechamento).toLocaleString()
+                    ? new Date(
+                        comandaFinalizada.conta.data_fechamento,
+                      ).toLocaleString()
                     : '-'}
                 </div>
                 <div>
@@ -150,7 +155,8 @@ const OrdersPage = () => {
                     Mesa: {comandaFinalizada.numMesa}
                   </span>
                   <span className='text-xl font-bold text-primary'>
-                    Total: {currencyFormatter(comandaFinalizada.conta?.valTotal)}
+                    Total:{' '}
+                    {currencyFormatter(comandaFinalizada.conta?.valTotal)}
                   </span>
                 </div>
               </div>

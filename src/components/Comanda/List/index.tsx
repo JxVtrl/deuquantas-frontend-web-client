@@ -59,7 +59,10 @@ export const ComandaList: React.FC = () => {
               >
                 {currencyFormatter(item.preco)}
               </span>
-              <button className='cursor-pointer w-[16px] h-[16px] p-0 bg-[#F0F0F0] flex items-center justify-center rounded-[2px]' onClick={() => setSelectedItem(item)}>
+              <button
+                className='cursor-pointer w-[16px] h-[16px] p-0 bg-[#F0F0F0] flex items-center justify-center rounded-[2px]'
+                onClick={() => setSelectedItem(item)}
+              >
                 <svg
                   width='11'
                   height='4'

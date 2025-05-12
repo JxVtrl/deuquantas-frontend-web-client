@@ -257,7 +257,9 @@ export const ComandaService = {
 
   async getPendentesPorComanda(id_comanda: string): Promise<Solicitacao[]> {
     try {
-      const response = await api.get(`/comandas/solicitacoes/pendentes/comanda/${id_comanda}`);
+      const response = await api.get(
+        `/comandas/solicitacoes/pendentes/comanda/${id_comanda}`,
+      );
       return response.data;
     } catch (error) {
       console.error('Erro ao buscar pendentes da comanda:', error);

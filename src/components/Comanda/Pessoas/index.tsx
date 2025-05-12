@@ -110,7 +110,6 @@ export const ComandaPessoas = () => {
               </span>
             </div>
           ))}
-
         </div>
       </div>
       <div>
@@ -119,7 +118,10 @@ export const ComandaPessoas = () => {
         </span>
         <div className='flex flex-col h-full overflow-y-auto'>
           {clientesPendentes?.map((cliente) => (
-            <div key={cliente.id} className='flex items-center justify-between gap-[8px] border-t border-[#E0E0E0] py-[10px] cursor-pointer'>
+            <div
+              key={cliente.id}
+              className='flex items-center justify-between gap-[8px] border-t border-[#E0E0E0] py-[10px] cursor-pointer'
+            >
               <div className='flex items-center gap-[12px]'>
                 <Avatar
                   name={cliente.nome}

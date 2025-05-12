@@ -12,7 +12,7 @@ const ComandaPage = () => {
   const { comanda, loading, error, setSelectedItem } = useComanda();
 
   useEffect(() => {
-    setSelectedItem(null)
+    setSelectedItem(null);
   }, []);
 
   if (loading) {

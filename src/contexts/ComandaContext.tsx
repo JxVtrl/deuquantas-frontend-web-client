@@ -69,7 +69,9 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
   const [menu, setMenu] = useState<Item[]>([]);
   const [clientes, setClientes] = useState<ComandaPessoa[]>([]);
-  const [clientesPendentes, setClientesPendentes] = useState<ComandaPessoa[]>([]);
+  const [clientesPendentes, setClientesPendentes] = useState<ComandaPessoa[]>(
+    [],
+  );
 
   const getMenu = async (cnpj: string) => {
     try {
@@ -262,7 +264,7 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
           valor_pago: 0,
           itens_consumidos: [],
           valor_total: 0,
-        }))
+        })),
       );
     } catch (error) {
       console.error('Erro ao buscar clientes pendentes:', error);

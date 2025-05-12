@@ -39,11 +39,7 @@ export const ComandaPayOptions = () => {
   const [isSplitting, setIsSplitting] = useState(false);
 
   useEffect(() => {
-    if (
-      clientes?.some(
-        (cliente) => cliente.status === 'aguardando_split',
-      )
-    ) {
+    if (clientes?.some((cliente) => cliente.status === 'aguardando_split')) {
       setIsSplitting(true);
     }
   }, [comanda]);
@@ -113,7 +109,7 @@ export const ComandaPayOptions = () => {
     } catch (error: any) {
       setError(
         error.response?.data?.message ||
-        'Ocorreu um erro ao iniciar a divisão. Tente novamente.',
+          'Ocorreu um erro ao iniciar a divisão. Tente novamente.',
       );
     } finally {
       setLoading(false);
@@ -138,7 +134,7 @@ export const ComandaPayOptions = () => {
     } catch (error: any) {
       setError(
         error.response?.data?.message ||
-        'Ocorreu um erro ao processar o pagamento. Tente novamente.',
+          'Ocorreu um erro ao processar o pagamento. Tente novamente.',
       );
     } finally {
       setLoading(false);
@@ -150,12 +146,9 @@ export const ComandaPayOptions = () => {
 
   // Identifica o criador da comanda (primeira pessoa da lista)
   const criadorId = clientes?.[0]?.id;
-  const meuStatus = clientes?.find(
-    (cliente) => cliente.id === user?.usuario.id,
-  )?.status as ComandaPessoa['status'];
-  const todosAtivos = clientes?.every(
-    (cliente) => cliente.status === 'ativo',
-  );
+  const meuStatus = clientes?.find((cliente) => cliente.id === user?.usuario.id)
+    ?.status as ComandaPessoa['status'];
+  const todosAtivos = clientes?.every((cliente) => cliente.status === 'ativo');
   const todosAguardandoSplit = clientes?.every(
     (cliente) => cliente.status === 'aguardando_split',
   );
