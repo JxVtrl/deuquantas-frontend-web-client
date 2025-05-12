@@ -34,13 +34,13 @@ export const ComandaPayOptions = () => {
     message: '',
   });
   const router = useRouter();
-  const { comanda, fetchComanda } = useComanda();
+  const { comanda, fetchComanda, clientes } = useComanda();
   const { user } = useAuth();
   const [isSplitting, setIsSplitting] = useState(false);
 
   useEffect(() => {
     if (
-      comanda?.clientes?.some(
+      clientes?.some(
         (cliente) => cliente.status === 'aguardando_split',
       )
     ) {
@@ -57,11 +57,11 @@ export const ComandaPayOptions = () => {
       };
 
     const valorTotal = comanda.conta.valTotal;
-    const totalClientes = comanda.clientes.length;
+    const totalClientes = clientes.length;
 
     switch (option) {
       case 'individual':
-        const clienteAtual = comanda.clientes.find((cliente) => {
+        const clienteAtual = clientes.find((cliente) => {
           return cliente.id === user?.usuario.id;
         });
         const valorIndividual = clienteAtual?.valor_total || 0;
@@ -113,7 +113,7 @@ export const ComandaPayOptions = () => {
     } catch (error: any) {
       setError(
         error.response?.data?.message ||
-          'Ocorreu um erro ao iniciar a divisão. Tente novamente.',
+        'Ocorreu um erro ao iniciar a divisão. Tente novamente.',
       );
     } finally {
       setLoading(false);
@@ -138,7 +138,7 @@ export const ComandaPayOptions = () => {
     } catch (error: any) {
       setError(
         error.response?.data?.message ||
-          'Ocorreu um erro ao processar o pagamento. Tente novamente.',
+        'Ocorreu um erro ao processar o pagamento. Tente novamente.',
       );
     } finally {
       setLoading(false);
@@ -149,14 +149,14 @@ export const ComandaPayOptions = () => {
   if (!comanda) return null;
 
   // Identifica o criador da comanda (primeira pessoa da lista)
-  const criadorId = comanda.clientes?.[0]?.id;
-  const meuStatus = comanda.clientes?.find(
+  const criadorId = clientes?.[0]?.id;
+  const meuStatus = clientes?.find(
     (cliente) => cliente.id === user?.usuario.id,
   )?.status as ComandaPessoa['status'];
-  const todosAtivos = comanda.clientes?.every(
+  const todosAtivos = clientes?.every(
     (cliente) => cliente.status === 'ativo',
   );
-  const todosAguardandoSplit = comanda.clientes?.every(
+  const todosAguardandoSplit = clientes?.every(
     (cliente) => cliente.status === 'aguardando_split',
   );
 
@@ -296,7 +296,7 @@ export const ComandaPayOptions = () => {
                     if (
                       confirmation.option === 'split' &&
                       user?.usuario.id === criadorId &&
-                      comanda.clientes?.some((c) => c.status === 'ativo')
+                      clientes?.some((c) => c.status === 'ativo')
                     ) {
                       // Criador inicia o split
                       handleStartSplit();

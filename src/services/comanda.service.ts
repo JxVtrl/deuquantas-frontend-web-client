@@ -66,23 +66,6 @@ export interface ItensFull {
   };
 }
 
-export interface Itens {
-  id: string;
-  nome: string;
-  descricao: string;
-  preco: number;
-  quantidade: number;
-  tipo: string;
-  img: string;
-  observacao: string;
-  data_criacao: string;
-  cliente: {
-    id: string;
-    nome: string;
-    avatar: string;
-  };
-}
-
 export interface ComandaResponse {
   id: string;
   num_cpf: string;
@@ -100,7 +83,7 @@ export interface ComandaResponse {
     data_criacao: string;
     data_fechamento?: string;
   };
-  itens: Itens[] | ItensFull[];
+  itens: Item[] | ItensFull[];
   clientes: ComandaPessoa[];
   estabelecimento: {
     nome: string;
@@ -125,6 +108,7 @@ export interface AdicionarClienteComandaDto {
 
 import { api } from '@/lib/axios';
 import { RegisterFormData } from '@/interfaces/register';
+import { Item } from './menu.service';
 
 interface GetComandaResponse {
   comanda: ComandaResponse;
@@ -208,11 +192,14 @@ export const ComandaService = {
   async removerCliente(
     id_comanda: string,
     id_usuario: string,
+    id_usuario_executor: string,
   ): Promise<ComandaResponse> {
     try {
-      const response = await api.delete(
-        `/comandas/${id_comanda}/clientes/${id_usuario}`,
-      );
+      const response = await api.post('/comandas/excluir-pessoa', {
+        id_comanda,
+        id_usuario,
+        id_usuario_executor,
+      });
       return response.data;
     } catch (error) {
       console.error('Erro ao remover cliente da comanda:', error);
@@ -264,6 +251,16 @@ export const ComandaService = {
       return response.data;
     } catch (error) {
       console.error('Erro ao buscar comandas finalizadas:', error);
+      throw error;
+    }
+  },
+
+  async getPendentesPorComanda(id_comanda: string): Promise<Solicitacao[]> {
+    try {
+      const response = await api.get(`/comandas/solicitacoes/pendentes/comanda/${id_comanda}`);
+      return response.data;
+    } catch (error) {
+      console.error('Erro ao buscar pendentes da comanda:', error);
       throw error;
     }
   },

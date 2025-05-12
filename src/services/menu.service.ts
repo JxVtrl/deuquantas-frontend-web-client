@@ -13,6 +13,11 @@ export interface Item {
   tipo: string;
   quantidade?: number;
   observacao?: string;
+  cliente?: {
+    id: string;
+    nome: string;
+    avatar: string;
+  };
 }
 
 export interface Pedido {

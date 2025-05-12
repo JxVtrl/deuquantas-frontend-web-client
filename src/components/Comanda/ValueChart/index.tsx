@@ -5,7 +5,7 @@ import { MaxWidthWrapper } from '@deuquantas/components';
 import { useAuth } from '@/contexts/AuthContext';
 
 export const ComandaValueChart: React.FC = () => {
-  const { comanda } = useComanda();
+  const { comanda, clientes } = useComanda();
   const { user } = useAuth();
   const [consumo_user, setConsumoUser] = useState<number>(0);
   const [consumo_total, setConsumoTotal] = useState<number>(0);
@@ -20,16 +20,16 @@ export const ComandaValueChart: React.FC = () => {
     let consumo_proprio = 0;
     let valor_pago = 0;
     const limite = 250; // TODO: Verificar limite do usuario nas preferências
-    if (comanda.clientes.length === 1) {
+    if (clientes.length === 1) {
       consumo_proprio = comanda.conta.valTotal;
     } else {
       consumo_proprio =
-        comanda.clientes.find((cliente) => {
+        clientes.find((cliente) => {
           const isFromClientLogged = cliente.id === user?.usuario.id;
           return isFromClientLogged;
         })?.valor_total || 0;
 
-      valor_pago = comanda.clientes.reduce((acc, cliente) => {
+      valor_pago = clientes.reduce((acc, cliente) => {
         const isFromClientPaid = cliente.status === 'pago';
         return isFromClientPaid ? acc + cliente.valor_pago : acc;
       }, 0);

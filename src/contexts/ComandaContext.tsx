@@ -25,7 +25,7 @@ interface ComandaContextData {
   clearComanda: () => void;
   updateComanda: (data: Partial<ComandaResponse>) => void;
   selectedItem: Item | null;
-  setSelectedItem: (item: Item) => void;
+  setSelectedItem: (item: Item | null) => void;
   itensInCart: Item[];
   setItensInCart: (itens: Item[]) => void;
   clearCart: () => void;
@@ -45,6 +45,8 @@ interface ComandaContextData {
   fetchComandasAtivas: () => Promise<ComandaResponse[] | undefined>;
   fetchComanda: (id: string) => Promise<void>;
   setComandaAtiva: (comanda: ComandaResponse) => void;
+  fetchClientesPendentes: () => Promise<void>;
+  clientesPendentes: ComandaPessoa[];
 }
 
 const ComandaContext = createContext<ComandaContextData>(
@@ -67,6 +69,7 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
   const [menu, setMenu] = useState<Item[]>([]);
   const [clientes, setClientes] = useState<ComandaPessoa[]>([]);
+  const [clientesPendentes, setClientesPendentes] = useState<ComandaPessoa[]>([]);
 
   const getMenu = async (cnpj: string) => {
     try {
@@ -229,6 +232,7 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
       const response = await ComandaService.removerCliente(
         comanda.id,
         id_usuario,
+        user?.usuario?.id || '',
       );
       setComanda(response);
       setClientes(response.clientes || []);
@@ -243,6 +247,31 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
       setClientes(comanda.clientes || []);
     }
   }, [comanda]);
+
+  const fetchClientesPendentes = useCallback(async () => {
+    if (!comanda) return;
+    try {
+      const pendentes = await ComandaService.getPendentesPorComanda(comanda.id);
+      setClientesPendentes(
+        pendentes.map((p) => ({
+          id: p.cliente.id,
+          nome: p.cliente.nome,
+          data_criacao: '',
+          avatar: '',
+          status: 'aguardando_split',
+          valor_pago: 0,
+          itens_consumidos: [],
+          valor_total: 0,
+        }))
+      );
+    } catch (error) {
+      console.error('Erro ao buscar clientes pendentes:', error);
+    }
+  }, [comanda]);
+
+  useEffect(() => {
+    fetchClientesPendentes();
+  }, [comanda, fetchClientesPendentes]);
 
   return (
     <ComandaContext.Provider
@@ -275,6 +304,8 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
         fetchComandasAtivas,
         fetchComanda,
         setComandaAtiva,
+        fetchClientesPendentes,
+        clientesPendentes,
       }}
     >
       {children}

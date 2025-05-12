@@ -28,28 +28,23 @@ export const AdicionarPessoaModal: React.FC<AdicionarPessoaModalProps> = ({
   const [usuarios, setUsuarios] = useState<Usuario[]>([]);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    const buscarUsuarios = async () => {
-      if (busca.length < 3) {
-        setUsuarios([]);
-        return;
-      }
+  const buscarUsuarios = async () => {
+    if (busca.length < 3) {
+      setUsuarios([]);
+      return;
+    }
 
-      setLoading(true);
-      try {
-        const response = await api.get(`/usuarios/buscar?nome=${busca}`);
-        setUsuarios(response.data);
-      } catch (error) {
-        console.error('Erro ao buscar usuários:', error);
-        toast.error('Erro ao buscar usuários');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    const timeoutId = setTimeout(buscarUsuarios, 300);
-    return () => clearTimeout(timeoutId);
-  }, [busca]);
+    setLoading(true);
+    try {
+      const response = await api.get(`/usuarios/buscar?nome=${busca}`);
+      setUsuarios(response.data);
+    } catch (error) {
+      console.error('Erro ao buscar usuários:', error);
+      toast.error('Erro ao buscar usuários');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -77,12 +72,16 @@ export const AdicionarPessoaModal: React.FC<AdicionarPessoaModalProps> = ({
           className='flex flex-col gap-4 mb-[81px] py-6'
         >
           <div className='relative'>
-            <input
-              placeholder='Digite o nome da pessoa'
-              value={busca}
-              onChange={(e) => setBusca(e.target.value)}
-              className='w-full p-2 border rounded'
-            />
+            <div className='flex flex-col gap-[8px]'>
+              <label htmlFor="cpf" className='text-[12px] font-[500] text-[#272727] leading-[12px]'>Adicionar:</label>
+              <input
+                placeholder='Digite o nome ou CPF da pessoa'
+                value={busca}
+                onChange={(e) => setBusca(e.target.value)}
+                className='w-full p-2 border rounded'
+                id='cpf'
+              />
+            </div>
             {loading && (
               <div className='absolute right-2 top-2'>
                 <div className='animate-spin rounded-full h-5 w-5 border-b-2 border-gray-900'></div>
@@ -106,9 +105,9 @@ export const AdicionarPessoaModal: React.FC<AdicionarPessoaModalProps> = ({
               </div>
             )}
           </div>
-          <div className='flex flex-col items-center justify-between gap-[8px] pt-[15px]'>
-            <Button variant='secondary' text='Cancelar' onClick={onClose} />
-            <Button type='submit' variant='primary' text='Adicionar' />
+          <div className='grid grid-cols-2 gap-[8px] pt-[15px]'>
+            <Button type='submit' variant='tertiary' text='Adicionar' />
+            <Button variant='underline' text='Cancelar' onClick={onClose} />
           </div>
         </form>
       </MaxWidthWrapper>

@@ -13,7 +13,7 @@ const statusColors: Record<string, string> = {
 
 const OrdersPage = () => {
   const { user } = useAuth();
-  const [comandas, setComandas] = useState<ComandaResponse[]>([]);
+  const [comandasFinalizadas, setComandasFinalizadas] = useState<ComandaResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -26,7 +26,7 @@ const OrdersPage = () => {
         const data = await ComandaService.getComandasFinalizadas(
           user.usuario.id,
         );
-        setComandas(data);
+        setComandasFinalizadas(data);
       } catch (err: any) {
         setError('Erro ao buscar histórico de comandas.');
       } finally {
@@ -49,37 +49,37 @@ const OrdersPage = () => {
         </h1>
         {loading && <div className='text-center'>Carregando...</div>}
         {error && <div className='text-red-600 text-center'>{error}</div>}
-        {!loading && !error && comandas.length === 0 && (
+        {!loading && !error && comandasFinalizadas.length === 0 && (
           <div className='text-center text-gray-500'>
             Nenhuma comanda finalizada encontrada.
           </div>
         )}
         <div className='grid gap-8'>
-          {comandas
+          {comandasFinalizadas
             .sort(
               (a, b) =>
                 new Date(b.conta?.data_criacao || '').getTime() -
                 new Date(a.conta?.data_criacao || '').getTime(),
             )
-            .map((comanda) => (
+            .map((comandaFinalizada) => (
               <div
-                key={comanda.id}
+                key={comandaFinalizada.id}
                 className='rounded-xl shadow-lg border border-gray-100 bg-white p-6 flex flex-col gap-3 hover:shadow-2xl transition-shadow'
               >
                 <div className='flex items-center justify-between'>
                   <div className='text-lg font-bold text-gray-700'>
-                    {comanda.estabelecimento?.nome || 'Estabelecimento'}
+                    {comandaFinalizada.estabelecimento?.nome || 'Estabelecimento'}
                   </div>
                   <span
-                    className={`px-3 py-1 rounded-full text-xs font-semibold ${statusColors[comanda.status] || 'bg-gray-100 text-gray-700'}`}
+                    className={`px-3 py-1 rounded-full text-xs font-semibold ${statusColors[comandaFinalizada.status] || 'bg-gray-100 text-gray-700'}`}
                   >
-                    {comanda.status}
+                    {comandaFinalizada.status}
                   </span>
                 </div>
                 <div className='text-sm text-gray-500 mb-1'>
                   Data:{' '}
-                  {comanda.conta?.data_fechamento
-                    ? new Date(comanda.conta.data_fechamento).toLocaleString()
+                  {comandaFinalizada.conta?.data_fechamento
+                    ? new Date(comandaFinalizada.conta.data_fechamento).toLocaleString()
                     : '-'}
                 </div>
                 <div>
@@ -87,7 +87,7 @@ const OrdersPage = () => {
                     Itens pedidos:
                   </div>
                   <ul className='divide-y divide-gray-100'>
-                    {comanda.itens.map((pedido, idx) => {
+                    {comandaFinalizada.itens.map((pedido, idx) => {
                       if ('item' in pedido) {
                         return (
                           <li
@@ -123,7 +123,7 @@ const OrdersPage = () => {
                     Pessoas na comanda:
                   </div>
                   <ul className='flex flex-wrap gap-3'>
-                    {comanda.clientes.map((cliente) => (
+                    {comandaFinalizada.clientes.map((cliente) => (
                       <li
                         key={cliente.id}
                         className='flex items-center gap-2 bg-gray-50 rounded-lg px-2 py-1'
@@ -147,10 +147,10 @@ const OrdersPage = () => {
                 </div>
                 <div className='mt-3 flex items-center justify-between'>
                   <span className='text-gray-500 font-medium'>
-                    Mesa: {comanda.numMesa}
+                    Mesa: {comandaFinalizada.numMesa}
                   </span>
                   <span className='text-xl font-bold text-primary'>
-                    Total: {currencyFormatter(comanda.conta?.valTotal)}
+                    Total: {currencyFormatter(comandaFinalizada.conta?.valTotal)}
                   </span>
                 </div>
               </div>

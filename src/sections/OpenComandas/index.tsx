@@ -1,11 +1,10 @@
 import { Card } from '@/components/ui/card';
 import { useAuth } from '@/contexts/AuthContext';
 import { useComanda } from '@/contexts/ComandaContext';
-import { MaxWidthWrapper, ReceiptIcon } from '@deuquantas/components';
+import { MaxWidthWrapper, ReceiptIcon, Button } from '@deuquantas/components';
 import { useRouter } from 'next/navigation';
 import React, { useCallback, useEffect, useState } from 'react';
 import { currencyFormatter } from '@/utils/formatters';
-import { Button } from '@deuquantas/components';
 import { toast } from 'react-hot-toast';
 import ComandaService, { ComandaResponse } from '@/services/comanda.service';
 import { useCustomerContext } from '@/contexts/CustomerContext';

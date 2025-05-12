@@ -5,24 +5,57 @@ import { Avatar, Button, MaxWidthWrapper } from '@deuquantas/components';
 import React, { useEffect, useState } from 'react';
 import { AdicionarPessoaModal } from './AdicionarPessoaModal';
 import { ExcluirPessoaModal } from './ExcluirPessoaModal';
+import ExcluirConfirmacaoModal from './ExcluirConfirmacaoModal';
+import ComandaService from '@/services/comanda.service';
 
 export const ComandaPessoas = () => {
-  const { comanda, fetchComandasAtivas } = useComanda();
+  const { clientes, comanda, clientesPendentes } = useComanda();
   const { user } = useAuth();
-  const clientes = comanda?.clientes;
 
   const [isAdicionarModalOpen, setIsAdicionarModalOpen] = useState(false);
   const [isExcluirModalOpen, setIsExcluirModalOpen] = useState(false);
+  const [isExcluirConfirmacaoModalOpen, setIsExcluirConfirmacaoModalOpen] =
+    useState(false);
+  const [selectedOption, setSelectedOption] = useState('');
+  const [options, setOptions] = useState<{ value: string; label: string }[]>(
+    [],
+  );
 
   const isCriador =
     clientes && clientes.length > 0 && clientes[0].id === user?.usuario?.id;
 
+  const criadorId = clientes[0]?.id;
+
   useEffect(() => {
-    const interval = setInterval(() => {
-      fetchComandasAtivas();
-    }, 30000);
-    return () => clearInterval(interval);
-  }, [fetchComandasAtivas]);
+    if (clientes) {
+      const filteredOptions = clientes
+        .filter((cliente) => cliente.id !== criadorId)
+        .map((cliente) => ({
+          value: cliente.id,
+          label: cliente.nome,
+        }));
+      setOptions(filteredOptions);
+    }
+  }, [clientes, criadorId]);
+
+  const handleExclude = async () => {
+    if (selectedOption) {
+      try {
+        const id_comanda = comanda?.id || '';
+
+        await ComandaService.removerCliente(
+          id_comanda,
+          selectedOption,
+          user?.usuario?.id || '',
+        );
+      } catch (error) {
+        console.error('Error:', error);
+      } finally {
+        setIsExcluirConfirmacaoModalOpen(false);
+        setSelectedOption('');
+      }
+    }
+  };
 
   return (
     <MaxWidthWrapper
@@ -42,7 +75,7 @@ export const ComandaPessoas = () => {
           {clientes?.map((cliente) => (
             <div
               key={cliente.id}
-              className='flex items-center justify-between gap-[8px] border-t border-[#E0E0E0] py-[10px]'
+              className='flex items-center justify-between gap-[8px] border-t border-[#E0E0E0] py-[10px] cursor-pointer'
             >
               <div className='flex items-center gap-[12px]'>
                 <div style={{ opacity: cliente.status === 'pago' ? 0.5 : 1 }}>
@@ -77,18 +110,41 @@ export const ComandaPessoas = () => {
               </span>
             </div>
           ))}
+
         </div>
       </div>
+      <div>
+        <span className='text-[12px] font-[500] text-[#272727] leading-[12px]'>
+          Pendentes
+        </span>
+        <div className='flex flex-col h-full overflow-y-auto'>
+          {clientesPendentes?.map((cliente) => (
+            <div key={cliente.id} className='flex items-center justify-between gap-[8px] border-t border-[#E0E0E0] py-[10px] cursor-pointer'>
+              <div className='flex items-center gap-[12px]'>
+                <Avatar
+                  name={cliente.nome}
+                  src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${cliente.avatar}`}
+                  bgColor='muted'
+                />
+                <span className='text-[16px] font-[500] leading-[16px]'>
+                  {cliente.nome}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
       {isCriador && (
         <div className='flex flex-col items-center justify-between gap-[8px] pt-[15px]'>
           <Button
-            variant='primary'
-            text='Adicionar Pessoa'
+            variant='tertiary'
+            text='ADICIONAR PESSOA'
             onClick={() => setIsAdicionarModalOpen(true)}
           />
           <Button
             variant='secondary'
-            text='Excluir Pessoa'
+            text='EXCLUIR PESSOA'
             onClick={() => setIsExcluirModalOpen(true)}
           />
         </div>
@@ -102,6 +158,27 @@ export const ComandaPessoas = () => {
       <ExcluirPessoaModal
         isOpen={isExcluirModalOpen}
         onClose={() => setIsExcluirModalOpen(false)}
+        onConfirm={() => {
+          setIsExcluirModalOpen(false);
+          setIsExcluirConfirmacaoModalOpen(true);
+        }}
+        options={options}
+        selectedOption={selectedOption}
+        setSelectedOption={setSelectedOption}
+        criadorId={criadorId}
+      />
+
+      <ExcluirConfirmacaoModal
+        isOpen={isExcluirConfirmacaoModalOpen}
+        onConfirm={() => {
+          setIsExcluirConfirmacaoModalOpen(false);
+          handleExclude();
+        }}
+        onClose={() => {
+          setIsExcluirConfirmacaoModalOpen(false);
+          setSelectedOption('');
+        }}
+        clienteId={selectedOption}
       />
     </MaxWidthWrapper>
   );

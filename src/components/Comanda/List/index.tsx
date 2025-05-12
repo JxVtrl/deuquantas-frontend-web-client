@@ -3,15 +3,11 @@ import { Avatar, Button, MaxWidthWrapper } from '@deuquantas/components';
 import { currencyFormatter } from '@/utils/formatters';
 import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { Itens, ItensFull } from '@/services/comanda.service';
+import { Item } from '@/services/menu.service';
 
 export const ComandaList: React.FC = () => {
-  const { comanda } = useComanda();
+  const { comanda, setSelectedItem, clientes } = useComanda();
   const { user } = useAuth();
-
-  const clientes = comanda?.clientes?.filter((cliente) => {
-    return cliente.id !== user?.usuario.id;
-  });
 
   return (
     <MaxWidthWrapper>
@@ -29,10 +25,10 @@ export const ComandaList: React.FC = () => {
         />
       </div>
 
-      {(comanda?.itens as Itens[]).map((item) => {
-        const isFromClientLogged = item.cliente.id === user?.usuario.id;
+      {(comanda?.itens as Item[]).map((item) => {
+        const isFromClientLogged = item.cliente?.id === user?.usuario.id;
         const isFromClientPaid =
-          clientes?.find((cliente) => cliente.id === item.cliente.id)
+          clientes?.find((cliente) => cliente.id === item.cliente?.id)
             ?.status === 'pago';
         return (
           <div
@@ -51,8 +47,8 @@ export const ComandaList: React.FC = () => {
             </div>
             <div className='flex items-center gap-[12px]'>
               <Avatar
-                name={item.cliente.nome}
-                src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${item.cliente.avatar}`}
+                name={item.cliente?.nome || ''}
+                src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${item.cliente?.avatar}`}
                 bgColor={isFromClientLogged ? '#FFCC00' : 'muted'}
               />
               <span
@@ -63,7 +59,7 @@ export const ComandaList: React.FC = () => {
               >
                 {currencyFormatter(item.preco)}
               </span>
-              <button className='cursor-pointer w-[16px] h-[16px] p-0 bg-[#F0F0F0] flex items-center justify-center rounded-[2px]'>
+              <button className='cursor-pointer w-[16px] h-[16px] p-0 bg-[#F0F0F0] flex items-center justify-center rounded-[2px]' onClick={() => setSelectedItem(item)}>
                 <svg
                   width='11'
                   height='4'

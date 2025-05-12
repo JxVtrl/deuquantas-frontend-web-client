@@ -6,28 +6,9 @@ import React from 'react';
 
 export const ComandaHeader: React.FC = () => {
   const { user } = useAuth();
-  const { comanda } = useComanda();
+  const { comanda, clientes } = useComanda();
 
-  if (!user) {
-    return null;
-  }
-
-  const myself = comanda?.clientes?.find((cliente) => {
-    return cliente.id === user.usuario.id;
-  });
-
-  if (!myself) {
-    return null;
-  }
-
-  const clientes = comanda?.clientes?.filter((cliente) => {
-    return cliente.id !== user.usuario.id;
-  });
-
-  if (clientes) {
-    clientes.unshift(myself);
-  }
-
+  // Valor total do consumo do usuário
   const consumo_user =
     clientes?.find((cliente) => {
       return cliente.id === user?.usuario.id;
@@ -35,11 +16,9 @@ export const ComandaHeader: React.FC = () => {
 
   // Soma do valor já pago por todos
   const valorPagoTotal =
-    comanda?.clientes?.reduce(
-      (acc, cliente) => acc + (cliente.valor_pago || 0),
-      0,
-    ) || 0;
+    clientes?.reduce((acc, cliente) => acc + (cliente.valor_pago || 0), 0) || 0;
 
+  // Valor total da conta
   const valorTotal = (comanda?.conta?.valTotal || 0) - valorPagoTotal;
 
   return (
@@ -73,7 +52,7 @@ export const ComandaHeader: React.FC = () => {
                     <Avatar
                       name={cliente.nome}
                       bgColor={
-                        cliente.id === user.usuario.id ? '#FFCC00' : 'muted'
+                        cliente.id === user?.usuario.id ? '#FFCC00' : 'muted'
                       }
                       src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${cliente.avatar}`}
                     />
@@ -90,7 +69,7 @@ export const ComandaHeader: React.FC = () => {
                     <Avatar
                       name={cliente.nome}
                       bgColor={
-                        cliente.id === user.usuario.id ? '#FFCC00' : 'muted'
+                        cliente.id === user?.usuario.id ? '#FFCC00' : 'muted'
                       }
                       src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${cliente.avatar}`}
                     />
@@ -109,7 +88,7 @@ export const ComandaHeader: React.FC = () => {
                       <Avatar
                         name={cliente.nome}
                         bgColor={
-                          cliente.id === user.usuario.id ? '#FFCC00' : 'muted'
+                          cliente.id === user?.usuario.id ? '#FFCC00' : 'muted'
                         }
                         src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${cliente.avatar}`}
                       />
@@ -132,14 +111,16 @@ export const ComandaHeader: React.FC = () => {
             })}
           </span>
         </div>
-        <div className='flex flex-row items-start gap-[10px]'>
-          <span className='text-[10px] leading-[10px] font-[700] text-[#27272799]'>
-            Valor já pago
-          </span>
-          <span className='text-[16px] leading-[16px] font-[700] text-green-700'>
-            {currencyFormatter(valorPagoTotal)}
-          </span>
-        </div>
+        {valorPagoTotal > 0 && (
+          <div className='flex flex-row items-start gap-[10px]'>
+            <span className='text-[10px] leading-[10px] font-[700] text-[#27272799]'>
+              Valor total pago
+            </span>
+            <span className='text-[16px] leading-[16px] font-[700] text-[#27272799]'>
+              {currencyFormatter(valorPagoTotal)}
+            </span>
+          </div>
+        )}
         <div className='flex flex-row items-start gap-[10px]'>
           <span className='text-[10px] leading-[10px] font-[700] text-[#27272799]'>
             Meu consumo
