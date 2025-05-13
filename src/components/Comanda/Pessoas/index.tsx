@@ -46,7 +46,7 @@ export const ComandaPessoas = () => {
         await ComandaService.removerCliente(
           id_comanda,
           selectedOption,
-          user?.usuario?.id || '',
+          user?.cliente?.id || '',
         );
       } catch (error) {
         console.error('Error:', error);

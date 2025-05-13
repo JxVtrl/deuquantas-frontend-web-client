@@ -20,25 +20,25 @@ import { useRouter } from 'next/router';
 // Tipos unificados de notificação
 export type NotificacaoComanda =
   | {
-      type: 'transferencia-item';
-      id: string;
-      origem: string;
-      item: string;
-      onAccept: () => void;
-      onReject: () => void;
-    }
+    type: 'transferencia-item';
+    id: string;
+    origem: string;
+    item: string;
+    onAccept: () => void;
+    onReject: () => void;
+  }
   | {
-      type: 'split-item';
-      id: string;
-      item: string;
-      origem: string;
-      onAccept: () => void;
-      onReject: () => void;
-    }
+    type: 'split-item';
+    id: string;
+    item: string;
+    origem: string;
+    onAccept: () => void;
+    onReject: () => void;
+  }
   | {
-      type: 'limite';
-      mensagem: string;
-    };
+    type: 'limite';
+    mensagem: string;
+  };
 
 interface ComandaContextData {
   comanda: ComandaResponse | null;
@@ -64,7 +64,6 @@ interface ComandaContextData {
   setIsCartEmptyErrorOpen: (isCartEmptyErrorOpen: boolean) => void;
   handleAddClick: () => void;
   adicionarUsuario: (id_usuario: string) => Promise<void>;
-  removerUsuario: (id_usuario: string) => Promise<void>;
   clientes: ComandaPessoa[];
   fetchComandasAtivas: () => Promise<ComandaResponse[] | undefined>;
   fetchComanda: (id: string) => Promise<void>;
@@ -273,23 +272,6 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
-  const removerUsuario = async (id_usuario: string) => {
-    if (!comanda) return;
-
-    try {
-      const response = await ComandaService.removerCliente(
-        comanda.id,
-        id_usuario,
-        user?.usuario?.id || '',
-      );
-      setComanda(response);
-      setClientes(response.clientes || []);
-    } catch (error) {
-      console.error('Erro ao remover cliente:', error);
-      toast.error('Erro ao remover cliente da comanda');
-    }
-  };
-
   useEffect(() => {
     if (comanda) {
       setClientes(comanda.clientes || []);
@@ -433,7 +415,6 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
         setIsCartEmptyErrorOpen,
         handleAddClick,
         adicionarUsuario,
-        removerUsuario,
         clientes,
         fetchComandasAtivas,
         fetchComanda,

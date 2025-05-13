@@ -202,14 +202,14 @@ export const ComandaService = {
 
   async removerCliente(
     id_comanda: string,
-    id_usuario: string,
-    id_usuario_executor: string,
+    id_cliente: string,
+    id_cliente_executor: string,
   ): Promise<ComandaResponse> {
     try {
       const response = await api.post('/comandas/excluir-pessoa', {
         id_comanda,
-        id_usuario,
-        id_usuario_executor,
+        id_cliente,
+        id_cliente_executor,
       });
       return response.data;
     } catch (error) {
