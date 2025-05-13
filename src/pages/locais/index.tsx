@@ -36,7 +36,6 @@ export default function Locais() {
   useEffect(() => {
     async function fetchAndGeocode() {
       const lista = await getEstabelecimentos();
-      console.log('lista', lista);
       const estabelecimentosComCoord: EstabelecimentoComCoord[] = [];
       for (const est of lista) {
         // Se já tiver lat/lng, usa, senão busca
@@ -48,9 +47,7 @@ export default function Locais() {
           });
         } else {
           const enderecoCompleto = `${est.endereco}, ${est.numero}, ${est.cep}`;
-          console.log('enderecoCompleto', enderecoCompleto);
           const coord = await geocodeEndereco(enderecoCompleto);
-          console.log('coord', coord);
           if (coord) {
             estabelecimentosComCoord.push({
               ...est,

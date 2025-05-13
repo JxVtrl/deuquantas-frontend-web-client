@@ -11,7 +11,7 @@ export const ComandaHeader: React.FC = () => {
   // Valor total do consumo do usuário
   const consumo_user =
     clientes?.find((cliente) => {
-      return cliente.id === user?.usuario.id;
+      return cliente.id === user?.cliente.id;
     })?.valor_total || 0;
 
   // Soma do valor já pago por todos
@@ -47,12 +47,12 @@ export const ComandaHeader: React.FC = () => {
                 {clientes.map((cliente, index) => (
                   <div
                     key={index}
-                    className={`rounded-full outline outline-[#FFCC00] ${cliente.status === 'pago' ? 'opacity-40' : ''}`}
+                    className={`rounded-full border border-[#FFCC00] ${cliente.status === 'pago' ? 'opacity-40' : ''}`}
                   >
                     <Avatar
                       name={cliente.nome}
                       bgColor={
-                        cliente.id === user?.usuario.id ? '#FFCC00' : 'muted'
+                        cliente.id === user?.cliente?.id ? '#FFCC00' : 'muted'
                       }
                       src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${cliente.avatar}`}
                     />
@@ -64,12 +64,12 @@ export const ComandaHeader: React.FC = () => {
                 {clientes.slice(0, 4).map((cliente, index) => (
                   <div
                     key={index}
-                    className={`rounded-full outline outline-[#FFCC00] ${cliente.status === 'pago' ? 'opacity-40' : ''}`}
+                    className={`rounded-full border border-[#FFCC00] ${cliente.status === 'pago' ? 'opacity-40' : ''}`}
                   >
                     <Avatar
                       name={cliente.nome}
                       bgColor={
-                        cliente.id === user?.usuario.id ? '#FFCC00' : 'muted'
+                        cliente.id === user?.cliente.id ? '#FFCC00' : 'muted'
                       }
                       src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${cliente.avatar}`}
                     />
@@ -79,7 +79,7 @@ export const ComandaHeader: React.FC = () => {
                   {clientes.slice(4, 8).map((cliente, index) => (
                     <div
                       key={index}
-                      className={`absolute inset-0 rounded-full outline outline-[#FFCC00] w-[24px] h-[24px] ${cliente.status === 'pago' ? 'opacity-40' : ''}`}
+                      className={`absolute inset-0 rounded-full border border-[#FFCC00] w-[24px] h-[24px] ${cliente.status === 'pago' ? 'opacity-40' : ''}`}
                       style={{
                         left: index * 10,
                         zIndex: 1 - index,
@@ -88,7 +88,7 @@ export const ComandaHeader: React.FC = () => {
                       <Avatar
                         name={cliente.nome}
                         bgColor={
-                          cliente.id === user?.usuario.id ? '#FFCC00' : 'muted'
+                          cliente.id === user?.cliente.id ? '#FFCC00' : 'muted'
                         }
                         src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${cliente.avatar}`}
                       />

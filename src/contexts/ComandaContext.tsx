@@ -11,10 +11,26 @@ import {
   ComandaResponse,
   ComandaService,
   ComandaPessoa,
+  ItemTransferSolicitacao,
 } from '@/services/comanda.service';
 import { useAuth } from './AuthContext';
 import { Item, MenuService } from '@/services/menu.service';
 import { useRouter } from 'next/router';
+
+// Tipos unificados de notificação
+export type NotificacaoComanda =
+  | {
+    type: 'transferencia-item';
+    id: string;
+    origem: string;
+    item: string;
+    onAccept: () => void;
+    onReject: () => void;
+  }
+  | {
+    type: 'limite';
+    mensagem: string;
+  };
 
 interface ComandaContextData {
   comanda: ComandaResponse | null;
@@ -47,6 +63,10 @@ interface ComandaContextData {
   setComandaAtiva: (comanda: ComandaResponse) => void;
   fetchClientesPendentes: () => Promise<void>;
   clientesPendentes: ComandaPessoa[];
+  transferSolicitacoes: ItemTransferSolicitacao[];
+  fetchTransferSolicitacoes: () => Promise<void>;
+  responderTransferSolicitacao: (id: string, status: 'ACEITA' | 'RECUSADA') => Promise<void>;
+  getNotificacoesComanda: () => NotificacaoComanda[];
 }
 
 const ComandaContext = createContext<ComandaContextData>(
@@ -72,6 +92,7 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
   const [clientesPendentes, setClientesPendentes] = useState<ComandaPessoa[]>(
     [],
   );
+  const [transferSolicitacoes, setTransferSolicitacoes] = useState<ItemTransferSolicitacao[]>([]);
 
   const getMenu = async (cnpj: string) => {
     try {
@@ -180,8 +201,6 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
         observacao: item.observacao,
       }));
 
-      console.log('itensFormatados', itensFormatados);
-
       await ComandaService.adicionarItens({
         id_comanda: comanda?.id || '',
         id_cliente: user?.cliente.id || '',
@@ -275,6 +294,43 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
     fetchClientesPendentes();
   }, [comanda, fetchClientesPendentes]);
 
+  const fetchTransferSolicitacoes = useCallback(async () => {
+    if (!user?.cliente?.id) return;
+    try {
+      const solicitacoes = await ComandaService.listarSolicitacoesPendentesTransferencia(user.cliente.id);
+      setTransferSolicitacoes(solicitacoes);
+    } catch (error) {
+      console.error('Erro ao buscar solicitações de transferência:', error);
+    }
+  }, [user?.cliente?.id]);
+
+  const responderTransferSolicitacao = useCallback(async (id: string, status: 'ACEITA' | 'RECUSADA') => {
+    try {
+      await ComandaService.responderSolicitacaoTransferenciaItem(id, status);
+      setTransferSolicitacoes((prev) => prev.filter((s) => s.id !== id));
+    } catch (error) {
+      console.error('Erro ao responder solicitação de transferência:', error);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchTransferSolicitacoes();
+  }, [fetchTransferSolicitacoes, comanda]);
+
+  // Função para unificar todas as notificações
+  const getNotificacoesComanda = () => {
+    // Transferências de item
+    const transferencias: NotificacaoComanda[] = transferSolicitacoes.map((sol) => ({
+      type: 'transferencia-item',
+      id: sol.id,
+      origem: sol.clienteOrigem?.usuario?.name || 'Alguém',
+      item: sol.comandaItem?.item?.nome || 'Item',
+      onAccept: () => responderTransferSolicitacao(sol.id, 'ACEITA'),
+      onReject: () => responderTransferSolicitacao(sol.id, 'RECUSADA'),
+    }));
+    return transferencias;
+  };
+
   return (
     <ComandaContext.Provider
       value={{
@@ -308,6 +364,11 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
         setComandaAtiva,
         fetchClientesPendentes,
         clientesPendentes,
+        transferSolicitacoes,
+        fetchTransferSolicitacoes,
+        responderTransferSolicitacao,
+        // Notificações unificadas
+        getNotificacoesComanda,
       }}
     >
       {children}

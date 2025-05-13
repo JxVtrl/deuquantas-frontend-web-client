@@ -40,8 +40,6 @@ export default function MapaEstabelecimentosGoogle({
 
   if (!isLoaded) return <div>Carregando mapa...</div>;
 
-  console.log('estabelecimentos', estabelecimentos);
-
   return (
     <GoogleMap
       mapContainerStyle={containerStyle}

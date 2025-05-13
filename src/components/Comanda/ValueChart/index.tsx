@@ -16,7 +16,6 @@ export const ComandaValueChart: React.FC = () => {
     if (!comanda || !comanda.conta) {
       return;
     }
-    console.log('comanda', comanda);
     let consumo_proprio = 0;
     let valor_pago = 0;
     const limite = 250; // TODO: Verificar limite do usuario nas preferências
@@ -25,7 +24,7 @@ export const ComandaValueChart: React.FC = () => {
     } else {
       consumo_proprio =
         clientes.find((cliente) => {
-          const isFromClientLogged = cliente.id === user?.usuario.id;
+          const isFromClientLogged = cliente.id === user?.cliente?.id;
           return isFromClientLogged;
         })?.valor_total || 0;
 

@@ -217,7 +217,6 @@ export const OpenComandas: React.FC = () => {
             </div>
             <div className='flex flex-col gap-2'>
               {comandasAtivas.map((comanda) => {
-                console.log(comanda);
                 // Soma do valor já pago por todos
                 const valorPago =
                   comanda.clientes?.reduce(

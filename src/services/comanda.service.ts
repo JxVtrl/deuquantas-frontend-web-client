@@ -131,11 +131,22 @@ export interface Solicitacao {
   status: 'PENDENTE' | 'ACEITA' | 'RECUSADA';
 }
 
+export interface ItemTransferSolicitacao {
+  id: string;
+  id_comanda_item: string;
+  id_cliente_origem: string;
+  id_cliente_destino: string;
+  status: 'PENDENTE' | 'ACEITA' | 'RECUSADA';
+  data_criacao: string;
+  comandaItem?: any;
+  clienteOrigem?: any;
+  clienteDestino?: any;
+}
+
 export const ComandaService = {
   async getComandasAtivas(id_usuario: string): Promise<ComandaResponse[]> {
     try {
       const response = await api.get(`/comandas/ativas/usuario/${id_usuario}`);
-      console.log('response', response.data);
       return response.data;
     } catch (error) {
       console.error('Erro ao buscar comandas ativas:', error);
@@ -265,6 +276,50 @@ export const ComandaService = {
       console.error('Erro ao buscar pendentes da comanda:', error);
       throw error;
     }
+  },
+
+  async transferirItens({
+    id_comanda,
+    id_usuario_origem,
+    id_usuario_destino,
+    ids_itens,
+  }: {
+    id_comanda: string;
+    id_usuario_origem: string;
+    id_usuario_destino: string;
+    ids_itens: string[];
+  }): Promise<ComandaResponse> {
+    try {
+      const response = await api.post(`/comandas/transferir-itens`, {
+        id_comanda,
+        id_usuario_origem,
+        id_usuario_destino,
+        ids_itens,
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Erro ao transferir itens:', error);
+      throw error;
+    }
+  },
+
+  async criarSolicitacaoTransferenciaItem(dto: {
+    id_comanda_item: string;
+    id_cliente_origem: string;
+    id_cliente_destino: string;
+  }): Promise<ItemTransferSolicitacao> {
+    const response = await api.post('/comandas/item-transfer-solicitacoes', dto);
+    return response.data;
+  },
+
+  async listarSolicitacoesPendentesTransferencia(id_cliente_destino: string): Promise<ItemTransferSolicitacao[]> {
+    const response = await api.get(`/comandas/item-transfer-solicitacoes/pendentes/${id_cliente_destino}`);
+    return response.data;
+  },
+
+  async responderSolicitacaoTransferenciaItem(id: string, status: 'ACEITA' | 'RECUSADA'): Promise<ItemTransferSolicitacao> {
+    const response = await api.patch(`/comandas/item-transfer-solicitacoes/${id}/responder`, { status });
+    return response.data;
   },
 };
 

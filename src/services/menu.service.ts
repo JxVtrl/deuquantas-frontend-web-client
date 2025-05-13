@@ -18,6 +18,11 @@ export interface Item {
     nome: string;
     avatar: string;
   };
+  cliente_origem?: {
+    id: string;
+    nome: string;
+    avatar: string;
+  };
 }
 
 export interface Pedido {

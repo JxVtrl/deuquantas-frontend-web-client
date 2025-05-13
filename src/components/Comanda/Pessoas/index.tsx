@@ -22,7 +22,7 @@ export const ComandaPessoas = () => {
   );
 
   const isCriador =
-    clientes && clientes.length > 0 && clientes[0].id === user?.usuario?.id;
+    clientes && clientes.length > 0 && clientes[0].id === user?.cliente?.id;
 
   const criadorId = clientes[0]?.id;
 

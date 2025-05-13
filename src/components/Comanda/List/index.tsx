@@ -26,7 +26,8 @@ export const ComandaList: React.FC = () => {
       </div>
 
       {(comanda?.itens as Item[]).map((item) => {
-        const isFromClientLogged = item.cliente?.id === user?.usuario.id;
+        const isFromClientLogged = item.cliente?.id === user?.cliente?.id;
+        const isFromClientOrigem = item.cliente_origem?.id === user?.cliente?.id;
         const isFromClientPaid =
           clientes?.find((cliente) => cliente.id === item.cliente?.id)
             ?.status === 'pago';
@@ -46,6 +47,18 @@ export const ComandaList: React.FC = () => {
               </span>
             </div>
             <div className='flex items-center gap-[12px]'>
+              {item.cliente_origem && (
+                <>
+                  <Avatar
+                    name={item.cliente_origem?.nome || ''}
+                    src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${item.cliente_origem?.avatar}`}
+                    bgColor={isFromClientOrigem ? '#FFCC00' : 'muted'}
+                  />
+                  <svg width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12.675 7L7.075 1.4L8.5 -6.99382e-07L16.5 8L8.5 16L7.075 14.6L12.675 9L0.500001 9L0.500001 7L12.675 7Z" fill="#1D1B20" />
+                  </svg>
+                </>
+              )}
               <Avatar
                 name={item.cliente?.nome || ''}
                 src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${item.cliente?.avatar}`}
