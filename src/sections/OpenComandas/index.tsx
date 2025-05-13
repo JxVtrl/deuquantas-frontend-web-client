@@ -83,8 +83,10 @@ export const OpenComandas: React.FC = () => {
   };
 
   const handleComandaClick = async (comanda: ComandaResponse) => {
-    await setComandaAtiva(comanda);
-    router.push(`/conta/${comanda.id}`);
+    const response = await setComandaAtiva(comanda);
+    if (response) {
+      router.push(`/conta/${response.id}`);
+    }
   };
 
   useEffect(() => {

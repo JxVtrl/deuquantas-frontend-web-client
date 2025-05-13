@@ -21,7 +21,8 @@ export const TransferDrawer = () => {
   const { selectedItem, setSelectedItem, clientes, comanda } = useComanda();
   const { user } = useAuth();
   const [isTransferToOpen, setIsTransferToOpen] = useState(false);
-  const [isTransferConfirmacaoModalOpen, setIsTransferConfirmacaoModalOpen] = useState(false);
+  const [isTransferConfirmacaoModalOpen, setIsTransferConfirmacaoModalOpen] =
+    useState(false);
   const [selectedOption, setSelectedOption] = useState('');
   const [options, setOptions] = useState<{ value: string; label: string }[]>(
     [],
@@ -102,8 +103,8 @@ export const TransferDrawer = () => {
                   {capitalize(selectedItem?.nome || '')}
                 </h1>
                 <p className='text-[12px] font-[400] leading-[16px] tracking-[0.5px] text-[#000000]'>
-                  Pedido às {timeFormatter(new Date(selectedItem.data_criacao))} |
-                  Pedido N° {selectedItem.id}
+                  Pedido às {timeFormatter(new Date(selectedItem.data_criacao))}{' '}
+                  | Pedido N° {selectedItem.id}
                 </p>
                 <p className='text-[12px] font-[400] leading-[16px] tracking-[0.5px] text-[#000000]'>
                   Atendido por {'Gomes'}
@@ -227,17 +228,17 @@ export const TransferDrawer = () => {
               animate={{
                 opacity:
                   selectedOption &&
-                    options.find((option) => option.value === selectedOption)
+                  options.find((option) => option.value === selectedOption)
                     ? 1
                     : 0,
                 y:
                   selectedOption &&
-                    options.find((option) => option.value === selectedOption)
+                  options.find((option) => option.value === selectedOption)
                     ? 0
                     : 50,
                 height:
                   selectedOption &&
-                    options.find((option) => option.value === selectedOption)
+                  options.find((option) => option.value === selectedOption)
                     ? 'auto'
                     : 0,
               }}
@@ -247,7 +248,10 @@ export const TransferDrawer = () => {
             >
               <p className='text-[14px] font-[500] leading-[20px] tracking-[0.1px] text-[#272727]'>
                 Transferir item para{' '}
-                {options.find((option) => option.value === selectedOption)?.label}
+                {
+                  options.find((option) => option.value === selectedOption)
+                    ?.label
+                }
                 ?
               </p>
               <div className='grid grid-cols-2 items-center justify-between gap-[8px]'>
@@ -278,7 +282,13 @@ export const TransferDrawer = () => {
           ></div>
         </MaxWidthWrapper>
       </Drawer>
-      <TransferConfirmacaoModal isOpen={isTransferConfirmacaoModalOpen} onClose={() => setIsTransferConfirmacaoModalOpen(false)} onConfirm={handleTransfer} clienteId={selectedOption} item={selectedItem} />
+      <TransferConfirmacaoModal
+        isOpen={isTransferConfirmacaoModalOpen}
+        onClose={() => setIsTransferConfirmacaoModalOpen(false)}
+        onConfirm={handleTransfer}
+        clienteId={selectedOption}
+        item={selectedItem}
+      />
     </>
   );
 };

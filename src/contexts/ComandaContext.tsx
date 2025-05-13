@@ -20,17 +20,17 @@ import { useRouter } from 'next/router';
 // Tipos unificados de notificação
 export type NotificacaoComanda =
   | {
-      type: 'transferencia-item';
-      id: string;
-      origem: string;
-      item: string;
-      onAccept: () => void;
-      onReject: () => void;
-    }
+    type: 'transferencia-item';
+    id: string;
+    origem: string;
+    item: string;
+    onAccept: () => void;
+    onReject: () => void;
+  }
   | {
-      type: 'limite';
-      mensagem: string;
-    };
+    type: 'limite';
+    mensagem: string;
+  };
 
 interface ComandaContextData {
   comanda: ComandaResponse | null;
@@ -60,7 +60,7 @@ interface ComandaContextData {
   clientes: ComandaPessoa[];
   fetchComandasAtivas: () => Promise<ComandaResponse[] | undefined>;
   fetchComanda: (id: string) => Promise<void>;
-  setComandaAtiva: (comanda: ComandaResponse) => void;
+  setComandaAtiva: (comanda: ComandaResponse) => Promise<ComandaResponse | null>;
   fetchClientesPendentes: () => Promise<void>;
   clientesPendentes: ComandaPessoa[];
   transferSolicitacoes: ItemTransferSolicitacao[];
@@ -141,18 +141,20 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }, [user?.usuario?.id, comanda]);
 
-  const setComandaAtiva = useCallback(async (comandaAtiva: ComandaResponse) => {
+  const setComandaAtiva = useCallback(async (comandaAtiva: ComandaResponse): Promise<ComandaResponse | null> => {
     try {
       const response = await ComandaService.getComandaById(comandaAtiva.id);
       if (response) {
         setComanda(response.comanda);
         setEstabelecimento(response.estabelecimento);
-        await getMenu(response.estabelecimento.num_cnpj);
+        return response.comanda;
       }
     } catch (error) {
       console.error('Erro ao selecionar comanda:', error);
       toast.error('Erro ao selecionar comanda');
+      return null;
     }
+    return null;
   }, []);
 
   const clearComanda = useCallback(() => {
