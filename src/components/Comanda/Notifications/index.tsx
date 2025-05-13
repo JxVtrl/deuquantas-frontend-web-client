@@ -27,7 +27,6 @@ export const ComandaNotifications: React.FC = () => {
 
       <div className='flex flex-col gap-[8px]'>
         {notificacoes.map((not) => {
-          console.log(not);
           switch (not.type) {
             case 'split-item':
               return (

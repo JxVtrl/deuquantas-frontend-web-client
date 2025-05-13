@@ -26,7 +26,6 @@ export const ComandaList: React.FC = () => {
       </div>
 
       {(comanda?.itens as Item[]).map((item) => {
-        console.log(`item`, item);
         const isFromClientLogged = item.cliente?.id === user?.cliente?.id;
         const isFromClientOrigem =
           item.cliente_origem?.id === user?.cliente?.id;
