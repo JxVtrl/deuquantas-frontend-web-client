@@ -15,11 +15,13 @@ import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import ComandaService from '@/services/comanda.service';
+import TransferConfirmacaoModal from './TransferConfirmacaoModal';
 
 export const TransferDrawer = () => {
   const { selectedItem, setSelectedItem, clientes, comanda } = useComanda();
   const { user } = useAuth();
   const [isTransferToOpen, setIsTransferToOpen] = useState(false);
+  const [isTransferConfirmacaoModalOpen, setIsTransferConfirmacaoModalOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState('');
   const [options, setOptions] = useState<{ value: string; label: string }[]>(
     [],
@@ -51,7 +53,7 @@ export const TransferDrawer = () => {
       setSelectedItem(null);
       setSelectedOption('');
       setIsTransferToOpen(false);
-      // Exibir feedback: Solicitação enviada!
+      setIsTransferConfirmacaoModalOpen(false);
     } catch (error) {
       console.error('Erro ao solicitar transferência:', error);
     }
@@ -62,220 +64,221 @@ export const TransferDrawer = () => {
   }
 
   return (
-    <Drawer isOpen={!!selectedItem} onClose={() => setSelectedItem(null)}>
-      <MaxWidthWrapper
-        styleContent={{
-          position: 'relative',
-        }}
-      >
-        <button
-          onClick={() => setSelectedItem(null)}
-          className='absolute top-[16px] right-[16px]'
+    <>
+      <Drawer isOpen={!!selectedItem} onClose={() => setSelectedItem(null)}>
+        <MaxWidthWrapper
+          styleContent={{
+            position: 'relative',
+          }}
         >
-          <svg
-            width='10'
-            height='10'
-            viewBox='0 0 10 10'
-            fill='none'
-            xmlns='http://www.w3.org/2000/svg'
+          <button
+            onClick={() => setSelectedItem(null)}
+            className='absolute top-[16px] right-[16px]'
           >
-            <path
-              d='M1.26659 9.66671L0.333252 8.73337L4.06659 5.00004L0.333252 1.26671L1.26659 0.333374L4.99992 4.06671L8.73325 0.333374L9.66659 1.26671L5.93325 5.00004L9.66659 8.73337L8.73325 9.66671L4.99992 5.93337L1.26659 9.66671Z'
-              fill='#272727'
-            />
-          </svg>
-        </button>
-
-        <div className='flex flex-col gap-[16px] py-6 transition-all duration-300'>
-          <div className='flex gap-[8px]'>
-            <Image
-              src={selectedItem.img || '/products/fallback.webp'}
-              alt={selectedItem.nome || ''}
-              width={100}
-              height={100}
-            />
-            <div className='flex flex-col gap-[4px]'>
-              <h1 className='text-[12px] font-[600] leading-[16px] tracking-[0.5px] text-[#000000]'>
-                {capitalize(selectedItem?.nome || '')}
-              </h1>
-              <p className='text-[12px] font-[400] leading-[16px] tracking-[0.5px] text-[#000000]'>
-                Pedido às {timeFormatter(new Date(selectedItem.data_criacao))} |
-                Pedido N° {selectedItem.id}
-              </p>
-              <p className='text-[12px] font-[400] leading-[16px] tracking-[0.5px] text-[#000000]'>
-                Atendido por {'Gomes'}
-              </p>
-
-              <p className='text-[14px] font-[600] leading-[20px] tracking-[0.5px] text-[#272727]'>
-                {currencyFormatter(selectedItem.preco || 0)}
-              </p>
-            </div>
-          </div>
-          <div className='grid grid-cols-3 gap-[12px]'>
-            <Button
-              variant='primary'
-              onClick={() => setIsTransferToOpen(!isTransferToOpen)}
-              text='Transferir item'
-            />
-            <Button variant='primary' text='Dividir item' />
-            <Button variant='underline' text='Não fiz esse pedido' />
-          </div>
-        </div>
-
-        <motion.div
-          initial={{
-            opacity: 0,
-            y: 100,
-            visibility: 'hidden',
-            height: 0,
-            overflow: 'hidden',
-            marginBottom: '0px',
-          }}
-          animate={{
-            opacity: isTransferToOpen ? 1 : 0,
-            visibility: isTransferToOpen ? 'visible' : 'hidden',
-            y: isTransferToOpen ? 0 : 100,
-            height: isTransferToOpen ? 'auto' : 0,
-            overflow: isTransferToOpen ? 'visible' : 'hidden',
-            marginBottom: isTransferToOpen ? '32px' : '0',
-          }}
-          exit={{
-            opacity: 0,
-            y: 100,
-            visibility: 'hidden',
-            height: 0,
-            overflow: 'hidden',
-            marginBottom: '81px',
-          }}
-          transition={{ duration: 0.3 }}
-          className='flex flex-col gap-[16px]'
-        >
-          <div className='flex flex-row items-center gap-[8px]'>
-            <label className='text-[12px] font-[500] leading-[12px] text-[#272727] text-nowrap'>
-              Transferir item para:
-            </label>
-            <select
-              value={selectedOption}
-              onChange={(e) => setSelectedOption(e.target.value)}
-              className='w-full p-0 border rounded h-[24px] text-[14px] font-[400] leading-[20px] tracking-[0.5px] text-[#272727] px-[8px] bg-[#FFFFFF] border-[#D9D9D9]'
+            <svg
+              width='10'
+              height='10'
+              viewBox='0 0 10 10'
+              fill='none'
+              xmlns='http://www.w3.org/2000/svg'
             >
-              <option
-                value=''
-                className='text-[12px] font-[400] leading-[12px] tracking-[0] text-[#272727]'
-              >
-                Selecione uma pessoa
-              </option>
-              {options.map((option) => (
-                <option
-                  key={option.value}
-                  value={option.value}
-                  className='text-[12px] font-[400] leading-[12px] tracking-[0] text-[#272727]'
-                >
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </div>
+              <path
+                d='M1.26659 9.66671L0.333252 8.73337L4.06659 5.00004L0.333252 1.26671L1.26659 0.333374L4.99992 4.06671L8.73325 0.333374L9.66659 1.26671L5.93325 5.00004L9.66659 8.73337L8.73325 9.66671L4.99992 5.93337L1.26659 9.66671Z'
+                fill='#272727'
+              />
+            </svg>
+          </button>
 
-          <div className='flex flex-row gap-[16px]'>
-            {clientes.map((cliente) => {
-              const bgColor =
-                selectedOption === cliente.id
-                  ? '#FFCC00'
-                  : cliente.status === 'pago'
-                    ? 'rgb(21, 128, 61)'
-                    : '#F0F0F0';
+          <div className='flex flex-col gap-[16px] py-6 transition-all duration-300'>
+            <div className='flex gap-[8px]'>
+              <Image
+                src={selectedItem.img || '/products/fallback.webp'}
+                alt={selectedItem.nome || ''}
+                width={100}
+                height={100}
+              />
+              <div className='flex flex-col gap-[4px]'>
+                <h1 className='text-[12px] font-[600] leading-[16px] tracking-[0.5px] text-[#000000]'>
+                  {capitalize(selectedItem?.nome || '')}
+                </h1>
+                <p className='text-[12px] font-[400] leading-[16px] tracking-[0.5px] text-[#000000]'>
+                  Pedido às {timeFormatter(new Date(selectedItem.data_criacao))} |
+                  Pedido N° {selectedItem.id}
+                </p>
+                <p className='text-[12px] font-[400] leading-[16px] tracking-[0.5px] text-[#000000]'>
+                  Atendido por {'Gomes'}
+                </p>
 
-              const isClientWhoRequestedItem =
-                cliente.id === selectedItem?.cliente?.id;
-
-              if (isClientWhoRequestedItem) {
-                return null;
-              }
-
-              return (
-                <div
-                  key={cliente.id}
-                  className='flex items-center cursor-pointer'
-                  onClick={() => {
-                    if (selectedOption === cliente.id) {
-                      setSelectedOption('');
-                    } else {
-                      setSelectedOption(cliente.id);
-                    }
-                  }}
-                >
-                  <Avatar
-                    key={cliente.id}
-                    name={cliente.nome}
-                    bgColor={bgColor}
-                  />
-                </div>
-              );
-            })}
+                <p className='text-[14px] font-[600] leading-[20px] tracking-[0.5px] text-[#272727]'>
+                  {currencyFormatter(selectedItem.preco || 0)}
+                </p>
+              </div>
+            </div>
+            <div className='grid grid-cols-3 gap-[12px]'>
+              <Button
+                variant='primary'
+                onClick={() => setIsTransferToOpen(!isTransferToOpen)}
+                text='Transferir item'
+              />
+              <Button variant='primary' text='Dividir item' />
+              <Button variant='underline' text='Não fiz esse pedido' />
+            </div>
           </div>
 
           <motion.div
             initial={{
               opacity: 0,
-              y: 50,
+              y: 100,
+              visibility: 'hidden',
               height: 0,
+              overflow: 'hidden',
+              marginBottom: '0px',
             }}
             animate={{
-              opacity:
-                selectedOption &&
-                options.find((option) => option.value === selectedOption)
-                  ? 1
-                  : 0,
-              y:
-                selectedOption &&
-                options.find((option) => option.value === selectedOption)
-                  ? 0
-                  : 50,
-              height:
-                selectedOption &&
-                options.find((option) => option.value === selectedOption)
-                  ? 'auto'
-                  : 0,
+              opacity: isTransferToOpen ? 1 : 0,
+              visibility: isTransferToOpen ? 'visible' : 'hidden',
+              y: isTransferToOpen ? 0 : 100,
+              height: isTransferToOpen ? 'auto' : 0,
+              overflow: isTransferToOpen ? 'visible' : 'hidden',
+              marginBottom: isTransferToOpen ? '32px' : '0',
             }}
-            exit={{ opacity: 0, y: 50, height: 0 }}
+            exit={{
+              opacity: 0,
+              y: 100,
+              visibility: 'hidden',
+              height: 0,
+              overflow: 'hidden',
+              marginBottom: '81px',
+            }}
             transition={{ duration: 0.3 }}
-            className='flex flex-col gap-[8px]'
+            className='flex flex-col gap-[16px]'
           >
-            <p className='text-[14px] font-[500] leading-[20px] tracking-[0.1px] text-[#272727]'>
-              Transferir item para{' '}
-              {options.find((option) => option.value === selectedOption)?.label}
-              ?
-            </p>
-            <div className='grid grid-cols-2 items-center justify-between gap-[8px]'>
-              <Button
-                type='submit'
-                variant='tertiary'
-                text='Transferir'
-                onClick={() => {
-                  setIsTransferToOpen(false);
-                  setSelectedOption('');
-                  handleTransfer();
-                }}
-              />
-              <Button
-                variant='underline'
-                text='Cancelar'
-                onClick={() => {
-                  setIsTransferToOpen(false);
-                  setSelectedOption('');
-                }}
-              />
+            <div className='flex flex-row items-center gap-[8px]'>
+              <label className='text-[12px] font-[500] leading-[12px] text-[#272727] text-nowrap'>
+                Transferir item para:
+              </label>
+              <select
+                value={selectedOption}
+                onChange={(e) => setSelectedOption(e.target.value)}
+                className='w-full p-0 border rounded h-[24px] text-[14px] font-[400] leading-[20px] tracking-[0.5px] text-[#272727] px-[8px] bg-[#FFFFFF] border-[#D9D9D9]'
+              >
+                <option
+                  value=''
+                  className='text-[12px] font-[400] leading-[12px] tracking-[0] text-[#272727]'
+                >
+                  Selecione uma pessoa
+                </option>
+                {options.map((option) => (
+                  <option
+                    key={option.value}
+                    value={option.value}
+                    className='text-[12px] font-[400] leading-[12px] tracking-[0] text-[#272727]'
+                  >
+                    {option.label}
+                  </option>
+                ))}
+              </select>
             </div>
-          </motion.div>
-        </motion.div>
 
-        <div
-          style={{
-            height: `81px`,
-          }}
-        ></div>
-      </MaxWidthWrapper>
-    </Drawer>
+            <div className='flex flex-row gap-[16px]'>
+              {clientes.map((cliente) => {
+                const bgColor =
+                  selectedOption === cliente.id
+                    ? '#FFCC00'
+                    : cliente.status === 'pago'
+                      ? 'rgb(21, 128, 61)'
+                      : '#F0F0F0';
+
+                const isClientWhoRequestedItem =
+                  cliente.id === selectedItem?.cliente?.id;
+
+                if (isClientWhoRequestedItem) {
+                  return null;
+                }
+
+                return (
+                  <div
+                    key={cliente.id}
+                    className='flex items-center cursor-pointer'
+                    onClick={() => {
+                      if (selectedOption === cliente.id) {
+                        setSelectedOption('');
+                      } else {
+                        setSelectedOption(cliente.id);
+                      }
+                    }}
+                  >
+                    <Avatar
+                      key={cliente.id}
+                      name={cliente.nome}
+                      bgColor={bgColor}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+
+            <motion.div
+              initial={{
+                opacity: 0,
+                y: 50,
+                height: 0,
+              }}
+              animate={{
+                opacity:
+                  selectedOption &&
+                    options.find((option) => option.value === selectedOption)
+                    ? 1
+                    : 0,
+                y:
+                  selectedOption &&
+                    options.find((option) => option.value === selectedOption)
+                    ? 0
+                    : 50,
+                height:
+                  selectedOption &&
+                    options.find((option) => option.value === selectedOption)
+                    ? 'auto'
+                    : 0,
+              }}
+              exit={{ opacity: 0, y: 50, height: 0 }}
+              transition={{ duration: 0.3 }}
+              className='flex flex-col gap-[8px]'
+            >
+              <p className='text-[14px] font-[500] leading-[20px] tracking-[0.1px] text-[#272727]'>
+                Transferir item para{' '}
+                {options.find((option) => option.value === selectedOption)?.label}
+                ?
+              </p>
+              <div className='grid grid-cols-2 items-center justify-between gap-[8px]'>
+                <Button
+                  type='submit'
+                  variant='tertiary'
+                  text='Transferir'
+                  onClick={() => {
+                    setIsTransferConfirmacaoModalOpen(true);
+                  }}
+                />
+                <Button
+                  variant='underline'
+                  text='Cancelar'
+                  onClick={() => {
+                    setIsTransferToOpen(false);
+                    setSelectedOption('');
+                  }}
+                />
+              </div>
+            </motion.div>
+          </motion.div>
+
+          <div
+            style={{
+              height: `81px`,
+            }}
+          ></div>
+        </MaxWidthWrapper>
+      </Drawer>
+      <TransferConfirmacaoModal isOpen={isTransferConfirmacaoModalOpen} onClose={() => setIsTransferConfirmacaoModalOpen(false)} onConfirm={handleTransfer} clienteId={selectedOption} item={selectedItem} />
+    </>
   );
 };
