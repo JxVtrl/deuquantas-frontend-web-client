@@ -20,17 +20,17 @@ import { useRouter } from 'next/router';
 // Tipos unificados de notificação
 export type NotificacaoComanda =
   | {
-    type: 'transferencia-item';
-    id: string;
-    origem: string;
-    item: string;
-    onAccept: () => void;
-    onReject: () => void;
-  }
+      type: 'transferencia-item';
+      id: string;
+      origem: string;
+      item: string;
+      onAccept: () => void;
+      onReject: () => void;
+    }
   | {
-    type: 'limite';
-    mensagem: string;
-  };
+      type: 'limite';
+      mensagem: string;
+    };
 
 interface ComandaContextData {
   comanda: ComandaResponse | null;
@@ -65,7 +65,10 @@ interface ComandaContextData {
   clientesPendentes: ComandaPessoa[];
   transferSolicitacoes: ItemTransferSolicitacao[];
   fetchTransferSolicitacoes: () => Promise<void>;
-  responderTransferSolicitacao: (id: string, status: 'ACEITA' | 'RECUSADA') => Promise<void>;
+  responderTransferSolicitacao: (
+    id: string,
+    status: 'ACEITA' | 'RECUSADA',
+  ) => Promise<void>;
   getNotificacoesComanda: () => NotificacaoComanda[];
 }
 
@@ -92,7 +95,9 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
   const [clientesPendentes, setClientesPendentes] = useState<ComandaPessoa[]>(
     [],
   );
-  const [transferSolicitacoes, setTransferSolicitacoes] = useState<ItemTransferSolicitacao[]>([]);
+  const [transferSolicitacoes, setTransferSolicitacoes] = useState<
+    ItemTransferSolicitacao[]
+  >([]);
 
   const getMenu = async (cnpj: string) => {
     try {
@@ -297,21 +302,27 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
   const fetchTransferSolicitacoes = useCallback(async () => {
     if (!user?.cliente?.id) return;
     try {
-      const solicitacoes = await ComandaService.listarSolicitacoesPendentesTransferencia(user.cliente.id);
+      const solicitacoes =
+        await ComandaService.listarSolicitacoesPendentesTransferencia(
+          user.cliente.id,
+        );
       setTransferSolicitacoes(solicitacoes);
     } catch (error) {
       console.error('Erro ao buscar solicitações de transferência:', error);
     }
   }, [user?.cliente?.id]);
 
-  const responderTransferSolicitacao = useCallback(async (id: string, status: 'ACEITA' | 'RECUSADA') => {
-    try {
-      await ComandaService.responderSolicitacaoTransferenciaItem(id, status);
-      setTransferSolicitacoes((prev) => prev.filter((s) => s.id !== id));
-    } catch (error) {
-      console.error('Erro ao responder solicitação de transferência:', error);
-    }
-  }, []);
+  const responderTransferSolicitacao = useCallback(
+    async (id: string, status: 'ACEITA' | 'RECUSADA') => {
+      try {
+        await ComandaService.responderSolicitacaoTransferenciaItem(id, status);
+        setTransferSolicitacoes((prev) => prev.filter((s) => s.id !== id));
+      } catch (error) {
+        console.error('Erro ao responder solicitação de transferência:', error);
+      }
+    },
+    [],
+  );
 
   useEffect(() => {
     fetchTransferSolicitacoes();
@@ -320,14 +331,16 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
   // Função para unificar todas as notificações
   const getNotificacoesComanda = () => {
     // Transferências de item
-    const transferencias: NotificacaoComanda[] = transferSolicitacoes.map((sol) => ({
-      type: 'transferencia-item',
-      id: sol.id,
-      origem: sol.clienteOrigem?.usuario?.name || 'Alguém',
-      item: sol.comandaItem?.item?.nome || 'Item',
-      onAccept: () => responderTransferSolicitacao(sol.id, 'ACEITA'),
-      onReject: () => responderTransferSolicitacao(sol.id, 'RECUSADA'),
-    }));
+    const transferencias: NotificacaoComanda[] = transferSolicitacoes.map(
+      (sol) => ({
+        type: 'transferencia-item',
+        id: sol.id,
+        origem: sol.clienteOrigem?.usuario?.name || 'Alguém',
+        item: sol.comandaItem?.item?.nome || 'Item',
+        onAccept: () => responderTransferSolicitacao(sol.id, 'ACEITA'),
+        onReject: () => responderTransferSolicitacao(sol.id, 'RECUSADA'),
+      }),
+    );
     return transferencias;
   };
 

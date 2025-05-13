@@ -1,4 +1,3 @@
-
 import { Button, MaxWidthWrapper } from '@deuquantas/components';
 import React from 'react';
 import { useComanda } from '@/contexts/ComandaContext';
@@ -39,7 +38,10 @@ export const ComandaNotifications: React.FC = () => {
           switch (not.type) {
             case 'transferencia-item':
               return (
-                <div key={not.id} className='bg-[#F0F0F0] backdrop-blur-[10px] shadow-[0px_4px_4px_0px_#00000040] border-radius-[10px] p-[10px] flex justify-between'>
+                <div
+                  key={not.id}
+                  className='bg-[#F0F0F0] backdrop-blur-[10px] shadow-[0px_4px_4px_0px_#00000040] border-radius-[10px] p-[10px] flex justify-between'
+                >
                   <div className='flex flex-col gap-[4px]'>
                     <p className='text-sm font-[500] leading-[100%] text-[#27272799]'>
                       Transferência de item - de {not.origem}
@@ -53,8 +55,17 @@ export const ComandaNotifications: React.FC = () => {
                       variant='notification_primary'
                       onClick={not.onAccept}
                       text={
-                        <svg width="11" height="9" viewBox="0 0 11 9" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M3.86665 8.99994L0.0666504 5.19994L1.01665 4.24994L3.86665 7.09994L9.98332 0.983276L10.9333 1.93328L3.86665 8.99994Z" fill="#1D1B20" />
+                        <svg
+                          width='11'
+                          height='9'
+                          viewBox='0 0 11 9'
+                          fill='none'
+                          xmlns='http://www.w3.org/2000/svg'
+                        >
+                          <path
+                            d='M3.86665 8.99994L0.0666504 5.19994L1.01665 4.24994L3.86665 7.09994L9.98332 0.983276L10.9333 1.93328L3.86665 8.99994Z'
+                            fill='#1D1B20'
+                          />
                         </svg>
                       }
                     />

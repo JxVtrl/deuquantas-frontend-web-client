@@ -308,17 +308,30 @@ export const ComandaService = {
     id_cliente_origem: string;
     id_cliente_destino: string;
   }): Promise<ItemTransferSolicitacao> {
-    const response = await api.post('/comandas/item-transfer-solicitacoes', dto);
+    const response = await api.post(
+      '/comandas/item-transfer-solicitacoes',
+      dto,
+    );
     return response.data;
   },
 
-  async listarSolicitacoesPendentesTransferencia(id_cliente_destino: string): Promise<ItemTransferSolicitacao[]> {
-    const response = await api.get(`/comandas/item-transfer-solicitacoes/pendentes/${id_cliente_destino}`);
+  async listarSolicitacoesPendentesTransferencia(
+    id_cliente_destino: string,
+  ): Promise<ItemTransferSolicitacao[]> {
+    const response = await api.get(
+      `/comandas/item-transfer-solicitacoes/pendentes/${id_cliente_destino}`,
+    );
     return response.data;
   },
 
-  async responderSolicitacaoTransferenciaItem(id: string, status: 'ACEITA' | 'RECUSADA'): Promise<ItemTransferSolicitacao> {
-    const response = await api.patch(`/comandas/item-transfer-solicitacoes/${id}/responder`, { status });
+  async responderSolicitacaoTransferenciaItem(
+    id: string,
+    status: 'ACEITA' | 'RECUSADA',
+  ): Promise<ItemTransferSolicitacao> {
+    const response = await api.patch(
+      `/comandas/item-transfer-solicitacoes/${id}/responder`,
+      { status },
+    );
     return response.data;
   },
 };

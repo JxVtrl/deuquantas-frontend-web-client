@@ -5,7 +5,12 @@ import {
   currencyFormatter,
   timeFormatter,
 } from '@/utils/formatters';
-import { Avatar, Button, Drawer, MaxWidthWrapper } from '@deuquantas/components';
+import {
+  Avatar,
+  Button,
+  Drawer,
+  MaxWidthWrapper,
+} from '@deuquantas/components';
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
@@ -16,12 +21,15 @@ export const TransferDrawer = () => {
   const { user } = useAuth();
   const [isTransferToOpen, setIsTransferToOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState('');
-  const [options, setOptions] = useState<{ value: string; label: string }[]>([]);
-
+  const [options, setOptions] = useState<{ value: string; label: string }[]>(
+    [],
+  );
 
   useEffect(() => {
     if (clientes) {
-      const clienteWhoRequestedItem = clientes.find((cliente) => cliente.id === selectedItem?.cliente?.id);
+      const clienteWhoRequestedItem = clientes.find(
+        (cliente) => cliente.id === selectedItem?.cliente?.id,
+      );
       const filteredOptions = clientes
         .filter((cliente) => cliente.id !== clienteWhoRequestedItem?.id)
         .map((cliente) => ({
@@ -104,7 +112,11 @@ export const TransferDrawer = () => {
             </div>
           </div>
           <div className='grid grid-cols-3 gap-[12px]'>
-            <Button variant='primary' onClick={() => setIsTransferToOpen(!isTransferToOpen)} text='Transferir item' />
+            <Button
+              variant='primary'
+              onClick={() => setIsTransferToOpen(!isTransferToOpen)}
+              text='Transferir item'
+            />
             <Button variant='primary' text='Dividir item' />
             <Button variant='underline' text='Não fiz esse pedido' />
           </div>
@@ -112,7 +124,8 @@ export const TransferDrawer = () => {
 
         <motion.div
           initial={{
-            opacity: 0, y: 100,
+            opacity: 0,
+            y: 100,
             visibility: 'hidden',
             height: 0,
             overflow: 'hidden',
@@ -127,7 +140,8 @@ export const TransferDrawer = () => {
             marginBottom: isTransferToOpen ? '32px' : '0',
           }}
           exit={{
-            opacity: 0, y: 100,
+            opacity: 0,
+            y: 100,
             visibility: 'hidden',
             height: 0,
             overflow: 'hidden',
@@ -137,7 +151,9 @@ export const TransferDrawer = () => {
           className='flex flex-col gap-[16px]'
         >
           <div className='flex flex-row items-center gap-[8px]'>
-            <label className='text-[12px] font-[500] leading-[12px] text-[#272727] text-nowrap'>Transferir item para:</label>
+            <label className='text-[12px] font-[500] leading-[12px] text-[#272727] text-nowrap'>
+              Transferir item para:
+            </label>
             <select
               value={selectedOption}
               onChange={(e) => setSelectedOption(e.target.value)}
@@ -170,7 +186,8 @@ export const TransferDrawer = () => {
                     ? 'rgb(21, 128, 61)'
                     : '#F0F0F0';
 
-              const isClientWhoRequestedItem = cliente.id === selectedItem?.cliente?.id;
+              const isClientWhoRequestedItem =
+                cliente.id === selectedItem?.cliente?.id;
 
               if (isClientWhoRequestedItem) {
                 return null;
@@ -198,7 +215,6 @@ export const TransferDrawer = () => {
             })}
           </div>
 
-
           <motion.div
             initial={{
               opacity: 0,
@@ -208,17 +224,17 @@ export const TransferDrawer = () => {
             animate={{
               opacity:
                 selectedOption &&
-                  options.find((option) => option.value === selectedOption)
+                options.find((option) => option.value === selectedOption)
                   ? 1
                   : 0,
               y:
                 selectedOption &&
-                  options.find((option) => option.value === selectedOption)
+                options.find((option) => option.value === selectedOption)
                   ? 0
                   : 50,
               height:
                 selectedOption &&
-                  options.find((option) => option.value === selectedOption)
+                options.find((option) => option.value === selectedOption)
                   ? 'auto'
                   : 0,
             }}
@@ -227,7 +243,9 @@ export const TransferDrawer = () => {
             className='flex flex-col gap-[8px]'
           >
             <p className='text-[14px] font-[500] leading-[20px] tracking-[0.1px] text-[#272727]'>
-              Transferir item para {options.find((option) => option.value === selectedOption)?.label}?
+              Transferir item para{' '}
+              {options.find((option) => option.value === selectedOption)?.label}
+              ?
             </p>
             <div className='grid grid-cols-2 items-center justify-between gap-[8px]'>
               <Button
@@ -235,26 +253,28 @@ export const TransferDrawer = () => {
                 variant='tertiary'
                 text='Transferir'
                 onClick={() => {
-                  setIsTransferToOpen(false)
-                  setSelectedOption('')
-                  handleTransfer()
+                  setIsTransferToOpen(false);
+                  setSelectedOption('');
+                  handleTransfer();
                 }}
               />
-              <Button variant='underline' text='Cancelar' onClick={() => {
-                setIsTransferToOpen(false)
-                setSelectedOption('')
-              }} />
+              <Button
+                variant='underline'
+                text='Cancelar'
+                onClick={() => {
+                  setIsTransferToOpen(false);
+                  setSelectedOption('');
+                }}
+              />
             </div>
           </motion.div>
-
-
         </motion.div>
 
-        <div style={{
-          height: `81px`,
-        }}>
-
-        </div>
+        <div
+          style={{
+            height: `81px`,
+          }}
+        ></div>
       </MaxWidthWrapper>
     </Drawer>
   );
