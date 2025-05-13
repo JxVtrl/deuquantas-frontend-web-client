@@ -30,12 +30,12 @@ export const ItemActionsDrawer = () => {
     useState(false);
 
   const [selectedOption, setSelectedOption] = useState<string[] | string>('');
-  const [transferOptions, setTransferOptions] = useState<{ value: string; label: string }[]>(
-    [],
-  );
-  const [splitOptions, setSplitOptions] = useState<{ value: string; label: string }[]>(
-    [],
-  );
+  const [transferOptions, setTransferOptions] = useState<
+    { value: string; label: string }[]
+  >([]);
+  const [splitOptions, setSplitOptions] = useState<
+    { value: string; label: string }[]
+  >([]);
 
   useEffect(() => {
     if (clientes) {
@@ -50,11 +50,10 @@ export const ItemActionsDrawer = () => {
         }));
       setTransferOptions(filteredTransferOptions);
 
-      const filteredSplitOptions = clientes
-        .map((cliente) => ({
-          value: cliente.id,
-          label: cliente.nome,
-        }));
+      const filteredSplitOptions = clientes.map((cliente) => ({
+        value: cliente.id,
+        label: cliente.nome,
+      }));
       setSplitOptions(filteredSplitOptions);
     }
   }, [selectedItem]);
@@ -79,15 +78,17 @@ export const ItemActionsDrawer = () => {
   const handleSplit = async () => {
     if (!selectedItem || !selectedOption || !comanda || !user) return;
     try {
-      const clientesIds = Array.isArray(selectedOption) ? selectedOption : [selectedOption];
-      const outrosClientes = clientesIds.filter(id => id !== user.cliente.id);
+      const clientesIds = Array.isArray(selectedOption)
+        ? selectedOption
+        : [selectedOption];
+      const outrosClientes = clientesIds.filter((id) => id !== user.cliente.id);
       await Promise.all(
-        outrosClientes.map(id_cliente =>
+        outrosClientes.map((id_cliente) =>
           ComandaService.criarSolicitacaoSplitItem({
             id_comanda_item: selectedItem.id,
             id_cliente,
-          })
-        )
+          }),
+        ),
       );
       setSelectedItem(null);
       setSelectedOption('');
@@ -96,13 +97,17 @@ export const ItemActionsDrawer = () => {
     } catch (error) {
       console.error('Erro ao dividir item:', error);
     }
-  }
+  };
 
   if (!selectedItem) {
     return null;
   }
 
-  const pessoasDividindo = clientes.filter((cliente) => cliente.id !== selectedItem?.cliente?.id && cliente.id !== user?.cliente?.id);
+  const pessoasDividindo = clientes.filter(
+    (cliente) =>
+      cliente.id !== selectedItem?.cliente?.id &&
+      cliente.id !== user?.cliente?.id,
+  );
 
   return (
     <>
@@ -155,35 +160,35 @@ export const ItemActionsDrawer = () => {
                 </p>
               </div>
             </div>
-            {
-              selectedItem.status === 'ativo-dividido' ? (
-                <div className='grid grid-cols-2 gap-[12px]'>
-                  <p className='text-[14px] font-[600] leading-[20px] tracking-[0.5px] text-[#272727]'>
-                    Dividido com {pessoasDividindo.map((cliente) => cliente.nome).join(', ')}
-                  </p>
-                  <Button variant='underline' text='Não fiz esse pedido' />
-                </div>
-              ) : (
-                <div className='grid grid-cols-3 gap-[12px]'>
-                  <Button
-                    variant='primary'
-                    onClick={() => {
-                      setIsTransferToOpen(!isTransferToOpen);
-                      setIsSplitToOpen(false);
-                    }}
-                    text='Transferir item'
-                  />
-                  <Button variant='primary'
-                    onClick={() => {
-                      setIsSplitToOpen(!isSplitToOpen);
-                      setIsTransferToOpen(false);
-                    }}
-                    text='Dividir item'
-                  />
-                  <Button variant='underline' text='Não fiz esse pedido' />
-                </div>
-              )
-            }
+            {selectedItem.status === 'ativo-dividido' ? (
+              <div className='grid grid-cols-2 gap-[12px]'>
+                <p className='text-[14px] font-[600] leading-[20px] tracking-[0.5px] text-[#272727]'>
+                  Dividido com{' '}
+                  {pessoasDividindo.map((cliente) => cliente.nome).join(', ')}
+                </p>
+                <Button variant='underline' text='Não fiz esse pedido' />
+              </div>
+            ) : (
+              <div className='grid grid-cols-3 gap-[12px]'>
+                <Button
+                  variant='primary'
+                  onClick={() => {
+                    setIsTransferToOpen(!isTransferToOpen);
+                    setIsSplitToOpen(false);
+                  }}
+                  text='Transferir item'
+                />
+                <Button
+                  variant='primary'
+                  onClick={() => {
+                    setIsSplitToOpen(!isSplitToOpen);
+                    setIsTransferToOpen(false);
+                  }}
+                  text='Dividir item'
+                />
+                <Button variant='underline' text='Não fiz esse pedido' />
+              </div>
+            )}
           </div>
 
           <motion.div
@@ -243,12 +248,11 @@ export const ItemActionsDrawer = () => {
 
             <div className='flex flex-row gap-[16px]'>
               {clientes.map((cliente) => {
-                const bgColor =
-                  selectedOption.includes(cliente.id)
-                    ? '#FFCC00'
-                    : cliente.status === 'pago'
-                      ? 'rgb(21, 128, 61)'
-                      : '#F0F0F0';
+                const bgColor = selectedOption.includes(cliente.id)
+                  ? '#FFCC00'
+                  : cliente.status === 'pago'
+                    ? 'rgb(21, 128, 61)'
+                    : '#F0F0F0';
 
                 const isClientWhoRequestedItem =
                   cliente.id === selectedItem?.cliente?.id;
@@ -269,14 +273,18 @@ export const ItemActionsDrawer = () => {
                           setSelectedOption(cliente.id);
                         }
                       } else {
-                        if (selectedOption.includes(cliente.id) && selectedOption.length > 1) {
-                          const newSelectedOption = selectedOption.filter((option) => option !== cliente.id);
+                        if (
+                          selectedOption.includes(cliente.id) &&
+                          selectedOption.length > 1
+                        ) {
+                          const newSelectedOption = selectedOption.filter(
+                            (option) => option !== cliente.id,
+                          );
                           setSelectedOption(newSelectedOption);
                         } else {
                           setSelectedOption([...selectedOption, cliente.id]);
                         }
                       }
-
                     }}
                   >
                     <Avatar
@@ -298,17 +306,23 @@ export const ItemActionsDrawer = () => {
               animate={{
                 opacity:
                   selectedOption.length > 0 &&
-                    transferOptions.find((option) => selectedOption.includes(option.value))
+                  transferOptions.find((option) =>
+                    selectedOption.includes(option.value),
+                  )
                     ? 1
                     : 0,
                 y:
                   selectedOption.length > 0 &&
-                    transferOptions.find((option) => selectedOption.includes(option.value))
+                  transferOptions.find((option) =>
+                    selectedOption.includes(option.value),
+                  )
                     ? 0
                     : 50,
                 height:
                   selectedOption.length > 0 &&
-                    transferOptions.find((option) => selectedOption.includes(option.value))
+                  transferOptions.find((option) =>
+                    selectedOption.includes(option.value),
+                  )
                     ? 'auto'
                     : 0,
               }}
@@ -319,8 +333,9 @@ export const ItemActionsDrawer = () => {
               <p className='text-[14px] font-[500] leading-[20px] tracking-[0.1px] text-[#272727]'>
                 Transferir item para{' '}
                 {
-                  transferOptions.find((option) => selectedOption.includes(option.value))
-                    ?.label
+                  transferOptions.find((option) =>
+                    selectedOption.includes(option.value),
+                  )?.label
                 }
                 ?
               </p>
@@ -389,7 +404,10 @@ export const ItemActionsDrawer = () => {
                   Selecione uma ou várias pessoas
                 </option>
                 {splitOptions.map((option) => {
-                  if (option.value === selectedItem?.cliente?.id && option.value === user?.cliente?.id) {
+                  if (
+                    option.value === selectedItem?.cliente?.id &&
+                    option.value === user?.cliente?.id
+                  ) {
                     return null;
                   }
 
@@ -401,21 +419,23 @@ export const ItemActionsDrawer = () => {
                     >
                       {option.label}
                     </option>
-                  )
+                  );
                 })}
               </select>
             </div>
 
             <div className='flex flex-row gap-[16px]'>
               {clientes.map((cliente) => {
-                const bgColor =
-                  selectedOption.includes(cliente.id)
-                    ? '#FFCC00'
-                    : cliente.status === 'pago'
-                      ? 'rgb(21, 128, 61)'
-                      : '#F0F0F0';
+                const bgColor = selectedOption.includes(cliente.id)
+                  ? '#FFCC00'
+                  : cliente.status === 'pago'
+                    ? 'rgb(21, 128, 61)'
+                    : '#F0F0F0';
 
-                if (cliente.id === selectedItem?.cliente?.id && cliente.id === user?.cliente?.id) {
+                if (
+                  cliente.id === selectedItem?.cliente?.id &&
+                  cliente.id === user?.cliente?.id
+                ) {
                   return null;
                 }
 
@@ -432,7 +452,9 @@ export const ItemActionsDrawer = () => {
                         }
                       } else {
                         if (selectedOption.includes(cliente.id)) {
-                          const newSelectedOption = selectedOption.filter((option) => option !== cliente.id);
+                          const newSelectedOption = selectedOption.filter(
+                            (option) => option !== cliente.id,
+                          );
                           setSelectedOption(newSelectedOption);
                         } else {
                           setSelectedOption([...selectedOption, cliente.id]);
@@ -459,17 +481,23 @@ export const ItemActionsDrawer = () => {
               animate={{
                 opacity:
                   selectedOption.length > 0 &&
-                    splitOptions.find((option) => selectedOption.includes(option.value))
+                  splitOptions.find((option) =>
+                    selectedOption.includes(option.value),
+                  )
                     ? 1
                     : 0,
                 y:
                   selectedOption.length > 0 &&
-                    splitOptions.find((option) => selectedOption.includes(option.value))
+                  splitOptions.find((option) =>
+                    selectedOption.includes(option.value),
+                  )
                     ? 0
                     : 50,
                 height:
                   selectedOption.length > 0 &&
-                    splitOptions.find((option) => selectedOption.includes(option.value))
+                  splitOptions.find((option) =>
+                    selectedOption.includes(option.value),
+                  )
                     ? 'auto'
                     : 0,
               }}
@@ -479,9 +507,10 @@ export const ItemActionsDrawer = () => {
             >
               <p className='text-[14px] font-[500] leading-[20px] tracking-[0.1px] text-[#272727]'>
                 Dividir item com{' '}
-                {
-                  splitOptions.filter((option) => selectedOption.includes(option.value)).map((option) => option.label).join(', ')
-                }
+                {splitOptions
+                  .filter((option) => selectedOption.includes(option.value))
+                  .map((option) => option.label)
+                  .join(', ')}
                 ?
               </p>
               <div className='grid grid-cols-2 items-center justify-between gap-[8px]'>

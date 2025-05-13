@@ -48,8 +48,17 @@ export const ComandaNotifications: React.FC = () => {
                       variant='notification_primary'
                       onClick={not.onAccept}
                       text={
-                        <svg width="11" height="9" viewBox="0 0 11 9" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M3.86665 8.99994L0.0666504 5.19994L1.01665 4.24994L3.86665 7.09994L9.98332 0.983276L10.9333 1.93328L3.86665 8.99994Z" fill="#1D1B20" />
+                        <svg
+                          width='11'
+                          height='9'
+                          viewBox='0 0 11 9'
+                          fill='none'
+                          xmlns='http://www.w3.org/2000/svg'
+                        >
+                          <path
+                            d='M3.86665 8.99994L0.0666504 5.19994L1.01665 4.24994L3.86665 7.09994L9.98332 0.983276L10.9333 1.93328L3.86665 8.99994Z'
+                            fill='#1D1B20'
+                          />
                         </svg>
                       }
                     />
@@ -57,8 +66,17 @@ export const ComandaNotifications: React.FC = () => {
                       variant='notification_secondary'
                       onClick={not.onReject}
                       text={
-                        <svg width="11" height="10" viewBox="0 0 11 10" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M1.76671 9.66671L0.833374 8.73337L4.56671 5.00004L0.833374 1.26671L1.76671 0.333374L5.50004 4.06671L9.23337 0.333374L10.1667 1.26671L6.43337 5.00004L10.1667 8.73337L9.23337 9.66671L5.50004 5.93337L1.76671 9.66671Z" fill="#1D1B20" />
+                        <svg
+                          width='11'
+                          height='10'
+                          viewBox='0 0 11 10'
+                          fill='none'
+                          xmlns='http://www.w3.org/2000/svg'
+                        >
+                          <path
+                            d='M1.76671 9.66671L0.833374 8.73337L4.56671 5.00004L0.833374 1.26671L1.76671 0.333374L5.50004 4.06671L9.23337 0.333374L10.1667 1.26671L6.43337 5.00004L10.1667 8.73337L9.23337 9.66671L5.50004 5.93337L1.76671 9.66671Z'
+                            fill='#1D1B20'
+                          />
                         </svg>
                       }
                     />

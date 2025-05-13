@@ -20,25 +20,25 @@ import { useRouter } from 'next/router';
 // Tipos unificados de notificação
 export type NotificacaoComanda =
   | {
-    type: 'transferencia-item';
-    id: string;
-    origem: string;
-    item: string;
-    onAccept: () => void;
-    onReject: () => void;
-  }
+      type: 'transferencia-item';
+      id: string;
+      origem: string;
+      item: string;
+      onAccept: () => void;
+      onReject: () => void;
+    }
   | {
-    type: 'split-item';
-    id: string;
-    item: string;
-    origem: string;
-    onAccept: () => void;
-    onReject: () => void;
-  }
+      type: 'split-item';
+      id: string;
+      item: string;
+      origem: string;
+      onAccept: () => void;
+      onReject: () => void;
+    }
   | {
-    type: 'limite';
-    mensagem: string;
-  };
+      type: 'limite';
+      mensagem: string;
+    };
 
 interface ComandaContextData {
   comanda: ComandaResponse | null;
@@ -353,7 +353,8 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
   const fetchSplitSolicitacoes = useCallback(async () => {
     if (!user?.cliente?.id) return;
     try {
-      const solicitacoes = await ComandaService.listarSolicitacoesPendentesSplit(user.cliente.id);
+      const solicitacoes =
+        await ComandaService.listarSolicitacoesPendentesSplit(user.cliente.id);
       setSplitSolicitacoes(solicitacoes);
     } catch (error) {
       console.error('Erro ao buscar solicitações de split:', error);
@@ -391,15 +392,17 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
     );
     // Split de item
     const splits: NotificacaoComanda[] = splitSolicitacoes.map((sol) => {
-      const origemCliente = clientes.find((cliente) => cliente.id === sol.comandaItem?.id_cliente);
-      return ({
+      const origemCliente = clientes.find(
+        (cliente) => cliente.id === sol.comandaItem?.id_cliente,
+      );
+      return {
         type: 'split-item',
         id: sol.id,
         item: sol.comandaItem?.item?.nome || 'Item',
         origem: origemCliente?.nome || 'Alguém',
         onAccept: () => responderSplitSolicitacao(sol.id, 'ACEITA'),
         onReject: () => responderSplitSolicitacao(sol.id, 'RECUSADA'),
-      })
+      };
     });
     return [...transferencias, ...splits];
   };
