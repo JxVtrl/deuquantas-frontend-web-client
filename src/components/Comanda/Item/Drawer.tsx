@@ -162,9 +162,11 @@ export const ItemActionsDrawer = () => {
                 </p>
               </div>
             </div>
-            {mesaDeUmaPessoa ? (<>
-              <Button variant='underline' text='Não fiz esse pedido' />
-            </>) : selectedItem.status === 'ativo-dividido' ? (
+            {mesaDeUmaPessoa ? (
+              <>
+                <Button variant='underline' text='Não fiz esse pedido' />
+              </>
+            ) : selectedItem.status === 'ativo-dividido' ? (
               <div className='grid grid-cols-2 gap-[12px]'>
                 <p className='text-[14px] font-[600] leading-[20px] tracking-[0.5px] text-[#272727]'>
                   Dividido com{' '}
@@ -310,23 +312,23 @@ export const ItemActionsDrawer = () => {
               animate={{
                 opacity:
                   selectedOption.length > 0 &&
-                    transferOptions.find((option) =>
-                      selectedOption.includes(option.value),
-                    )
+                  transferOptions.find((option) =>
+                    selectedOption.includes(option.value),
+                  )
                     ? 1
                     : 0,
                 y:
                   selectedOption.length > 0 &&
-                    transferOptions.find((option) =>
-                      selectedOption.includes(option.value),
-                    )
+                  transferOptions.find((option) =>
+                    selectedOption.includes(option.value),
+                  )
                     ? 0
                     : 50,
                 height:
                   selectedOption.length > 0 &&
-                    transferOptions.find((option) =>
-                      selectedOption.includes(option.value),
-                    )
+                  transferOptions.find((option) =>
+                    selectedOption.includes(option.value),
+                  )
                     ? 'auto'
                     : 0,
               }}
@@ -485,23 +487,23 @@ export const ItemActionsDrawer = () => {
               animate={{
                 opacity:
                   selectedOption.length > 0 &&
-                    splitOptions.find((option) =>
-                      selectedOption.includes(option.value),
-                    )
+                  splitOptions.find((option) =>
+                    selectedOption.includes(option.value),
+                  )
                     ? 1
                     : 0,
                 y:
                   selectedOption.length > 0 &&
-                    splitOptions.find((option) =>
-                      selectedOption.includes(option.value),
-                    )
+                  splitOptions.find((option) =>
+                    selectedOption.includes(option.value),
+                  )
                     ? 0
                     : 50,
                 height:
                   selectedOption.length > 0 &&
-                    splitOptions.find((option) =>
-                      selectedOption.includes(option.value),
-                    )
+                  splitOptions.find((option) =>
+                    selectedOption.includes(option.value),
+                  )
                     ? 'auto'
                     : 0,
               }}
