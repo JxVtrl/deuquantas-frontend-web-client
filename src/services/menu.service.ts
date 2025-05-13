@@ -12,6 +12,7 @@ export interface Item {
   preco: number;
   tipo: string;
   quantidade?: number;
+  status: 'ativo' | 'pago' | 'transferido' | 'dividido' | 'ativo-dividido';
   observacao?: string;
   cliente?: {
     id: string;

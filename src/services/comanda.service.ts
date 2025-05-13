@@ -334,6 +334,35 @@ export const ComandaService = {
     );
     return response.data;
   },
+
+  async dividirItem({ id_comanda, id_item, ids_clientes }: { id_comanda: string; id_item: string; ids_clientes: string[] }) {
+    try {
+      const response = await api.post('/comandas/dividir-item', {
+        id_comanda,
+        id_item,
+        ids_clientes,
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Erro ao dividir item:', error);
+      throw error;
+    }
+  },
+
+  async criarSolicitacaoSplitItem(dto: { id_comanda_item: string; id_cliente: string }) {
+    const response = await api.post('/comandas/item-split-solicitacoes', dto);
+    return response.data;
+  },
+
+  async responderSolicitacaoSplitItem(id: string, status: 'ACEITA' | 'RECUSADA') {
+    const response = await api.patch(`/comandas/item-split-solicitacoes/${id}/responder`, { id_solicitacao: id, status });
+    return response.data;
+  },
+
+  async listarSolicitacoesPendentesSplit(id_cliente: string) {
+    const response = await api.get(`/comandas/item-split-solicitacoes/pendentes/${id_cliente}`);
+    return response.data;
+  },
 };
 
 export default ComandaService;

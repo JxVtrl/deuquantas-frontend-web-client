@@ -7,7 +7,8 @@ import { ComandaHeader } from '@/components/Comanda/Header';
 import { ComandaList } from '@/components/Comanda/List';
 import { ComandaPayOptions } from '@/components/Comanda/PayOptions';
 import SeoHead from '@/components/SeoHead';
-import { TransferDrawer } from '@/components/TransferDrawer';
+import { ItemActionsDrawer } from '@/components/Comanda/Item/Drawer';
+
 const ComandaPage = () => {
   const { comanda, loading, error, setSelectedItem } = useComanda();
 
@@ -51,7 +52,7 @@ const ComandaPage = () => {
         <ComandaHeader />
         <ComandaList />
         <ComandaPayOptions />
-        <TransferDrawer />
+        <ItemActionsDrawer />
       </Layout>
     </>
   );

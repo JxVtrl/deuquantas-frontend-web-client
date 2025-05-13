@@ -20,17 +20,25 @@ import { useRouter } from 'next/router';
 // Tipos unificados de notificação
 export type NotificacaoComanda =
   | {
-      type: 'transferencia-item';
-      id: string;
-      origem: string;
-      item: string;
-      onAccept: () => void;
-      onReject: () => void;
-    }
+    type: 'transferencia-item';
+    id: string;
+    origem: string;
+    item: string;
+    onAccept: () => void;
+    onReject: () => void;
+  }
   | {
-      type: 'limite';
-      mensagem: string;
-    };
+    type: 'split-item';
+    id: string;
+    item: string;
+    origem: string;
+    onAccept: () => void;
+    onReject: () => void;
+  }
+  | {
+    type: 'limite';
+    mensagem: string;
+  };
 
 interface ComandaContextData {
   comanda: ComandaResponse | null;
@@ -71,6 +79,12 @@ interface ComandaContextData {
     id: string,
     status: 'ACEITA' | 'RECUSADA',
   ) => Promise<void>;
+  splitSolicitacoes: any[];
+  fetchSplitSolicitacoes: () => Promise<void>;
+  responderSplitSolicitacao: (
+    id: string,
+    status: 'ACEITA' | 'RECUSADA',
+  ) => Promise<void>;
   getNotificacoesComanda: () => NotificacaoComanda[];
 }
 
@@ -100,6 +114,7 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
   const [transferSolicitacoes, setTransferSolicitacoes] = useState<
     ItemTransferSolicitacao[]
   >([]);
+  const [splitSolicitacoes, setSplitSolicitacoes] = useState<any[]>([]);
 
   const getMenu = async (cnpj: string) => {
     try {
@@ -335,6 +350,32 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
     fetchTransferSolicitacoes();
   }, [fetchTransferSolicitacoes, comanda]);
 
+  const fetchSplitSolicitacoes = useCallback(async () => {
+    if (!user?.cliente?.id) return;
+    try {
+      const solicitacoes = await ComandaService.listarSolicitacoesPendentesSplit(user.cliente.id);
+      setSplitSolicitacoes(solicitacoes);
+    } catch (error) {
+      console.error('Erro ao buscar solicitações de split:', error);
+    }
+  }, [user?.cliente?.id]);
+
+  const responderSplitSolicitacao = useCallback(
+    async (id: string, status: 'ACEITA' | 'RECUSADA') => {
+      try {
+        await ComandaService.responderSolicitacaoSplitItem(id, status);
+        setSplitSolicitacoes((prev) => prev.filter((s) => s.id !== id));
+      } catch (error) {
+        console.error('Erro ao responder solicitação de split:', error);
+      }
+    },
+    [],
+  );
+
+  useEffect(() => {
+    fetchSplitSolicitacoes();
+  }, [fetchSplitSolicitacoes, comanda]);
+
   // Função para unificar todas as notificações
   const getNotificacoesComanda = () => {
     // Transferências de item
@@ -348,7 +389,19 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
         onReject: () => responderTransferSolicitacao(sol.id, 'RECUSADA'),
       }),
     );
-    return transferencias;
+    // Split de item
+    const splits: NotificacaoComanda[] = splitSolicitacoes.map((sol) => {
+      const origemCliente = clientes.find((cliente) => cliente.id === sol.comandaItem?.id_cliente);
+      return ({
+        type: 'split-item',
+        id: sol.id,
+        item: sol.comandaItem?.item?.nome || 'Item',
+        origem: origemCliente?.nome || 'Alguém',
+        onAccept: () => responderSplitSolicitacao(sol.id, 'ACEITA'),
+        onReject: () => responderSplitSolicitacao(sol.id, 'RECUSADA'),
+      })
+    });
+    return [...transferencias, ...splits];
   };
 
   return (
@@ -387,6 +440,9 @@ export const ComandaProvider: React.FC<{ children: React.ReactNode }> = ({
         transferSolicitacoes,
         fetchTransferSolicitacoes,
         responderTransferSolicitacao,
+        splitSolicitacoes,
+        fetchSplitSolicitacoes,
+        responderSplitSolicitacao,
         // Notificações unificadas
         getNotificacoesComanda,
       }}
