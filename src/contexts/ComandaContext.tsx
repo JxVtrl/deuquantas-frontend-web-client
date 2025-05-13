@@ -20,25 +20,25 @@ import { useRouter } from 'next/router';
 // Tipos unificados de notificação
 export type NotificacaoComanda =
   | {
-    type: 'transferencia-item';
-    id: string;
-    origem: string;
-    item: string;
-    onAccept: () => void;
-    onReject: () => void;
-  }
+      type: 'transferencia-item';
+      id: string;
+      origem: string;
+      item: string;
+      onAccept: () => void;
+      onReject: () => void;
+    }
   | {
-    type: 'split-item';
-    id: string;
-    item: string;
-    origem: string;
-    onAccept: () => void;
-    onReject: () => void;
-  }
+      type: 'split-item';
+      id: string;
+      item: string;
+      origem: string;
+      onAccept: () => void;
+      onReject: () => void;
+    }
   | {
-    type: 'limite';
-    mensagem: string;
-  };
+      type: 'limite';
+      mensagem: string;
+    };
 
 interface ComandaContextData {
   comanda: ComandaResponse | null;
