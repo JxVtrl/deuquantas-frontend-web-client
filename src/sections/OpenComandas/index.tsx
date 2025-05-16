@@ -104,16 +104,6 @@ export const OpenComandas: React.FC = () => {
     };
 
     fetchData();
-
-    // Configura o polling para buscar solicitações, comandas e status da solicitação a cada 30 segundos
-    const intervalId = setInterval(() => {
-      fetchSolicitacoes();
-      fetchComandasAtivas();
-      fetchSolicitacaoAguardando();
-    }, 30000);
-
-    // Limpa o intervalo quando o componente for desmontado
-    return () => clearInterval(intervalId);
   }, [
     user?.usuario?.id,
     fetchSolicitacoes,
