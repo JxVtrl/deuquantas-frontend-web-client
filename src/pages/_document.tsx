@@ -19,7 +19,7 @@ export default function Document() {
         <meta name='apple-mobile-web-app-status-bar-style' content='default' />
         <meta name='format-detection' content='telephone=no' />
         {/* Favicon */}
-        <link rel='icon' href='/favicon.ico' />
+        <link rel='icon' href='favicon.svg' sizes='any' type='image/svg+xml' />
         {/* Open Graph (Facebook, LinkedIn) */}
         <meta property='og:type' content='website' />
         <meta property='og:url' content='https://deuquantas.com.br/' />
